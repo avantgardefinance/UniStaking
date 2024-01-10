@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { buttonVariants } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
+import { GitHub, Twitter } from "@/components/icons";
 import { MainNav } from "@/components/main-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ConnectButton } from "@/components/connect-button";
 
 export function SiteHeader() {
   return (
@@ -23,7 +24,7 @@ export function SiteHeader() {
                   variant: "ghost",
                 })}
               >
-                <Icons.gitHub className="h-5 w-5" />
+                <GitHub className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </div>
             </Link>
@@ -38,10 +39,12 @@ export function SiteHeader() {
                   variant: "ghost",
                 })}
               >
-                <Icons.twitter className="h-4 w-4 fill-current" />
+                <Twitter className="h-4 w-4 fill-current" />
                 <span className="sr-only">Twitter</span>
               </div>
             </Link>
+
+            <ConnectButton />
             <ThemeToggle />
           </nav>
         </div>

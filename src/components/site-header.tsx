@@ -1,10 +1,10 @@
-import Link from "next/link";
-import { siteConfig } from "@/config/site";
-import { buttonVariants } from "@/components/ui/button";
-import { GitHub, Twitter } from "@/components/icons";
-import { MainNav } from "@/components/main-nav";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { ConnectButton } from "@/components/connect-button";
+import { ConnectButton } from "@/components/connect-button"
+import { GitHub, Twitter } from "@/components/icons"
+import { MainNav } from "@/components/main-nav"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { buttonVariants } from "@/components/ui/button"
+import { siteConfig } from "@/config/site"
+import Link from "next/link"
 
 export function SiteHeader() {
   return (
@@ -21,7 +21,7 @@ export function SiteHeader() {
               <div
                 className={buttonVariants({
                   size: "icon",
-                  variant: "ghost",
+                  variant: "ghost"
                 })}
               >
                 <GitHub className="h-5 w-5" />
@@ -36,7 +36,7 @@ export function SiteHeader() {
               <div
                 className={buttonVariants({
                   size: "icon",
-                  variant: "ghost",
+                  variant: "ghost"
                 })}
               >
                 <Twitter className="h-4 w-4 fill-current" />
@@ -50,5 +50,5 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
-  );
+  )
 }

@@ -1,7 +1,7 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
@@ -20,8 +20,8 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
+  "eslint.format.enable": true,
   "eslint.validate": ["markdown", "javascript", "typescript"],
-  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
@@ -30,6 +30,7 @@
     "comments": false,
     "strings": false
   },
+  "editor.formatOnSave": true,
   "editor.acceptSuggestionOnCommitCharacter": true,
   "editor.acceptSuggestionOnEnter": "on",
   "editor.quickSuggestionsDelay": 10,

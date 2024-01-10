@@ -1,24 +1,24 @@
-import "@/styles/globals.css";
-import { Metadata } from "next";
-import { SiteHeader } from "@/components/site-header";
-import { TailwindIndicator } from "@/components/tailwind-indicator";
-import { Providers } from "@/components/providers/providers";
-import { siteConfig } from "@/config/site";
-import { fontSans } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
+import "@/styles/globals.css"
+import { Providers } from "@/components/providers/providers"
+import { SiteHeader } from "@/components/site-header"
+import { TailwindIndicator } from "@/components/tailwind-indicator"
+import { siteConfig } from "@/config/site"
+import { fontSans } from "@/lib/fonts"
+import { cn } from "@/lib/utils"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
-    template: `%s - ${siteConfig.name}`,
+    template: `%s - ${siteConfig.name}`
   },
-  description: siteConfig.description,
-};
+  description: siteConfig.description
+}
 
 export default function RootLayout({
-  children,
+  children
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <>
@@ -38,7 +38,7 @@ export default function RootLayout({
         <body
           className={cn(
             "min-h-screen font-sans antialiased",
-            fontSans.variable,
+            fontSans.variable
           )}
         >
           <Providers>
@@ -51,5 +51,5 @@ export default function RootLayout({
         </body>
       </html>
     </>
-  );
+  )
 }

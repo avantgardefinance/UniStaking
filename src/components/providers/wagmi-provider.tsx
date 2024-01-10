@@ -1,45 +1,41 @@
-"use client";
+"use client"
 
-import "@rainbow-me/rainbowkit/styles.css";
-import { getRpcUrl } from "@/lib/rpc";
-import {
-  RainbowKitProvider,
-  darkTheme,
-  getDefaultWallets,
-} from "@rainbow-me/rainbowkit";
-import type { ReactNode } from "react";
-import { WagmiConfig, configureChains, createConfig } from "wagmi";
-import { mainnet, polygon } from "wagmi/chains";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
-import { walletConnectProjectId } from "@/lib/consts";
+import "@rainbow-me/rainbowkit/styles.css"
+import { walletConnectProjectId } from "@/lib/consts"
+import { getRpcUrl } from "@/lib/rpc"
+import { darkTheme, getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit"
+import type { ReactNode } from "react"
+import { configureChains, createConfig, WagmiConfig } from "wagmi"
+import { mainnet, polygon } from "wagmi/chains"
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
 
 const { chains, publicClient } = configureChains(
   [mainnet, polygon],
   [
     jsonRpcProvider({
       rpc: (chain) => {
-        const url = getRpcUrl(chain.id);
+        const url = getRpcUrl(chain.id)
         if (url === undefined) {
-          return null;
+          return null
         }
 
-        return { http: url };
-      },
-    }),
-  ],
-);
+        return { http: url }
+      }
+    })
+  ]
+)
 
 const { connectors } = getDefaultWallets({
   appName: "Uniswap",
   projectId: walletConnectProjectId,
-  chains,
-});
+  chains
+})
 
 const config = createConfig({
   autoConnect: true,
   publicClient,
-  connectors,
-});
+  connectors
+})
 
 export function WagmiProvider({ children }: { children: ReactNode }) {
   return (
@@ -48,5 +44,5 @@ export function WagmiProvider({ children }: { children: ReactNode }) {
         {children}
       </RainbowKitProvider>
     </WagmiConfig>
-  );
+  )
 }

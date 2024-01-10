@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import { QueryClientProvider } from "@/components/providers/query-provider";
-import { ThemeProvider } from "@/components/providers/theme-provider";
-import { WagmiProvider } from "@/components/providers/wagmi-provider";
-import type { ReactNode } from "react";
+import { QueryClientProvider } from "@/components/providers/query-provider"
+import { ThemeProvider } from "@/components/providers/theme-provider"
+import { WagmiProvider } from "@/components/providers/wagmi-provider"
+import type { ReactNode } from "react"
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -12,5 +12,5 @@ export function Providers({ children }: { children: ReactNode }) {
         <QueryClientProvider>{children}</QueryClientProvider>
       </WagmiProvider>
     </ThemeProvider>
-  );
+  )
 }

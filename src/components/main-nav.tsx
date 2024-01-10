@@ -1,15 +1,15 @@
-import Link from "next/link";
-import { Logo } from "@/components/icons";
-import { siteConfig } from "@/config/site";
-import { cn } from "@/lib/utils";
+import { Logo } from "@/components/icons"
+import { siteConfig } from "@/config/site"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 interface MainNavProps {
   items?: Array<{
-    title: string;
-    href?: string;
-    disabled?: boolean;
-    external?: boolean;
-  }>;
+    title: string
+    href?: string
+    disabled?: boolean
+    external?: boolean
+  }>
 }
 
 export function MainNav({ items }: MainNavProps) {
@@ -19,25 +19,27 @@ export function MainNav({ items }: MainNavProps) {
         <Logo className="h-6 w-6" />
         <span className="inline-block font-bold">{siteConfig.name}</span>
       </Link>
-      {items?.length ? (
-        <nav className="flex gap-6">
-          {items?.map(
-            (item, index) =>
-              item.href && (
-                <Link
-                  key={index}
-                  href={item.href}
-                  className={cn(
-                    "text-muted-foreground flex items-center text-sm font-medium",
-                    item.disabled && "cursor-not-allowed opacity-80",
-                  )}
-                >
-                  {item.title}
-                </Link>
-              ),
-          )}
-        </nav>
-      ) : null}
+      {items?.length ?
+        (
+          <nav className="flex gap-6">
+            {items?.map(
+              (item, index) =>
+                item.href && (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    className={cn(
+                      "text-muted-foreground flex items-center text-sm font-medium",
+                      item.disabled && "cursor-not-allowed opacity-80"
+                    )}
+                  >
+                    {item.title}
+                  </Link>
+                )
+            )}
+          </nav>
+        ) :
+        null}
     </div>
-  );
+  )
 }

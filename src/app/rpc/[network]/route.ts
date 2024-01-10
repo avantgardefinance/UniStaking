@@ -1,8 +1,11 @@
 import { getRpcUrl } from "@/lib/rpc";
 import { NextRequest } from "next/server";
 
-export async function POST(req: NextRequest, { params }: { params: { network: string } }) {
-  const url = getRpcUrl(Number(params.network))
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { network: string } },
+) {
+  const url = getRpcUrl(Number(params.network));
   if (!req.body || url === undefined) {
     return new Response(undefined, { status: 404 });
   }
@@ -11,12 +14,11 @@ export async function POST(req: NextRequest, { params }: { params: { network: st
     method: "POST",
     body: req.body,
     // @ts-ignore
-    duplex: 'half',
+    duplex: "half",
     headers: {
       "Content-Type": "application/json",
     },
   });
-
 }
 
 export const runtime = "edge";

@@ -5,15 +5,15 @@ import { createPublicClient, http } from "viem";
 const alchemyPrefix = {
   1: "eth-mainnet",
   137: "polygon-mainnet",
-} as const
+} as const;
 
 function alchemyUrl(chain: keyof typeof alchemyPrefix) {
-  const alchemyKey = process.env.ALCHEMY_API_KEY
+  const alchemyKey = process.env.ALCHEMY_API_KEY;
   if (alchemyKey === undefined) {
     throw new Error("Missing `ALCHEMY_API_KEY` environment variable");
   }
 
-  return `https://${alchemyPrefix[chain]}.alchemyapi.io/v2/${alchemyKey}`
+  return `https://${alchemyPrefix[chain]}.alchemyapi.io/v2/${alchemyKey}`;
 }
 
 function originUrl(chain: keyof typeof alchemyPrefix) {
@@ -38,4 +38,3 @@ export const getPublicClient = cache(function getPublicClient(chain: number) {
     },
   });
 });
-

@@ -2,7 +2,11 @@
 
 import "@rainbow-me/rainbowkit/styles.css";
 import { getRpcUrl } from "@/lib/rpc";
-import { RainbowKitProvider, darkTheme, getDefaultWallets } from "@rainbow-me/rainbowkit";
+import {
+  RainbowKitProvider,
+  darkTheme,
+  getDefaultWallets,
+} from "@rainbow-me/rainbowkit";
 import type { ReactNode } from "react";
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { mainnet, polygon } from "wagmi/chains";
@@ -26,15 +30,15 @@ const { chains, publicClient } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: 'Uniswap',
+  appName: "Uniswap",
   projectId: walletConnectProjectId,
-  chains
+  chains,
 });
 
 const config = createConfig({
   autoConnect: true,
   publicClient,
-  connectors
+  connectors,
 });
 
 export function WagmiProvider({ children }: { children: ReactNode }) {

@@ -1,24 +1,25 @@
 "use client";
 
 import "@rainbow-me/rainbowkit/styles.css";
-import { mainnetRpcUrl } from "@/lib/rpc";
+import { getRpcUrl } from "@/lib/rpc";
 import { RainbowKitProvider, darkTheme, getDefaultWallets } from "@rainbow-me/rainbowkit";
 import type { ReactNode } from "react";
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
-import { mainnet } from "wagmi/chains";
+import { mainnet, polygon } from "wagmi/chains";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { walletConnectProjectId } from "@/lib/consts";
 
 const { chains, publicClient } = configureChains(
-  [mainnet],
+  [mainnet, polygon],
   [
     jsonRpcProvider({
       rpc: (chain) => {
-        if (chain.id === 1) {
-          return { http: mainnetRpcUrl };
+        const url = getRpcUrl(chain.id);
+        if (url === undefined) {
+          return null;
         }
 
-        return null;
+        return { http: url };
       },
     }),
   ],

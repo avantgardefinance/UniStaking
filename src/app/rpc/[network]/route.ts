@@ -1,10 +1,7 @@
 import { getRpcUrl } from "@/lib/rpc"
 import type { NextRequest } from "next/server"
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { network: string } }
-) {
+export async function POST(req: NextRequest, { params }: { params: { network: string } }) {
   const url = getRpcUrl(Number(params.network))
   if (!req.body || url === undefined) {
     return new Response(undefined, { status: 404 })

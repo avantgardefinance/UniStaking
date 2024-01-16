@@ -37,4 +37,7 @@ yarn-error.log*
 next-env.d.ts
 
 # nix
-/.direnv
+.direnv
+
+# foundry
+.foundry

@@ -1,22 +1,16 @@
 {
   inputs = {
-    nixpkgs = {
-      url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    };
-
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-    };
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    utils.url = "github:numtide/flake-utils";
+    foundry.url = "github:shazow/foundry.nix";
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    flake-utils,
-    ...
-  }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+  outputs = { self, nixpkgs, utils, foundry, ... }:
+    utils.lib.eachDefaultSystem (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ foundry.overlay ];
+      };
       corepackEnable = pkgs.runCommand "corepack-enable" {} ''
         mkdir -p $out/bin
         ${pkgs.nodejs_20}/bin/corepack enable --install-directory $out/bin
@@ -25,13 +19,14 @@
       formatter = pkgs.alejandra;
 
       devShells = {
-        default = with pkgs;
-          mkShell {
-            buildInputs = [
-              corepackEnable
-              nodejs_20
-            ];
-          };
+        default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            corepackEnable
+            nodejs_20
+            foundry-bin
+            gnumake
+          ];
+        };
       };
     });
 }

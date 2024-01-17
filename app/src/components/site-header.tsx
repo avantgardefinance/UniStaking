@@ -1,9 +1,9 @@
-import { ConnectButton } from "@/components/connect-button"
-import { GitHub, Twitter } from "@/components/icons"
-import { MainNav } from "@/components/main-nav"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { buttonVariants } from "@/components/ui/button"
-import { siteConfig } from "@/config/site"
+import { ConnectButton } from "./connect-button"
+import { GitHub, Twitter } from "./icons"
+import { MainNav } from "./main-nav"
+import { ThemeToggle } from "./theme-toggle"
+import { buttonVariants } from "./ui/button"
+import { siteConfig } from "../config/site"
 import Link from "next/link"
 
 export function SiteHeader() {

@@ -1,8 +1,8 @@
 "use client"
 
 import "@rainbow-me/rainbowkit/styles.css"
-import { walletConnectProjectId } from "@/lib/consts"
-import { getRpcUrl } from "@/lib/rpc"
+import { walletConnectProjectId } from "../../lib/consts"
+import { getRpcUrl } from "../../lib/rpc"
 import { darkTheme, getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import type { ReactNode } from "react"
 import { configureChains, createConfig, WagmiConfig } from "wagmi"

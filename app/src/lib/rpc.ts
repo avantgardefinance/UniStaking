@@ -1,6 +1,6 @@
-import { isServer } from "@/lib/environment"
 import { cache } from "react"
 import { createPublicClient, http } from "viem"
+import { isServer } from "./environment"
 
 const alchemyPrefix = {
   1: "eth-mainnet",

@@ -1,6 +1,6 @@
-import { Logo } from "@/components/icons"
-import { siteConfig } from "@/config/site"
-import { cn } from "@/lib/utils"
+import { Logo } from "./icons"
+import { siteConfig } from "../config/site"
+import { cn } from "../lib/utils"
 import Link from "next/link"
 
 interface MainNavProps {

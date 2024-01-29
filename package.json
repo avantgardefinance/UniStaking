@@ -1,6 +1,13 @@
 {
   "private": true,
   "packageManager": "pnpm@8.14.2",
+  "scripts": {
+    "lint": "pnpm --recursive --parallel run lint",
+    "format": "pnpm --recursive --parallel run format",
+    "build": "pnpm --recursive --parallel run build",
+    "start": "pnpm --recursive --parallel run start",
+    "dev": "pnpm --recursive --parallel run dev"
+  },
   "devDependencies": {
     "typescript": "^5"
   }

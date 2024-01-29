@@ -1,10 +1,10 @@
 import "@/styles/globals.css"
-import { Providers } from "../components/providers/providers"
-import { SiteHeader } from "../components/site-header"
-import { TailwindIndicator } from "../components/tailwind-indicator"
-import { siteConfig } from "../config/site"
-import { fontSans } from "../lib/fonts"
-import { cn } from "../lib/utils"
+import { Providers } from "@/components/providers/providers"
+import { SiteHeader } from "@/components/site-header"
+import { TailwindIndicator } from "@/components/tailwind-indicator"
+import { siteConfig } from "@/config/site"
+import { fontSans } from "@/lib/fonts"
+import { cn } from "@/lib/utils"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {

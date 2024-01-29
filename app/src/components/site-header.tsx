@@ -1,9 +1,9 @@
-import { ConnectButton } from "./connect-button"
-import { GitHub, Twitter } from "./icons"
-import { MainNav } from "./main-nav"
-import { ThemeToggle } from "./theme-toggle"
-import { buttonVariants } from "./ui/button"
-import { siteConfig } from "../config/site"
+import { ConnectButton } from "@/components/connect-button"
+import { GitHub, Twitter } from "@/components/icons"
+import { MainNav } from "@/components/main-nav"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { buttonVariants } from "@/components/ui/button"
+import { siteConfig } from "@/config/site"
 import Link from "next/link"
 
 export function SiteHeader() {
@@ -24,7 +24,7 @@ export function SiteHeader() {
                   variant: "ghost"
                 })}
               >
-                <GitHub className="h-5 w-5" />
+                <GitHub className="size-5" />
                 <span className="sr-only">GitHub</span>
               </div>
             </Link>
@@ -39,7 +39,7 @@ export function SiteHeader() {
                   variant: "ghost"
                 })}
               >
-                <Twitter className="h-4 w-4 fill-current" />
+                <Twitter className="size-4 fill-current" />
                 <span className="sr-only">Twitter</span>
               </div>
             </Link>

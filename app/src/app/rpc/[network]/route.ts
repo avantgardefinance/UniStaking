@@ -1,5 +1,5 @@
+import { getRpcUrl } from "@/lib/rpc"
 import type { NextRequest } from "next/server"
-import { getRpcUrl } from "../../../lib/rpc"
 
 export async function POST(req: NextRequest, { params }: { params: { network: string } }) {
   const url = getRpcUrl(Number(params.network))

@@ -1,6 +1,8 @@
+import { StakeDialogContent } from "@/components/stake-dialog"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Download, Trophy } from "lucide-react"
 
 export function StakeCards(
@@ -49,11 +51,15 @@ export function StakeCards(
               <BigIntDisplay value={availableForStakingUni} decimals={18} />
               <span>UNI</span>
             </h3>
-
-            <Button size="lg" className="space-x-2">
-              <Download size={16} />
-              <span>Stake</span>
-            </Button>
+            <Dialog>
+              <DialogTrigger>
+                <Button size="lg" className="space-x-2">
+                  <Download size={16} />
+                  <span>Stake</span>
+                </Button>
+              </DialogTrigger>
+              <StakeDialogContent />
+            </Dialog>
           </CardContent>
         </Card>
       </div>

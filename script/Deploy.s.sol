@@ -7,10 +7,15 @@ import {ERC20VotesMock} from "scopelift/test/mocks/MockERC20Votes.sol";
 import {ERC20Fake} from "scopelift/test/fakes/ERC20Fake.sol";
 
 contract Deploy is Script {
-    uint256 constant public DEPLOYER = uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
+    string public constant MNEMONIC = "test test test test test test test test test test test junk";
     address public constant REWARDS_TOKEN = 0x83e83Eb0bCc4B922e5032DA9c34fcCAf00b87432; 
     address public constant GOVERNANCE_TOKEN = 0xf4d010117e1c1296075569F54a4768b176b68b6A;
     address public constant UNI_STAKER = 0xFb6E5742285f3Fd43a616a02b774351Ea574ba3f;
+
+    uint256 public DEPLOYER = vm.deriveKey(MNEMONIC, 0);
+    address public ADMIN = vm.addr(DEPLOYER);
+    address public ALICE = vm.addr(vm.deriveKey(MNEMONIC, 1));
+    address public BOB = vm.addr(vm.deriveKey(MNEMONIC, 2));
 
     function run() external {
         vm.startBroadcast(DEPLOYER);
@@ -26,6 +31,10 @@ contract Deploy is Script {
 
         UniStaker uniStaker = new UniStaker{salt: "unistaker"}(rewardsToken, govToken, rewardsNotifier);
         vm.label(address(uniStaker), "UniStaker");
+
+        govToken.mint(ADMIN, 10000e18);
+        govToken.mint(ALICE, 10000e18);
+        govToken.mint(BOB, 10000e18);
 
         vm.stopBroadcast();
     }

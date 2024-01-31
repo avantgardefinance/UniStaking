@@ -5,34 +5,43 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Uniswap
+    name: UniStaker
     network: mainnet
     source:
-      address: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
-      abi: Uniswap
-      startBlock: 10861674
+      address: "0xFb6E5742285f3Fd43a616a02b774351Ea574ba3f"
+      abi: UniStaker
+      startBlock: 19061305
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - DelegateChanged
-        - DelegateVotesChanged
-        - MinterChanged
-        - Transfer
+        - BeneficiaryAltered
+        - DelegateeAltered
+        - MoreStaked
+        - RewardClaimed
+        - RewardNotified
+        - Stake
+        - StakeWithdrawn
+        - SurrogateDeployed
       abis:
-        - name: Uniswap
-          file: ./abis/Uniswap.json
+        - name: UniStaker
+          file: ./abis/UniStaker.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: DelegateChanged(indexed address,indexed address,indexed address)
-          handler: handleDelegateChanged
-        - event: DelegateVotesChanged(indexed address,uint256,uint256)
-          handler: handleDelegateVotesChanged
-        - event: MinterChanged(address,address)
-          handler: handleMinterChanged
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/uniswap.ts
+        - event: BeneficiaryAltered(indexed uint256,indexed address,indexed address)
+          handler: handleBeneficiaryAltered
+        - event: DelegateeAltered(indexed uint256,address,address)
+          handler: handleDelegateeAltered
+        - event: MoreStaked(indexed uint256,uint256,uint256)
+          handler: handleMoreStaked
+        - event: RewardClaimed(indexed address,uint256)
+          handler: handleRewardClaimed
+        - event: RewardNotified(uint256)
+          handler: handleRewardNotified
+        - event: Stake(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleStake
+        - event: StakeWithdrawn(indexed uint256,uint256,uint256)
+          handler: handleStakeWithdrawn
+        - event: SurrogateDeployed(indexed address,indexed address)
+          handler: handleSurrogateDeployed
+      file: ./src/uni-staker.ts

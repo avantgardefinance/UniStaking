@@ -1,50 +1,49 @@
 import { ConnectButton } from "@/components/connect-button"
-import { GitHub, Twitter } from "@/components/icons"
-import { MainNav } from "@/components/main-nav"
+import { Logo } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { buttonVariants } from "@/components/ui/button"
-import { siteConfig } from "@/config/site"
+import { cn } from "@/lib/utils"
+import { Download, History } from "lucide-react"
+
 import Link from "next/link"
 
 export function SiteHeader() {
   return (
-    <header className="bg-background sticky top-0 z-40 w-full border-b">
+    <header className="bg-background sticky top-0 z-40 w-full">
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-        <MainNav items={siteConfig.mainNav} />
+        <Link href="/" className="flex items-center space-x-2">
+          <Logo className="size-6" />
+        </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-1">
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-            >
+            <ConnectButton />
+            <Link href="/">
               <div
-                className={buttonVariants({
-                  size: "icon",
-                  variant: "ghost"
-                })}
+                className={cn(
+                  "space-x-2",
+                  buttonVariants({
+                    variant: "outline"
+                  })
+                )}
               >
-                <GitHub className="size-5" />
-                <span className="sr-only">GitHub</span>
+                <Download size={16} />
+                <span>Stake</span>
               </div>
             </Link>
-            <Link
-              href={siteConfig.links.twitter}
-              target="_blank"
-              rel="noreferrer"
-            >
+            <Link href="/history">
               <div
-                className={buttonVariants({
-                  size: "icon",
-                  variant: "ghost"
-                })}
+                className={cn(
+                  "space-x-2",
+                  buttonVariants({
+                    variant: "outline"
+                  })
+                )}
               >
-                <Twitter className="size-4 fill-current" />
-                <span className="sr-only">Twitter</span>
+                <History size={16} />
+                <span>History</span>
               </div>
             </Link>
 
-            <ConnectButton />
             <ThemeToggle />
           </nav>
         </div>

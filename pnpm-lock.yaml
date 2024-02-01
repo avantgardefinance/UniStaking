@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@graphprotocol/graph-cli@0.67.2':
+    hash: msycjv6aeac4tt2nzdtvfl2524
+    path: patches/@graphprotocol__graph-cli@0.67.2.patch
+
 importers:
 
   .:
@@ -122,7 +127,7 @@ importers:
     dependencies:
       '@graphprotocol/graph-cli':
         specifier: 0.67.2
-        version: 0.67.2(@types/node@20.10.8)(node-fetch@3.3.2)(typescript@5.3.3)
+        version: 0.67.2(patch_hash=msycjv6aeac4tt2nzdtvfl2524)(@types/node@20.10.8)(node-fetch@3.3.2)(typescript@5.3.3)
       '@graphprotocol/graph-ts':
         specifier: 0.32.0
         version: 0.32.0
@@ -435,7 +440,7 @@ packages:
       js-yaml: 4.1.0
     dev: false
 
-  /@graphprotocol/graph-cli@0.67.2(@types/node@20.10.8)(node-fetch@3.3.2)(typescript@5.3.3):
+  /@graphprotocol/graph-cli@0.67.2(patch_hash=msycjv6aeac4tt2nzdtvfl2524)(@types/node@20.10.8)(node-fetch@3.3.2)(typescript@5.3.3):
     resolution: {integrity: sha512-seQyK8Fkqw0+TxWOtqVGkicLqEbCR5DQPRooo+8iqRtmZu12wDJ85n63t2abaUF//iFT7cRT4oA2OQdFXK8Vog==}
     engines: {node: '>=18'}
     hasBin: true
@@ -478,6 +483,7 @@ packages:
       - typescript
       - utf-8-validate
     dev: false
+    patched: true
 
   /@graphprotocol/graph-ts@0.27.0:
     resolution: {integrity: sha512-r1SPDIZVQiGMxcY8rhFSM0y7d/xAbQf5vHMWUf59js1KgoyWpM6P3tczZqmQd7JTmeyNsDGIPzd9FeaxllsU4w==}

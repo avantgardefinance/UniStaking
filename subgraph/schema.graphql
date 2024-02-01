@@ -18,16 +18,6 @@ type DelegateeAltered @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type MoreStaked @entity(immutable: true) {
-  id: Bytes!
-  depositId: BigInt! # uint256
-  amount: BigInt! # uint256
-  balance: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type RewardClaimed @entity(immutable: true) {
   id: Bytes!
   beneficiary: Bytes! # address
@@ -45,12 +35,11 @@ type RewardNotified @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type Stake @entity(immutable: true) {
+type StakeDeposited @entity(immutable: true) {
   id: Bytes!
   depositId: BigInt! # uint256
   amount: BigInt! # uint256
-  delegatee: Bytes! # address
-  beneficiary: Bytes! # address
+  totalDeposited: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

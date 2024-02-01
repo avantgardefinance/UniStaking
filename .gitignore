@@ -13,9 +13,6 @@ out/
 # production
 build/
 
-# code generation
-generated/
-
 # misc
 .DS_Store
 *.pem

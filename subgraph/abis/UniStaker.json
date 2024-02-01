@@ -350,31 +350,6 @@
   },
   {
     "type": "event",
-    "name": "MoreStaked",
-    "inputs": [
-      {
-        "name": "depositId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "UniStaker.DepositIdentifier"
-      },
-      {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "balance",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "RewardClaimed",
     "inputs": [
       {
@@ -407,7 +382,7 @@
   },
   {
     "type": "event",
-    "name": "Stake",
+    "name": "StakeDeposited",
     "inputs": [
       {
         "name": "depositId",
@@ -422,16 +397,10 @@
         "internalType": "uint256"
       },
       {
-        "name": "delegatee",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "beneficiary",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "name": "totalDeposited",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
       }
     ],
     "anonymous": false

@@ -1,0 +1,20 @@
+diff --git a/dist/protocols/ethereum/codegen/abi.js b/dist/protocols/ethereum/codegen/abi.js
+index da32c78a4a1ba92ae10bd2454637486ac05a01b8..0d6c2c72bab9a29eefca08b1c910b94cc72c7149 100644
+--- a/dist/protocols/ethereum/codegen/abi.js
++++ b/dist/protocols/ethereum/codegen/abi.js
+@@ -30,7 +30,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ const fs_1 = __importDefault(require("fs"));
+ const immutable_1 = __importDefault(require("immutable"));
+ const sync_request_1 = __importDefault(require("sync-request"));
+-const web3_eth_abi_1 = __importDefault(require("web3-eth-abi"));
+ const yaml_1 = __importDefault(require("yaml"));
+ const typesCodegen = __importStar(require("../../../codegen/types"));
+ const tsCodegen = __importStar(require("../../../codegen/typescript"));
+@@ -195,6 +194,7 @@ class AbiCodeGenerator {
+                 if (body.status === '0') {
+                     throw new Error(body.result);
+                 }
++                const web3_eth_abi_1 = __importDefault(require("web3-eth-abi"));
+                 const res = web3_eth_abi_1.default
+                     // @ts-expect-error decodeLog seems to exist on Web3EthAbi
+                     .decodeLog(namesAndTypes, body.result[0].data, []);

@@ -10,5 +10,10 @@
   },
   "devDependencies": {
     "typescript": "^5"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@graphprotocol/graph-cli@0.67.2": "patches/@graphprotocol__graph-cli@0.67.2.patch"
+    }
   }
 }

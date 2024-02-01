@@ -9,8 +9,8 @@ import {
 import { BigInt, Address } from "@graphprotocol/graph-ts"
 import { BeneficiaryAltered } from "../generated/schema"
 import { BeneficiaryAltered as BeneficiaryAlteredEvent } from "../generated/UniStaker/UniStaker"
-import { handleBeneficiaryAltered } from "../src/unistaker"
-import { createBeneficiaryAlteredEvent } from "./unistaker.utils"
+import { handleBeneficiaryAltered } from "../src/uni-staker"
+import { createBeneficiaryAlteredEvent } from "./uni-staker-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0

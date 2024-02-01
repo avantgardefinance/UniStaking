@@ -3,10 +3,9 @@ import { ethereum, BigInt, Address } from "@graphprotocol/graph-ts"
 import {
   BeneficiaryAltered,
   DelegateeAltered,
-  MoreStaked,
   RewardClaimed,
   RewardNotified,
-  Stake,
+  StakeDeposited,
   StakeWithdrawn,
   SurrogateDeployed
 } from "../generated/UniStaker/UniStaker"
@@ -73,34 +72,6 @@ export function createDelegateeAlteredEvent(
   return delegateeAlteredEvent
 }
 
-export function createMoreStakedEvent(
-  depositId: BigInt,
-  amount: BigInt,
-  balance: BigInt
-): MoreStaked {
-  let moreStakedEvent = changetype<MoreStaked>(newMockEvent())
-
-  moreStakedEvent.parameters = new Array()
-
-  moreStakedEvent.parameters.push(
-    new ethereum.EventParam(
-      "depositId",
-      ethereum.Value.fromUnsignedBigInt(depositId)
-    )
-  )
-  moreStakedEvent.parameters.push(
-    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
-  )
-  moreStakedEvent.parameters.push(
-    new ethereum.EventParam(
-      "balance",
-      ethereum.Value.fromUnsignedBigInt(balance)
-    )
-  )
-
-  return moreStakedEvent
-}
-
 export function createRewardClaimedEvent(
   beneficiary: Address,
   amount: BigInt
@@ -134,36 +105,32 @@ export function createRewardNotifiedEvent(amount: BigInt): RewardNotified {
   return rewardNotifiedEvent
 }
 
-export function createStakeEvent(
+export function createStakeDepositedEvent(
   depositId: BigInt,
   amount: BigInt,
-  delegatee: Address,
-  beneficiary: Address
-): Stake {
-  let stakeEvent = changetype<Stake>(newMockEvent())
+  totalDeposited: BigInt
+): StakeDeposited {
+  let stakeDepositedEvent = changetype<StakeDeposited>(newMockEvent())
 
-  stakeEvent.parameters = new Array()
+  stakeDepositedEvent.parameters = new Array()
 
-  stakeEvent.parameters.push(
+  stakeDepositedEvent.parameters.push(
     new ethereum.EventParam(
       "depositId",
       ethereum.Value.fromUnsignedBigInt(depositId)
     )
   )
-  stakeEvent.parameters.push(
+  stakeDepositedEvent.parameters.push(
     new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
   )
-  stakeEvent.parameters.push(
-    new ethereum.EventParam("delegatee", ethereum.Value.fromAddress(delegatee))
-  )
-  stakeEvent.parameters.push(
+  stakeDepositedEvent.parameters.push(
     new ethereum.EventParam(
-      "beneficiary",
-      ethereum.Value.fromAddress(beneficiary)
+      "totalDeposited",
+      ethereum.Value.fromUnsignedBigInt(totalDeposited)
     )
   )
 
-  return stakeEvent
+  return stakeDepositedEvent
 }
 
 export function createStakeWithdrawnEvent(

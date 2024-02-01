@@ -17,13 +17,13 @@ import { abi } from "../lib/abi/uni-staker"
 export function StakeDialogContent({ availableForStakingUni }: { availableForStakingUni: bigint }) {
   const account = useAccount()
   const { write } = useContractWrite({
-    address: "0xFb6E5742285f3Fd43a616a02b774351Ea574ba3f",
+    address: "0x175527e743Dd01D80E463065e967073dB8C63070",
     abi,
     functionName: "stake"
   })
 
   const { data, error, isError, isLoading } = useContractRead({
-    address: "0xFb6E5742285f3Fd43a616a02b774351Ea574ba3f",
+    address: "0x175527e743Dd01D80E463065e967073dB8C63070",
     abi,
     functionName: "rewardRate"
   })

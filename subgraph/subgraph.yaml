@@ -6,7 +6,7 @@ schema:
 dataSources:
   - kind: ethereum
     name: UniStaker
-    network: local
+    network: mainnet
     source:
       address: "0xfe6ae331258c660967e9693731378b5298b307fe"
       abi: UniStaker

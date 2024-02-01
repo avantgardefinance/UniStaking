@@ -30,7 +30,7 @@ services:
       postgres_pass: let-me-in
       postgres_db: graph-node
       ipfs: ipfs:5001
-      ethereum: local:http://anvil:8545
+      ethereum: mainnet:http://anvil:8545
       GRAPH_LOG: info
       ETHEREUM_REORG_THRESHOLD: 10
       GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER: 19061305

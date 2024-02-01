@@ -1,7 +1,7 @@
 {
-  "local": {
+  "mainnet": {
     "UniStaker": {
-      "address": "0xfe6ae331258c660967e9693731378b5298b307fe",
+      "address": "0xfb6e5742285f3fd43a616a02b774351ea574ba3f",
       "startBlock": 19061305
     }
   }

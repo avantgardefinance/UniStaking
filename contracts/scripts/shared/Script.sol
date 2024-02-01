@@ -5,11 +5,6 @@ import {Script as ForgeScript} from "forge-std/Script.sol";
 import {ERC20VotesMock} from "scopelift/test/mocks/MockERC20Votes.sol";
 import {ERC20Fake} from "scopelift/test/fakes/ERC20Fake.sol";
 import {UniStaker} from "scopelift/src/UniStaker.sol";
-import "forge-std/console2.sol";
-
-// address constant REWARDS_TOKEN = 0x83e83Eb0bCc4B922e5032DA9c34fcCAf00b87432;
-// address constant GOVERNANCE_TOKEN = 0xf4d010117e1c1296075569F54a4768b176b68b6A;
-// address constant UNI_STAKER = 0xFb6E5742285f3Fd43a616a02b774351Ea574ba3f;
 
 abstract contract Script is ForgeScript {
     string constant MNEMONIC = "test test test test test test test test test test test junk";
@@ -34,14 +29,21 @@ abstract contract Script is ForgeScript {
         vm.label(address(UNI_STAKER), "UniStaker");
     }
 
-    function deal(uint32 index, uint256 amount) public {
-        uint256 key = vm.deriveKey(MNEMONIC, index);
-        address account = vm.addr(key);
+    function deal(uint32 who, uint256 amount) public {
+        uint256 key = vm.deriveKey(MNEMONIC, who);
 
-        vm.broadcast(key);
-        REWARDS_TOKEN.mint(account, amount);
+        vm.startBroadcast(key);
+        GOVERNANCE_TOKEN.mint(vm.addr(key), amount);
+        vm.stopBroadcast();
+    }
 
-        vm.broadcast(key);
-        REWARDS_TOKEN.approve(address(UNI_STAKER), type(uint256).max);
+    function stake(uint32 who, uint256 amount, address delegatee) public returns (UniStaker.DepositIdentifier delegateId) {
+        uint256 key = vm.deriveKey(MNEMONIC, who);
+
+        vm.startBroadcast(key);
+        GOVERNANCE_TOKEN.mint(vm.addr(key), amount);
+        GOVERNANCE_TOKEN.approve(address(UNI_STAKER), amount);
+        delegateId = UNI_STAKER.stake(amount, delegatee);
+        vm.stopBroadcast();
     }
 }

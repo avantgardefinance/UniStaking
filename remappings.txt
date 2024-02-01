@@ -1,7 +1,7 @@
-@openzeppelin/contracts/=lib/scopelift/lib/openzeppelin-contracts/contracts/
-ds-test/=lib/forge-std/lib/ds-test/src/
-erc4626-tests/=lib/scopelift/lib/openzeppelin-contracts/lib/erc4626-tests/
-forge-std/=lib/forge-std/src/
-openzeppelin-contracts/=lib/scopelift/lib/openzeppelin-contracts/
-openzeppelin/=lib/scopelift/lib/openzeppelin-contracts/contracts/
-scopelift/=lib/scopelift/
+@openzeppelin/contracts/=contracts/lib/scopelift/lib/openzeppelin-contracts/contracts/
+ds-test/=contracts/lib/forge-std/lib/ds-test/src/
+erc4626-tests/=contracts/lib/scopelift/lib/openzeppelin-contracts/lib/erc4626-tests/
+forge-std/=contracts/lib/forge-std/src/
+openzeppelin-contracts/=contracts/lib/scopelift/lib/openzeppelin-contracts/
+openzeppelin/=contracts/lib/scopelift/lib/openzeppelin-contracts/contracts/
+scopelift/=contracts/lib/scopelift/

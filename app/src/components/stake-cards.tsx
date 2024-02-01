@@ -53,12 +53,14 @@ export function StakeCards(
             </h3>
             <Dialog>
               <DialogTrigger>
+                {/* TODO: Problem with rendering button inside of DialogTrigger*/}
                 <Button size="lg" className="space-x-2">
                   <Download size={16} />
                   <span>Stake</span>
                 </Button>
               </DialogTrigger>
-              <StakeDialogContent />
+
+              <StakeDialogContent availableForStakingUni={availableForStakingUni} />
             </Dialog>
           </CardContent>
         </Card>

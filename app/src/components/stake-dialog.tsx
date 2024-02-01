@@ -1,9 +1,59 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Download } from "lucide-react"
 
-export function StakeDialogContent() {
+import { useForm } from "react-hook-form"
+
+import { BigIntDisplay } from "@/components/ui/big-int-display"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { useCallback } from "react"
+import { formatUnits, parseUnits } from "viem"
+import { useAccount, useContractRead, useContractWrite } from "wagmi"
+import { abi } from "../lib/abi/uni-staker"
+
+export function StakeDialogContent({ availableForStakingUni }: { availableForStakingUni: bigint }) {
+  const account = useAccount()
+  const { write } = useContractWrite({
+    address: "0xFb6E5742285f3Fd43a616a02b774351Ea574ba3f",
+    abi,
+    functionName: "stake"
+  })
+
+  const { data, error, isError, isLoading } = useContractRead({
+    address: "0xFb6E5742285f3Fd43a616a02b774351Ea574ba3f",
+    abi,
+    functionName: "rewardRate"
+  })
+
+  console.log({ data, error })
+
+  const form = useForm({
+    defaultValues: {
+      beneficiary: account.address,
+      delegatee: account.address,
+      amount: formatUnits(availableForStakingUni, 18)
+    }
+  })
+
+  const onSubmit = useCallback(async (values: {
+    beneficiary: `0x${string}` | undefined
+    delegatee: `0x${string}` | undefined
+    amount: string
+  }) => {
+    console.log(values)
+
+    if (values.beneficiary === undefined || values.delegatee === undefined) {
+      return
+    }
+
+    write({
+      args: [parseUnits(values.amount, 18), values.delegatee, values.beneficiary]
+    })
+  }, [write])
+
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -12,23 +62,65 @@ export function StakeDialogContent() {
           Enter the amount, fee beneficiary and delegatee to stake
         </DialogDescription>
       </DialogHeader>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">
-            Name
-          </Label>
-          <Input id="name" value="Pedro Duarte" className="col-span-3" />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="beneficiary" className="text-right">
-            Beneficiary
-          </Label>
-          <Input id="beneficiary" value="@peduarte" className="col-span-3" />
-        </div>
-      </div>
-      <DialogFooter>
-        <Button type="submit">Save changes</Button>
-      </DialogFooter>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit((values) => onSubmit(values))}>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    You have{" "}
+                    <Button variant="link" className="space-x-1 px-0">
+                      <BigIntDisplay value={availableForStakingUni} decimals={18} />
+                      <span>UNI</span>
+                    </Button>{" "}
+                    in your balance
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="beneficiary"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Beneficiary</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="delegatee"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Delegatee</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="submit" className="space-x-2">
+              <Download size={16} />
+              <span>Stake</span>
+            </Button>
+          </DialogFooter>
+        </form>
+      </Form>
     </DialogContent>
   )
 }

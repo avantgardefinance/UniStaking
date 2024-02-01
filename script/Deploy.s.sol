@@ -32,10 +32,16 @@ contract Deploy is Script {
         UniStaker uniStaker = new UniStaker{salt: "unistaker"}(rewardsToken, govToken, rewardsNotifier);
         vm.label(address(uniStaker), "UniStaker");
 
-        govToken.mint(ADMIN, 10000e18);
-        govToken.mint(ALICE, 10000e18);
-        govToken.mint(BOB, 10000e18);
-
         vm.stopBroadcast();
+
+        for (uint32 i = 0; i < 10; i++) {
+            uint256 key = vm.deriveKey(MNEMONIC, i);
+            address account = vm.addr(key);
+
+            vm.startBroadcast(key);
+            govToken.mint(account, 10000e18);
+            govToken.approve(address(uniStaker), type(uint256).max);
+            vm.stopBroadcast();
+        }
     }
 }

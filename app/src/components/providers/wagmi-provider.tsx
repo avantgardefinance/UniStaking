@@ -2,28 +2,15 @@
 
 import "@rainbow-me/rainbowkit/styles.css"
 import { walletConnectProjectId } from "@/lib/consts"
-import { getRpcUrl } from "@/lib/rpc"
+import { chain, rpcUrl } from "@/lib/environment"
 import { darkTheme, getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import type { ReactNode } from "react"
 import { configureChains, createConfig, WagmiConfig } from "wagmi"
-import { mainnet, polygon } from "wagmi/chains"
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
 
-const { chains, publicClient } = configureChains(
-  [mainnet, polygon],
-  [
-    jsonRpcProvider({
-      rpc: (chain) => {
-        const url = getRpcUrl(chain.id)
-        if (url === undefined) {
-          return null
-        }
-
-        return { http: url }
-      }
-    })
-  ]
-)
+const { chains, publicClient } = configureChains([chain], [jsonRpcProvider({
+  rpc: ({ id }) => (id === chain.id) ? { http: rpcUrl } : null
+})])
 
 const { connectors } = getDefaultWallets({
   appName: "Uniswap",

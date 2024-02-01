@@ -8,6 +8,7 @@ services:
       - --fork-block-number=19061305
       - --host=0.0.0.0
       - --mnemonic=test test test test test test test test test test test junk
+      - --chain-id=31337
     ports:
       - 8545:8545      
 

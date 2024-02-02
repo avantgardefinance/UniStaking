@@ -35,20 +35,17 @@ export default function RootLayout({
           color="black"
         />
       </head>
-      <body
-        className={cn(
-          "mx-5 min-h-screen font-sans antialiased md:mx-20 lg:mx-40",
-          fontSans.variable
-        )}
-      >
-        <Providers>
+      <body className={cn("min-h-screen font-sans antialiased", fontSans.variable)}>
+        <div className="mx-5 md:mx-20 lg:mx-40">
           <div className="relative flex min-h-screen flex-col">
-            <SiteHeader />
-            <div className="flex-1">{children}</div>
+            <Providers>
+              <SiteHeader />
+              <div className="flex-1">{children}</div>
+            </Providers>
           </div>
-          <TailwindIndicator />
-        </Providers>
+        </div>
         <Toaster />
+        <TailwindIndicator />
       </body>
     </html>
   )

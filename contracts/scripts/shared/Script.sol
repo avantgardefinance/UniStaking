@@ -37,7 +37,10 @@ abstract contract Script is ForgeScript {
         vm.stopBroadcast();
     }
 
-    function stake(uint32 who, uint256 amount, address delegatee) public returns (UniStaker.DepositIdentifier delegateId) {
+    function stake(uint32 who, uint256 amount, address delegatee)
+        public
+        returns (UniStaker.DepositIdentifier delegateId)
+    {
         uint256 key = vm.deriveKey(MNEMONIC, who);
 
         vm.startBroadcast(key);

@@ -2,6 +2,7 @@ import "@/styles/globals.css"
 import { Providers } from "@/components/providers/providers"
 import { SiteHeader } from "@/components/site-header"
 import { TailwindIndicator } from "@/components/tailwind-indicator"
+import { Toaster } from "@/components/ui/toaster"
 import { siteConfig } from "@/config/site"
 import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
@@ -47,6 +48,7 @@ export default function RootLayout({
           </div>
           <TailwindIndicator />
         </Providers>
+        <Toaster />
       </body>
     </html>
   )

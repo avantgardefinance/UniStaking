@@ -21,35 +21,33 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          <meta
-            name="theme-color"
-            media="(prefers-color-scheme: light)"
-            color="white"
-          />
-          <meta
-            name="theme-color"
-            media="(prefers-color-scheme: dark)"
-            color="black"
-          />
-        </head>
-        <body
-          className={cn(
-            "mx-5 min-h-screen font-sans antialiased md:mx-20 lg:mx-40",
-            fontSans.variable
-          )}
-        >
-          <Providers>
-            <div className="relative flex min-h-screen flex-col">
-              <SiteHeader />
-              <div className="flex-1">{children}</div>
-            </div>
-            <TailwindIndicator />
-          </Providers>
-        </body>
-      </html>
-    </>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: light)"
+          color="white"
+        />
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: dark)"
+          color="black"
+        />
+      </head>
+      <body
+        className={cn(
+          "mx-5 min-h-screen font-sans antialiased md:mx-20 lg:mx-40",
+          fontSans.variable
+        )}
+      >
+        <Providers>
+          <div className="relative flex min-h-screen flex-col">
+            <SiteHeader />
+            <div className="flex-1">{children}</div>
+          </div>
+          <TailwindIndicator />
+        </Providers>
+      </body>
+    </html>
   )
 }

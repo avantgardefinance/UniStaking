@@ -8,7 +8,7 @@ dataSources:
     name: UniStaker
     network: mainnet
     source:
-      address: "0xfe6ae331258c660967e9693731378b5298b307fe"
+      address: "0x2eefa487b01766f7c74556406ee1404ced73abec"
       abi: UniStaker
       startBlock: 19061305
     mapping:

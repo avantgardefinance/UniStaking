@@ -8,6 +8,6 @@ import {ERC20Fake} from "scopelift/test/fakes/ERC20Fake.sol";
 
 contract Deal is Script {
     function run(uint32 index) external {
-        deal(index, 10000e18);
+        dealToDerivedKey(index, 10000e18);
     }
 }

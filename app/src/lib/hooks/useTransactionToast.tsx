@@ -30,7 +30,7 @@ export function useTransactionToast(
 
     switch (status) {
       case "success":
-        toast({ title: "Success", action })
+        toast({ title: "Success!", action })
         break
       case "loading":
         toast({ title: "Loading...", action })

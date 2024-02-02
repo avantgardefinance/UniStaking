@@ -2,25 +2,46 @@
 pragma solidity ^0.8.13;
 
 import {Script as ForgeScript} from "forge-std/Script.sol";
+import {StdCheats} from "forge-std/StdCheats.sol";
 import {ERC20VotesMock} from "scopelift/test/mocks/MockERC20Votes.sol";
 import {ERC20Fake} from "scopelift/test/fakes/ERC20Fake.sol";
 import {UniStaker} from "scopelift/src/UniStaker.sol";
 
-abstract contract Script is ForgeScript {
-    string constant MNEMONIC = "test test test test test test test test test test test junk";
+abstract contract Script is StdCheats, ForgeScript {
+    string constant MNEMONIC =
+        "test test test test test test test test test test test junk";
 
     uint256 public immutable DEPLOYER = vm.deriveKey(MNEMONIC, 0);
 
     address constant REWARDS_NOTIFIER = address(0xaffab1ebeef);
     ERC20VotesMock public immutable GOVERNANCE_TOKEN =
-        ERC20VotesMock(vm.computeCreate2Address(0, hashInitCode(type(ERC20VotesMock).creationCode)));
+        ERC20VotesMock(
+            vm.computeCreate2Address(
+                0,
+                hashInitCode(type(ERC20VotesMock).creationCode)
+            )
+        );
     ERC20Fake public immutable REWARDS_TOKEN =
-        ERC20Fake(vm.computeCreate2Address(0, hashInitCode(type(ERC20Fake).creationCode)));
-    UniStaker public immutable UNI_STAKER = UniStaker(
-        vm.computeCreate2Address(
-            0, hashInitCode(type(UniStaker).creationCode, abi.encode(REWARDS_TOKEN, GOVERNANCE_TOKEN, REWARDS_NOTIFIER))
-        )
-    );
+        ERC20Fake(
+            vm.computeCreate2Address(
+                0,
+                hashInitCode(type(ERC20Fake).creationCode)
+            )
+        );
+    UniStaker public immutable UNI_STAKER =
+        UniStaker(
+            vm.computeCreate2Address(
+                0,
+                hashInitCode(
+                    type(UniStaker).creationCode,
+                    abi.encode(
+                        REWARDS_TOKEN,
+                        GOVERNANCE_TOKEN,
+                        REWARDS_NOTIFIER
+                    )
+                )
+            )
+        );
 
     constructor() {
         vm.label(REWARDS_NOTIFIER, "Rewards Notifier");
@@ -29,7 +50,7 @@ abstract contract Script is ForgeScript {
         vm.label(address(UNI_STAKER), "UniStaker");
     }
 
-    function deal(uint32 who, uint256 amount) public {
+    function dealToDerivedKey(uint32 who, uint256 amount) public {
         uint256 key = vm.deriveKey(MNEMONIC, who);
 
         vm.startBroadcast(key);
@@ -37,10 +58,11 @@ abstract contract Script is ForgeScript {
         vm.stopBroadcast();
     }
 
-    function stake(uint32 who, uint256 amount, address delegatee)
-        public
-        returns (UniStaker.DepositIdentifier delegateId)
-    {
+    function stake(
+        uint32 who,
+        uint256 amount,
+        address delegatee
+    ) public returns (UniStaker.DepositIdentifier delegateId) {
         uint256 key = vm.deriveKey(MNEMONIC, who);
 
         vm.startBroadcast(key);

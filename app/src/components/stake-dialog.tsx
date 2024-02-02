@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
-import { useContractWriteWithToast } from "@/lib/hooks/useContractWriteWithToast"
+import { useContractWriteWithToast } from "@/lib/hooks/use-contract-write-with-toast"
 
 import { Download, RotateCw } from "lucide-react"
 import { useCallback } from "react"

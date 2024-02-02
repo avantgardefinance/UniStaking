@@ -1,4 +1,4 @@
-import { useTransactionToast } from "@/lib/hooks/useTransactionToast"
+import { useTransactionToast } from "@/lib/hooks/use-transaction-toast"
 import type { Abi } from "viem"
 import { useContractWrite, type UseContractWriteConfig } from "wagmi"
 

@@ -1,16 +1,13 @@
-import { StakeDialogContent } from "@/components/stake-dialog"
+import { AvailableUniForStaking } from "@/components/stake-card-available-uni"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
-import { Download, Trophy } from "lucide-react"
+import { Trophy } from "lucide-react"
 
 export function StakeCards(
-  { availableForStakingUni, rewardsWeth, totalStakedUni }: {
+  { rewardsWeth, totalStakedUni }: {
     totalStakedUni: bigint
     rewardsWeth: bigint
-    availableForStakingUni: bigint
   }
 ) {
   return (
@@ -43,25 +40,7 @@ export function StakeCards(
             </Button>
           </CardContent>
         </Card>
-        <Card className="grow">
-          <CardHeader>
-            <CardDescription className="text-base font-medium">Available for staking</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
-            <h3 className="space-x-2">
-              <BigIntDisplay value={availableForStakingUni} decimals={18} />
-              <span>UNI</span>
-            </h3>
-            <Dialog>
-              <DialogTrigger className={cn(buttonVariants({ size: "lg", className: "space-x-2" }))}>
-                <Download size={16} />
-                <span>Stake</span>
-              </DialogTrigger>
-
-              <StakeDialogContent availableForStakingUni={availableForStakingUni} />
-            </Dialog>
-          </CardContent>
-        </Card>
+        <AvailableUniForStaking />
       </div>
     </div>
   )

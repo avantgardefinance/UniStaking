@@ -9,13 +9,18 @@ import { governanceToken } from "@/lib/consts"
 import { Download } from "lucide-react"
 import { useAccount, useBalance } from "wagmi"
 
-export function AvailableUniForStaking() {
+function useAvailableUniForStaking() {
   const account = useAccount()
 
   const { data, isLoading } = useBalance({
     address: account.address,
     token: governanceToken
   })
+  return { data, isLoading }
+}
+
+export function AvailableUniForStaking() {
+  const { data, isLoading } = useAvailableUniForStaking()
 
   return (
     <>

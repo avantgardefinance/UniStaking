@@ -5,6 +5,7 @@ import { Controller, FormProvider, useFormContext } from "react-hook-form"
 
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import React from "react"
 
 const Form = FormProvider
 
@@ -155,4 +156,4 @@ const FormMessage = React.forwardRef<
 })
 FormMessage.displayName = "FormMessage"
 
-export { Form, FormControl, FormDescription, FormField, FormField, FormItem, FormLabel, FormMessage }
+export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage }

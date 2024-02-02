@@ -1,8 +1,9 @@
 import { StakeDialogContent } from "@/components/stake-dialog"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
 import { Download, Trophy } from "lucide-react"
 
 export function StakeCards(
@@ -52,12 +53,9 @@ export function StakeCards(
               <span>UNI</span>
             </h3>
             <Dialog>
-              <DialogTrigger>
-                {/* TODO: Problem with rendering button inside of DialogTrigger*/}
-                <Button size="lg" className="space-x-2">
-                  <Download size={16} />
-                  <span>Stake</span>
-                </Button>
+              <DialogTrigger className={cn(buttonVariants({ size: "lg", className: "space-x-2" }))}>
+                <Download size={16} />
+                <span>Stake</span>
               </DialogTrigger>
 
               <StakeDialogContent availableForStakingUni={availableForStakingUni} />

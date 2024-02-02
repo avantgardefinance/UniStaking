@@ -1,29 +1,29 @@
 "use client"
 
+import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Download } from "lucide-react"
-
-import { useForm } from "react-hook-form"
-
-import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { abi } from "@/lib/abi/uni-staker"
+import { uniStaker } from "@/lib/consts"
+import { Download } from "lucide-react"
 import { useCallback } from "react"
+import { useForm } from "react-hook-form"
+import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
 import { useAccount, useContractRead, useContractWrite } from "wagmi"
-import { abi } from "../lib/abi/uni-staker"
 
-export function StakeDialogContent({ availableForStakingUni }: { availableForStakingUni: bigint }) {
+const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bigint }) => {
   const account = useAccount()
   const { write } = useContractWrite({
-    address: "0x175527e743Dd01D80E463065e967073dB8C63070",
+    address: uniStaker,
     abi,
     functionName: "stake"
   })
 
   const { data, error, isError, isLoading } = useContractRead({
-    address: "0x175527e743Dd01D80E463065e967073dB8C63070",
+    address: uniStaker,
     abi,
     functionName: "rewardRate"
   })
@@ -39,8 +39,8 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
   })
 
   const onSubmit = useCallback(async (values: {
-    beneficiary: `0x${string}` | undefined
-    delegatee: `0x${string}` | undefined
+    beneficiary: Address | undefined
+    delegatee: Address | undefined
     amount: string
   }) => {
     console.log(values)
@@ -54,6 +54,12 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
     })
   }, [write])
 
+  return { form, onSubmit: form.handleSubmit((values) => onSubmit(values)) }
+}
+
+export function StakeDialogContent({ availableForStakingUni }: { availableForStakingUni: bigint }) {
+  const { form, onSubmit } = useStakeDialog({ availableForStakingUni })
+
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -63,7 +69,7 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit((values) => onSubmit(values))}>
+        <form onSubmit={onSubmit}>
           <div className="space-y-4">
             <FormField
               control={form.control}

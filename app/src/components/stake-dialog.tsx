@@ -71,23 +71,13 @@ const useStakeDialog = ({ availableForStakingUni }: {
         functionName: "stake",
         args: [parseUnits(values.amount, 18), values.delegatee, values.beneficiary]
       })
-
-      // },  {
-      //   onSuccess: () => {
-      //     queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
-      //   })
     } else {
-      // writeContract({
-      //   address: governanceToken,
-      //   abi: abiIERC20,
-      //   functionName: "approve",
-      //   args: [uniStaker, parseUnits(values.amount, 18)],
-
-      // },
-      // {
-      //   onSuccess: () => {
-      //     queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
-      //   })
+      writeContract({
+        address: governanceToken,
+        abi: abiIERC20,
+        functionName: "approve",
+        args: [uniStaker, parseUnits(values.amount, 18)]
+      })
     }
   }, [hasEnoughAllowance, writeContract])
 

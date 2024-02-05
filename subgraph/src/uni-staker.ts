@@ -1,4 +1,4 @@
-import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
 import {
   BeneficiaryAltered,
   DelegateeAltered,
@@ -86,7 +86,7 @@ export function handleRewardNotified(event: RewardNotifiedEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
-  // trackUniStakerHistory(BigInt.fromI32(0), BigInt.fromI32(0), event.params.amount, BigInt.fromI32(0), event)
+  trackUniStakerHistory(BigInt.fromI32(0), BigInt.fromI32(0), event.params.amount, BigInt.fromI32(0), event)
 }
 
 export function handleStakeDeposited(event: StakeDepositedEvent): void {
@@ -105,7 +105,12 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
-  // trackUniStakerHistory(event.params.amount, BigInt.fromI32(0), BigInt.fromI32(0), BigInt.fromI32(0), event)
+  const account = getOrCreateAccount(Address.fromBytes(deposit.owner), event)
+  account.totalStaked = account.totalStaked.plus(event.params.amount)
+  account.currentlyStaked = account.currentlyStaked.plus(event.params.amount)
+  account.save()
+
+  trackUniStakerHistory(event.params.amount, BigInt.fromI32(0), BigInt.fromI32(0), BigInt.fromI32(0), event)
 }
 
 export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
@@ -124,7 +129,12 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
-  // trackUniStakerHistory(BigInt.fromI32(0), event.params.amount, BigInt.fromI32(0), BigInt.fromI32(0), event)
+  const account = getOrCreateAccount(Address.fromBytes(deposit.owner), event)
+  account.totalWithdrawn = account.totalWithdrawn.minus(event.params.amount)
+  account.currentlyStaked = account.currentlyStaked.minus(event.params.amount)
+  account.save()
+
+  trackUniStakerHistory(BigInt.fromI32(0), event.params.amount, BigInt.fromI32(0), BigInt.fromI32(0), event)
 }
 
 export function handleSurrogateDeployed(event: SurrogateDeployedEvent): void {

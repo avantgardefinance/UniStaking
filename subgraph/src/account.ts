@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts"
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { Account } from "../generated/schema"
 
 export function getOrCreateAccount(address: Address, event: ethereum.Event): Account {
@@ -10,6 +10,10 @@ export function getOrCreateAccount(address: Address, event: ethereum.Event): Acc
 
   account = new Account(address)
   account.createdAt = event.block.timestamp.toI32()
+  account.totalStaked = BigInt.fromI32(0)
+  account.totalWithdrawn = BigInt.fromI32(0)
+  account.currentlyStaked = BigInt.fromI32(0)
+  account.claimedRewards = BigInt.fromI32(0)
   account.save()
 
   return account

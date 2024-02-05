@@ -1198,6 +1198,45 @@ export class Account extends Entity {
     this.set("createdAt", Value.fromI32(value));
   }
 
+  get totalStaked(): BigInt {
+    let value = this.get("totalStaked");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set totalStaked(value: BigInt) {
+    this.set("totalStaked", Value.fromBigInt(value));
+  }
+
+  get totalWithdrawn(): BigInt {
+    let value = this.get("totalWithdrawn");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set totalWithdrawn(value: BigInt) {
+    this.set("totalWithdrawn", Value.fromBigInt(value));
+  }
+
+  get currentlyStaked(): BigInt {
+    let value = this.get("currentlyStaked");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set currentlyStaked(value: BigInt) {
+    this.set("currentlyStaked", Value.fromBigInt(value));
+  }
+
   get claimedRewards(): BigInt {
     let value = this.get("claimedRewards");
     if (!value || value.kind == ValueKind.NULL) {

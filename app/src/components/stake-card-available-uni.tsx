@@ -1,6 +1,7 @@
 "use client"
 
 import { StakeDialogContent } from "@/components/stake-dialog"
+import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
@@ -23,7 +24,9 @@ export function AvailableUniForStaking() {
   return (
     <Card className="grow">
       <CardHeader>
-        <CardDescription className="text-base font-medium">Available for staking</CardDescription>
+        <CardDescription className="text-base font-medium">
+          Available for staking
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
         <NoSsr>
@@ -41,7 +44,7 @@ function AvailableUniForStakingContent() {
     return "Error"
   }
 
-  if (status === "loading") {
+  if (status === "pending") {
     return "Loading"
   }
 
@@ -52,7 +55,9 @@ function AvailableUniForStakingContent() {
   return (
     <>
       <h3 className="space-x-2">
-        <span>{data.formatted}</span>
+        <span>
+          <BigIntDisplay value={data.value} decimals={data.decimals} />
+        </span>
         <span>{data.symbol}</span>
       </h3>
       <Dialog>

@@ -1,7 +1,7 @@
 "use client"
 
-import { ConnectButton as ConnectButtonBase } from "@rainbow-me/rainbowkit"
+import { ConnectKitButton } from "connectkit"
 
 export function ConnectButton() {
-  return <ConnectButtonBase />
+  return <ConnectKitButton />
 }

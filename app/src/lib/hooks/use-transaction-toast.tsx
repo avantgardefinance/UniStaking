@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useEffect } from "react"
 import type { Hash } from "viem"
-import type { useContractWrite } from "wagmi"
+import type { UseWriteContractReturnType } from "wagmi"
 
 export function useTransactionToast(
-  { status, txHash }: { status: ReturnType<typeof useContractWrite>["status"]; txHash?: Hash }
+  { status, txHash }: { status: UseWriteContractReturnType["status"]; txHash?: Hash }
 ) {
   const { toast } = useToast()
 
@@ -32,8 +32,8 @@ export function useTransactionToast(
       case "success":
         toast({ title: "Success", action })
         break
-      case "loading":
-        toast({ title: "Loading...", action })
+      case "pending":
+        toast({ title: "Pending ...", action })
         break
       case "idle":
         toast({ title: "Idle", action })
@@ -42,7 +42,7 @@ export function useTransactionToast(
         toast({ title: "Failed", action, variant: "destructive" })
         break
       default:
-        never(status, "Unhandled status")
+        never(status, "Unhandled state")
     }
   }, [status, toast, txHash])
 }

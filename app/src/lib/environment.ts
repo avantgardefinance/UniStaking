@@ -1,4 +1,4 @@
-import { mainnet } from "wagmi"
+import { mainnet } from "wagmi/chains"
 
 export const isServer = typeof window === "undefined"
 export const isBrowser = !isServer

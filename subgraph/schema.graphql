@@ -2,6 +2,7 @@
 
 interface Event {
   id: Bytes!
+  type: EventType!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -9,6 +10,7 @@ interface Event {
 
 interface DepositEvent {
   id: Bytes!
+  type: EventType!
   depositId: BigInt!
   deposit: Deposit!
   blockNumber: BigInt!
@@ -18,14 +20,26 @@ interface DepositEvent {
 
 interface RewardEvent {
   id: Bytes!
+  type: EventType!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
+enum EventType {
+  BeneficiaryAltered
+  DelegateeAltered
+  RewardClaimed
+  RewardNotified
+  StakeDeposited
+  StakeWithdrawn
+  SurrogateDeployed
+}
+
 type BeneficiaryAltered implements Event & DepositEvent
   @entity(immutable: true) {
   id: Bytes!
+  type: EventType!
   depositId: BigInt!
   deposit: Deposit!
   oldBeneficiary: Bytes!
@@ -37,6 +51,7 @@ type BeneficiaryAltered implements Event & DepositEvent
 
 type DelegateeAltered implements Event & DepositEvent @entity(immutable: true) {
   id: Bytes!
+  type: EventType!
   depositId: BigInt!
   deposit: Deposit!
   oldDelegatee: Bytes!
@@ -48,6 +63,7 @@ type DelegateeAltered implements Event & DepositEvent @entity(immutable: true) {
 
 type RewardClaimed implements Event & RewardEvent @entity(immutable: true) {
   id: Bytes!
+  type: EventType!
   beneficiary: Bytes!
   amount: BigInt!
   blockNumber: BigInt!
@@ -57,6 +73,7 @@ type RewardClaimed implements Event & RewardEvent @entity(immutable: true) {
 
 type RewardNotified implements Event & RewardEvent @entity(immutable: true) {
   id: Bytes!
+  type: EventType!
   amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -65,6 +82,7 @@ type RewardNotified implements Event & RewardEvent @entity(immutable: true) {
 
 type StakeDeposited implements Event & DepositEvent @entity(immutable: true) {
   id: Bytes!
+  type: EventType!
   depositId: BigInt!
   deposit: Deposit!
   amount: BigInt!
@@ -76,6 +94,7 @@ type StakeDeposited implements Event & DepositEvent @entity(immutable: true) {
 
 type StakeWithdrawn implements Event & DepositEvent @entity(immutable: true) {
   id: Bytes!
+  type: EventType!
   depositId: BigInt!
   deposit: Deposit!
   amount: BigInt!
@@ -87,6 +106,7 @@ type StakeWithdrawn implements Event & DepositEvent @entity(immutable: true) {
 
 type SurrogateDeployed implements Event @entity(immutable: true) {
   id: Bytes!
+  type: EventType!
   delegatee: Bytes!
   surrogate: Bytes!
   blockNumber: BigInt!

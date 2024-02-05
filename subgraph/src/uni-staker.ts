@@ -32,6 +32,7 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   deposit.save()
 
   const entity = new BeneficiaryAltered(eventId(event))
+  entity.type = "BeneficiaryAltered"
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
   entity.oldBeneficiary = event.params.oldBeneficiary
@@ -48,6 +49,7 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   deposit.save()
 
   const entity = new DelegateeAltered(eventId(event))
+  entity.type = "DelegateeAltered"
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
   entity.oldDelegatee = event.params.oldDelegatee
@@ -60,6 +62,7 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
   const entity = new RewardClaimed(eventId(event))
+  entity.type = "RewardClaimed"
   entity.beneficiary = event.params.beneficiary
   entity.amount = event.params.amount
   entity.blockNumber = event.block.number
@@ -76,6 +79,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
 
 export function handleRewardNotified(event: RewardNotifiedEvent): void {
   const entity = new RewardNotified(eventId(event))
+  entity.type = "RewardNotified"
   entity.amount = event.params.amount
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -91,6 +95,7 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   deposit.save()
 
   const entity = new StakeDeposited(eventId(event))
+  entity.type = "StakeDeposited"
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
   entity.amount = event.params.amount
@@ -109,6 +114,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   deposit.save()
 
   const entity = new StakeWithdrawn(eventId(event))
+  entity.type = "StakeWithdrawn"
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
   entity.amount = event.params.amount
@@ -123,6 +129,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
 
 export function handleSurrogateDeployed(event: SurrogateDeployedEvent): void {
   const entity = new SurrogateDeployed(eventId(event))
+  entity.type = "SurrogateDeployed"
   entity.delegatee = event.params.delegatee
   entity.surrogate = event.params.surrogate
   entity.blockNumber = event.block.number

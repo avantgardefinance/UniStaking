@@ -54,6 +54,19 @@ export class BeneficiaryAltered extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
+  get type(): string {
+    let value = this.get("type");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
+  }
+
   get depositId(): BigInt {
     let value = this.get("depositId");
     if (!value || value.kind == ValueKind.NULL) {
@@ -187,6 +200,19 @@ export class DelegateeAltered extends Entity {
 
   set id(value: Bytes) {
     this.set("id", Value.fromBytes(value));
+  }
+
+  get type(): string {
+    let value = this.get("type");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
   }
 
   get depositId(): BigInt {
@@ -324,6 +350,19 @@ export class RewardClaimed extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
+  get type(): string {
+    let value = this.get("type");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
+  }
+
   get beneficiary(): Bytes {
     let value = this.get("beneficiary");
     if (!value || value.kind == ValueKind.NULL) {
@@ -433,6 +472,19 @@ export class RewardNotified extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
+  get type(): string {
+    let value = this.get("type");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
+  }
+
   get amount(): BigInt {
     let value = this.get("amount");
     if (!value || value.kind == ValueKind.NULL) {
@@ -527,6 +579,19 @@ export class StakeDeposited extends Entity {
 
   set id(value: Bytes) {
     this.set("id", Value.fromBytes(value));
+  }
+
+  get type(): string {
+    let value = this.get("type");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
   }
 
   get depositId(): BigInt {
@@ -664,6 +729,19 @@ export class StakeWithdrawn extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
+  get type(): string {
+    let value = this.get("type");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
+  }
+
   get depositId(): BigInt {
     let value = this.get("depositId");
     if (!value || value.kind == ValueKind.NULL) {
@@ -797,6 +875,19 @@ export class SurrogateDeployed extends Entity {
 
   set id(value: Bytes) {
     this.set("id", Value.fromBytes(value));
+  }
+
+  get type(): string {
+    let value = this.get("type");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
   }
 
   get delegatee(): Bytes {

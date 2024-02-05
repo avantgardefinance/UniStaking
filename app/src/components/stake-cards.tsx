@@ -1,4 +1,4 @@
-import { StakeCardAvailableUniForStaking } from "@/components/stake-card-available-uni-for-staking"
+import { AvailableUniForStaking } from "@/components/stake-card-available-uni"
 import { StakeCardRewards } from "@/components/stake-card-rewards"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
@@ -25,7 +25,7 @@ export function StakeCards(
           </CardContent>
         </Card>
         <StakeCardRewards />
-        <StakeCardAvailableUniForStaking />
+        <AvailableUniForStaking />
       </div>
     </div>
   )

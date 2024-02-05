@@ -13,7 +13,7 @@ import { useAccount, useReadContract } from "wagmi"
 function useStakeCardRewards() {
   const account = useAccount()
 
-  const { data: rewards, isLoading: isLoadingRewards, refetch } = useReadContract({
+  const { data: rewards, refetch, status } = useReadContract({
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "earned",
@@ -41,11 +41,23 @@ function useStakeCardRewards() {
 
   const isAbleToClaim = rewards !== 0n && rewards !== undefined
 
-  return { rewards, isLoadingRewards, writeClaim, isAbleToClaim }
+  return { rewards, status, writeClaim, isAbleToClaim }
 }
 
 export function StakeCardRewards() {
-  const { isAbleToClaim, isLoadingRewards, rewards, writeClaim } = useStakeCardRewards()
+  const { isAbleToClaim, rewards, status, writeClaim } = useStakeCardRewards()
+
+  if (status === "error") {
+    return "Error"
+  }
+
+  if (status === "pending") {
+    return "Loading"
+  }
+
+  if (rewards === undefined) {
+    return "Not available"
+  }
 
   return (
     <Card className="grow">
@@ -53,12 +65,10 @@ export function StakeCardRewards() {
         <CardDescription className="text-base font-medium">Rewards</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
-        {isLoadingRewards ? "Loading... " : (
-          <h3 className="space-x-2">
-            {rewards === undefined ? <span>N/A</span> : <BigIntDisplay value={rewards} decimals={18} />}
-            <span>WETH</span>
-          </h3>
-        )}
+        <h3 className="space-x-2">
+          <BigIntDisplay value={rewards} decimals={18} />
+          <span>WETH</span>
+        </h3>
         <Button
           size="lg"
           disabled={!isAbleToClaim}

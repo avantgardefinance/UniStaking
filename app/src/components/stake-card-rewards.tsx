@@ -3,18 +3,17 @@
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
-import { NoSsr } from "@/components/ui/no-ssr"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
-import { useContractWriteWithToast } from "@/lib/hooks/useContractWriteWithToast"
+import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { Trophy } from "lucide-react"
-import { useCallback } from "react"
+import { use, useCallback, useEffect } from "react"
 import { useAccount, useReadContract } from "wagmi"
 
 function useStakeCardRewards() {
   const account = useAccount()
 
-  const { data: rewards, isLoading: isLoadingRewards } = useReadContract({
+  const { data: rewards, isLoading: isLoadingRewards, refetch } = useReadContract({
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "earned",
@@ -22,12 +21,15 @@ function useStakeCardRewards() {
   })
 
   const {
+    isSuccess,
     writeContract
-  } = useContractWriteWithToast({
-    address: uniStaker,
-    abi: abiUniStaker,
-    functionName: "claimReward"
-  })
+  } = useWriteContractWithToast()
+
+  useEffect(() => {
+    if (isSuccess) {
+      refetch()
+    }
+  }, [isSuccess, refetch])
 
   const writeClaim = useCallback(() => {
     writeContract({

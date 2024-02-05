@@ -7,7 +7,7 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { Trophy } from "lucide-react"
-import { use, useCallback, useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { useAccount, useReadContract } from "wagmi"
 
 function useStakeCardRewards() {

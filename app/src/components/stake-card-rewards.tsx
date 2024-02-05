@@ -6,14 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { useQueryClient } from "@tanstack/react-query"
 import { Trophy } from "lucide-react"
-import { useCallback, useEffect } from "react"
+import { useEffect } from "react"
 import { useAccount, useReadContract } from "wagmi"
 
 function useStakeCardRewards() {
   const account = useAccount()
 
-  const { data: rewards, refetch, status } = useReadContract({
+  const { data: rewards, queryKey, status } = useReadContract({
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "earned",
@@ -25,19 +26,20 @@ function useStakeCardRewards() {
     writeContract
   } = useWriteContractWithToast()
 
+  const queryClient = useQueryClient()
+
   useEffect(() => {
     if (isSuccess) {
-      refetch()
+      queryClient.invalidateQueries({ queryKey })
     }
-  }, [isSuccess, refetch])
+  }, [isSuccess, queryClient, queryKey])
 
-  const writeClaim = useCallback(() => {
+  const writeClaim = () =>
     writeContract({
       address: uniStaker,
       abi: abiUniStaker,
       functionName: "claimReward"
     })
-  }, [writeContract])
 
   const isAbleToClaim = rewards !== 0n && rewards !== undefined
 

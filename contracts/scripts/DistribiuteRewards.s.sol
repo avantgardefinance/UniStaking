@@ -5,8 +5,8 @@ import {Script as ForgeScript} from "forge-std/Script.sol";
 
 import {Script} from "./shared/Script.sol";
 
-contract DistribiuteRewards is Script {
+contract DistributeRewards is Script {
     function run(uint256 _amount) external {
-        distribiuteRewards(_amount);
+        distributeRewards(_amount);
     }
 }

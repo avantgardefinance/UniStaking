@@ -10,6 +10,7 @@ import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
 import { useCallback, useEffect } from "react"
 import { useForm } from "react-hook-form"
@@ -26,7 +27,9 @@ const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bi
     writeContract
   } = useWriteContractWithToast()
 
-  const { data: allowance, refetch: refetchAllowance } = useReadContract({
+  const queryClient = useQueryClient()
+
+  const { data: allowance, queryKey: queryKeyAllowance } = useReadContract({
     address: governanceToken,
     abi: abiIERC20,
     functionName: "allowance",
@@ -35,9 +38,9 @@ const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bi
 
   useEffect(() => {
     if (isSuccessWrite) {
-      refetchAllowance()
+      queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
     }
-  }, [isSuccessWrite, refetchAllowance])
+  }, [isSuccessWrite, queryClient, queryKeyAllowance])
 
   const form = useForm({
     defaultValues: {

@@ -9,7 +9,7 @@ import {ERC20Fake} from "scopelift/test/fakes/ERC20Fake.sol";
 
 contract Deploy is Script {
     function run() external {
-        vm.startBroadcast(DEPLOYER);
+        vm.startBroadcast(DEPLOYER.privateKey);
 
         console2.log(
             "Deploying Rewards Token Contract: %s",
@@ -30,15 +30,15 @@ contract Deploy is Script {
             address(UNI_STAKER)
         );
         address uniStaker = address(
-            new UniStaker{salt: 0}(REWARDS_TOKEN, GOVERNANCE_TOKEN, ADMIN)
+            new UniStaker{salt: 0}(REWARDS_TOKEN, GOVERNANCE_TOKEN, ADMIN.addr)
         );
         assert(uniStaker == address(UNI_STAKER));
 
         vm.stopBroadcast();
 
-        vm.prank(ADMIN);
+        vm.broadcast(ADMIN.privateKey);
         UNI_STAKER.setRewardsNotifier({
-            _rewardsNotifier: REWARDS_NOTIFIER,
+            _rewardsNotifier: REWARDS_NOTIFIER.addr,
             _isEnabled: true
         });
     }

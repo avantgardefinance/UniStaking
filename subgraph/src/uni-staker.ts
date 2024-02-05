@@ -1,13 +1,4 @@
 import {
-  BeneficiaryAltered as BeneficiaryAlteredEvent,
-  DelegateeAltered as DelegateeAlteredEvent,
-  RewardClaimed as RewardClaimedEvent,
-  RewardNotified as RewardNotifiedEvent,
-  StakeDeposited as StakeDepositedEvent,
-  StakeWithdrawn as StakeWithdrawnEvent,
-  SurrogateDeployed as SurrogateDeployedEvent
-} from "../generated/UniStaker/UniStaker"
-import {
   BeneficiaryAltered,
   DelegateeAltered,
   RewardClaimed,
@@ -16,9 +7,18 @@ import {
   StakeWithdrawn,
   SurrogateDeployed
 } from "../generated/schema"
+import {
+  BeneficiaryAltered as BeneficiaryAlteredEvent,
+  DelegateeAltered as DelegateeAlteredEvent,
+  RewardClaimed as RewardClaimedEvent,
+  RewardNotified as RewardNotifiedEvent,
+  StakeDeposited as StakeDepositedEvent,
+  StakeWithdrawn as StakeWithdrawnEvent,
+  SurrogateDeployed as SurrogateDeployedEvent
+} from "../generated/UniStaker/UniStaker"
 
 export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
-  let entity = new BeneficiaryAltered(
+  const entity = new BeneficiaryAltered(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.depositId = event.params.depositId
@@ -33,7 +33,7 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
 }
 
 export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
-  let entity = new DelegateeAltered(
+  const entity = new DelegateeAltered(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.depositId = event.params.depositId
@@ -48,7 +48,7 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
 }
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
-  let entity = new RewardClaimed(
+  const entity = new RewardClaimed(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.beneficiary = event.params.beneficiary
@@ -62,7 +62,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
 }
 
 export function handleRewardNotified(event: RewardNotifiedEvent): void {
-  let entity = new RewardNotified(
+  const entity = new RewardNotified(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.amount = event.params.amount
@@ -75,7 +75,7 @@ export function handleRewardNotified(event: RewardNotifiedEvent): void {
 }
 
 export function handleStakeDeposited(event: StakeDepositedEvent): void {
-  let entity = new StakeDeposited(
+  const entity = new StakeDeposited(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.depositId = event.params.depositId
@@ -90,7 +90,7 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
 }
 
 export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
-  let entity = new StakeWithdrawn(
+  const entity = new StakeWithdrawn(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.depositId = event.params.depositId
@@ -105,7 +105,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
 }
 
 export function handleSurrogateDeployed(event: SurrogateDeployedEvent): void {
-  let entity = new SurrogateDeployed(
+  const entity = new SurrogateDeployed(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.delegatee = event.params.delegatee

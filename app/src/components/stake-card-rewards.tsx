@@ -16,7 +16,8 @@ function useStakeCardRewards() {
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "earned",
-    args: account.address === undefined ? undefined : [account.address]
+    args: account.address === undefined ? undefined : [account.address],
+    watch: true
   })
 
   const {

@@ -14,6 +14,7 @@ abstract contract Script is StdCheats, ForgeScript {
     uint256 public immutable DEPLOYER = vm.deriveKey(MNEMONIC, 0);
 
     address constant REWARDS_NOTIFIER = address(0xaffab1ebeef);
+    address constant ADMIN = address(0x70997970c);
     ERC20VotesMock public immutable GOVERNANCE_TOKEN =
         ERC20VotesMock(
             vm.computeCreate2Address(
@@ -34,16 +35,13 @@ abstract contract Script is StdCheats, ForgeScript {
                 0,
                 hashInitCode(
                     type(UniStaker).creationCode,
-                    abi.encode(
-                        REWARDS_TOKEN,
-                        GOVERNANCE_TOKEN,
-                        REWARDS_NOTIFIER
-                    )
+                    abi.encode(REWARDS_TOKEN, GOVERNANCE_TOKEN, ADMIN)
                 )
             )
         );
 
     constructor() {
+        vm.label(ADMIN, "UniStaker Admin");
         vm.label(REWARDS_NOTIFIER, "Rewards Notifier");
         vm.label(address(REWARDS_TOKEN), "Rewards Token");
         vm.label(address(GOVERNANCE_TOKEN), "Governance Token");

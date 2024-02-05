@@ -8,7 +8,6 @@ import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { Trophy } from "lucide-react"
-import { useEffect } from "react"
 import { useAccount, useReadContract } from "wagmi"
 
 function useStakeCardRewards() {
@@ -21,18 +20,14 @@ function useStakeCardRewards() {
     args: account.address === undefined ? undefined : [account.address]
   })
 
-  const {
-    isSuccess,
-    writeContract
-  } = useWriteContractWithToast()
-
   const queryClient = useQueryClient()
-
-  useEffect(() => {
-    if (isSuccess) {
-      queryClient.invalidateQueries({ queryKey })
+  const {
+    writeContract
+  } = useWriteContractWithToast({
+    mutation: {
+      onSuccess: () => queryClient.invalidateQueries({ queryKey })
     }
-  }, [isSuccess, queryClient, queryKey])
+  })
 
   const writeClaim = () =>
     writeContract({

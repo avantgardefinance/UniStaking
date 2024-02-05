@@ -12,22 +12,16 @@ import { governanceToken, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
-import { useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
 import { useAccount, useReadContract } from "wagmi"
 
-const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bigint }) => {
+const useStakeDialog = ({ availableForStakingUni }: {
+  availableForStakingUni: bigint
+}) => {
   const account = useAccount()
-  const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    isSuccess: isSuccessWrite,
-    writeContract
-  } = useWriteContractWithToast()
-
-  const queryClient = useQueryClient()
 
   const { data: allowance, queryKey: queryKeyAllowance } = useReadContract({
     address: governanceToken,
@@ -36,11 +30,16 @@ const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bi
     args: account.address === undefined ? undefined : [account.address, uniStaker]
   })
 
-  useEffect(() => {
-    if (isSuccessWrite) {
-      queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
+  const queryClient = useQueryClient()
+  const {
+    error: errorWrite,
+    isPending: isPendingWrite,
+    writeContract
+  } = useWriteContractWithToast({
+    mutation: {
+      onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
     }
-  }, [isSuccessWrite, queryClient, queryKeyAllowance])
+  })
 
   const form = useForm({
     defaultValues: {
@@ -72,13 +71,23 @@ const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bi
         functionName: "stake",
         args: [parseUnits(values.amount, 18), values.delegatee, values.beneficiary]
       })
+
+      // },  {
+      //   onSuccess: () => {
+      //     queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
+      //   })
     } else {
-      writeContract({
-        address: governanceToken,
-        abi: abiIERC20,
-        functionName: "approve",
-        args: [uniStaker, parseUnits(values.amount, 18)]
-      })
+      // writeContract({
+      //   address: governanceToken,
+      //   abi: abiIERC20,
+      //   functionName: "approve",
+      //   args: [uniStaker, parseUnits(values.amount, 18)],
+
+      // },
+      // {
+      //   onSuccess: () => {
+      //     queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
+      //   })
     }
   }, [hasEnoughAllowance, writeContract])
 

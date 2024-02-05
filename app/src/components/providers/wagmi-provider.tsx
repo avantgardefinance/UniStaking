@@ -1,35 +1,31 @@
 "use client"
 
-import "@rainbow-me/rainbowkit/styles.css"
 import { walletConnectProjectId } from "@/lib/consts"
 import { chain, rpcUrl } from "@/lib/environment"
-import { darkTheme, getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit"
+import { ConnectKitProvider, getDefaultConfig } from "connectkit"
 import type { ReactNode } from "react"
-import { configureChains, createConfig, WagmiConfig } from "wagmi"
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
+import { createConfig, http, WagmiProvider as WagmiProviderBase } from "wagmi"
 
-const { chains, publicClient } = configureChains([chain], [jsonRpcProvider({
-  rpc: ({ id }) => (id === chain.id) ? { http: rpcUrl } : null
-})])
-
-const { connectors } = getDefaultWallets({
-  appName: "Uniswap",
-  projectId: walletConnectProjectId,
-  chains
-})
-
-const config = createConfig({
-  autoConnect: true,
-  publicClient,
-  connectors
-})
+const config = createConfig(getDefaultConfig({
+  chains: [chain],
+  transports: {
+    [chain.id]: http(rpcUrl)
+  },
+  walletConnectProjectId,
+  // TODO: Fill in proper values for these.
+  appName: "Uniswap Staking",
+  appDescription: "Uniswap Staking",
+  appUrl: "https://family.co", // your app's url
+  appIcon: "https://family.co/logo.png" // your app's icon, no bigger than 1024x1024px (max. 1MB)
+}))
 
 export function WagmiProvider({ children }: { children: ReactNode }) {
   return (
-    <WagmiConfig config={config}>
-      <RainbowKitProvider chains={chains} theme={darkTheme()}>
+    <WagmiProviderBase config={config}>
+      {/* TODO: Remove this configuration once https://github.com/family/connectkit/issues/340 is resolved. */}
+      <ConnectKitProvider options={{ enforceSupportedChains: false }}>
         {children}
-      </RainbowKitProvider>
-    </WagmiConfig>
+      </ConnectKitProvider>
+    </WagmiProviderBase>
   )
 }

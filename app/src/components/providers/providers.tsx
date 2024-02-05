@@ -8,9 +8,11 @@ import type { ReactNode } from "react"
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
-      <WagmiProvider>
-        <QueryClientProvider>{children}</QueryClientProvider>
-      </WagmiProvider>
+      <QueryClientProvider>
+        <WagmiProvider>
+          {children}
+        </WagmiProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   )
 }

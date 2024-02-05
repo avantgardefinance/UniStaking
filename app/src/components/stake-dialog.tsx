@@ -9,45 +9,35 @@ import { Input } from "@/components/ui/input"
 import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
-import { useContractWriteWithToast } from "@/lib/hooks/useContractWriteWithToast"
-
+import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { Download, RotateCw } from "lucide-react"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
-import { useAccount, useContractRead } from "wagmi"
+import { useAccount, useReadContract } from "wagmi"
 
 const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bigint }) => {
   const account = useAccount()
-
   const {
-    error: errorStake,
-    isLoading: isLoadingStake,
-    write: writeStake
-  } = useContractWriteWithToast({
-    address: uniStaker,
-    abi: abiUniStaker,
-    functionName: "stake"
-  })
+    error: errorWrite,
+    isPending: isPendingWrite,
+    isSuccess: isSuccessWrite,
+    writeContract
+  } = useWriteContractWithToast()
 
-  const {
-    error: errorApprove,
-    isLoading: isLoadingApprove,
-    write: writeApprove
-  } = useContractWriteWithToast({
-    address: governanceToken,
-    abi: abiIERC20,
-    functionName: "approve"
-  })
-
-  const { data: allowance, error: errorAllowance } = useContractRead({
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: governanceToken,
     abi: abiIERC20,
     functionName: "allowance",
-    args: account.address === undefined ? undefined : [account.address, uniStaker],
-    watch: true
+    args: account.address === undefined ? undefined : [account.address, uniStaker]
   })
+
+  useEffect(() => {
+    if (isSuccessWrite) {
+      refetchAllowance()
+    }
+  }, [isSuccessWrite, refetchAllowance])
 
   const form = useForm({
     defaultValues: {
@@ -73,37 +63,38 @@ const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bi
     }
 
     if (hasEnoughAllowance) {
-      writeStake({
+      writeContract({
+        address: uniStaker,
+        abi: abiUniStaker,
+        functionName: "stake",
         args: [parseUnits(values.amount, 18), values.delegatee, values.beneficiary]
       })
-      return
+    } else {
+      writeContract({
+        address: governanceToken,
+        abi: abiIERC20,
+        functionName: "approve",
+        args: [uniStaker, parseUnits(values.amount, 18)]
+      })
     }
-
-    writeApprove({
-      args: [uniStaker, parseUnits(values.amount, 18)]
-    })
-  }, [hasEnoughAllowance, writeApprove, writeStake])
+  }, [hasEnoughAllowance, writeContract])
 
   const setMaxAmount = useCallback(() => {
     setValue("amount", formatUnits(availableForStakingUni, 18))
   }, [availableForStakingUni, setValue])
 
-  const isLoading = isLoadingStake || isLoadingApprove
-
-  const error = errorAllowance || errorStake || errorApprove
-
   return {
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
     hasEnoughAllowance,
-    error,
-    isLoading,
+    error: errorWrite,
+    isPending: isPendingWrite,
     setMaxAmount
   }
 }
 
 export function StakeDialogContent({ availableForStakingUni }: { availableForStakingUni: bigint }) {
-  const { error, form, hasEnoughAllowance, isLoading, onSubmit, setMaxAmount } = useStakeDialog({
+  const { error, form, hasEnoughAllowance, isPending, onSubmit, setMaxAmount } = useStakeDialog({
     availableForStakingUni
   })
 
@@ -191,8 +182,8 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
           </div>
 
           <DialogFooter>
-            <Button type="submit" className="space-x-2" disabled={isLoading}>
-              {isLoading
+            <Button type="submit" className="space-x-2" disabled={isPending}>
+              {isPending
                 ? <RotateCw className="mr-2 size-4 animate-spin" />
                 : hasEnoughAllowance
                 ? <Download size={16} />

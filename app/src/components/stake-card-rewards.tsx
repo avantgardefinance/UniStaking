@@ -3,30 +3,39 @@
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
+import { NoSsr } from "@/components/ui/no-ssr"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
 import { useContractWriteWithToast } from "@/lib/hooks/useContractWriteWithToast"
 import { Trophy } from "lucide-react"
-import { useAccount, useContractRead } from "wagmi"
+import { useCallback } from "react"
+import { useAccount, useReadContract } from "wagmi"
 
 function useStakeCardRewards() {
   const account = useAccount()
 
-  const { data: rewards, isLoading: isLoadingRewards } = useContractRead({
+  const { data: rewards, isLoading: isLoadingRewards } = useReadContract({
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "earned",
-    args: account.address === undefined ? undefined : [account.address],
-    watch: true
+    args: account.address === undefined ? undefined : [account.address]
   })
 
   const {
-    write: writeClaim
+    writeContract
   } = useContractWriteWithToast({
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "claimReward"
   })
+
+  const writeClaim = useCallback(() => {
+    writeContract({
+      address: uniStaker,
+      abi: abiUniStaker,
+      functionName: "claimReward"
+    })
+  }, [writeContract])
 
   const isAbleToClaim = rewards !== 0n && rewards !== undefined
 

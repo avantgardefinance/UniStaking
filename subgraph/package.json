@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "codegen": "graph codegen",
+    "lint": "eslint \"src/**/*.ts\"",
+    "format": "pnpm lint --fix",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ uniswap/staking",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 uniswap/staking",
@@ -10,7 +12,7 @@
     "remove-local": "graph remove --node http://localhost:8020/ uniswap/staking"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.67.2",
+    "@graphprotocol/graph-cli": "0.67.3",
     "@graphprotocol/graph-ts": "0.32.0"
   }
 }

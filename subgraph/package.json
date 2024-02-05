@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "codegen": "graph codegen",
+    "lint": "eslint \"src/**/*.ts\"",
+    "format": "pnpm lint --fix",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ uniswap/staking",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 uniswap/staking",

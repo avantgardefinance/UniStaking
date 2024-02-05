@@ -4,16 +4,14 @@
   "scripts": {
     "lint": "pnpm --recursive --parallel run lint",
     "format": "pnpm --recursive --parallel run format",
-    "build": "pnpm --recursive --parallel run build",
-    "start": "pnpm --recursive --parallel run start",
-    "dev": "pnpm --recursive --parallel run dev"
+    "dev": "pnpm --filter app run dev"
   },
   "devDependencies": {
     "typescript": "^5"
   },
   "pnpm": {
     "patchedDependencies": {
-      "@graphprotocol/graph-cli@0.67.2": "patches/@graphprotocol__graph-cli@0.67.2.patch"
+      "@graphprotocol/graph-cli@0.67.3": "patches/@graphprotocol__graph-cli@0.67.3.patch"
     }
   }
 }

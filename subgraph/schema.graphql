@@ -7,58 +7,79 @@ interface Event {
   transactionHash: Bytes!
 }
 
-type BeneficiaryAltered implements Event @entity(immutable: true) {
+interface DepositEvent {
   id: Bytes!
-  depositId: BigInt! # uint256
-  oldBeneficiary: Bytes! # address
-  newBeneficiary: Bytes! # address
+  depositId: BigInt!
+  deposit: Deposit!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type DelegateeAltered implements Event @entity(immutable: true) {
+interface RewardEvent {
   id: Bytes!
-  depositId: BigInt! # uint256
-  oldDelegatee: Bytes! # address
-  newDelegatee: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RewardClaimed implements Event @entity(immutable: true) {
+type BeneficiaryAltered implements Event & DepositEvent
+  @entity(immutable: true) {
   id: Bytes!
-  beneficiary: Bytes! # address
-  amount: BigInt! # uint256
+  depositId: BigInt!
+  deposit: Deposit!
+  oldBeneficiary: Bytes!
+  newBeneficiary: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RewardNotified implements Event @entity(immutable: true) {
+type DelegateeAltered implements Event & DepositEvent @entity(immutable: true) {
   id: Bytes!
-  amount: BigInt! # uint256
+  depositId: BigInt!
+  deposit: Deposit!
+  oldDelegatee: Bytes!
+  newDelegatee: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type StakeDeposited implements Event @entity(immutable: true) {
+type RewardClaimed implements Event & RewardEvent @entity(immutable: true) {
   id: Bytes!
-  depositId: BigInt! # uint256
-  amount: BigInt! # uint256
-  totalDeposited: BigInt! # uint256
+  beneficiary: Bytes!
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type StakeWithdrawn implements Event @entity(immutable: true) {
+type RewardNotified implements Event & RewardEvent @entity(immutable: true) {
   id: Bytes!
-  depositId: BigInt! # uint256
-  amount: BigInt! # uint256
-  remainingAmount: BigInt! # uint256
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type StakeDeposited implements Event & DepositEvent @entity(immutable: true) {
+  id: Bytes!
+  depositId: BigInt!
+  deposit: Deposit!
+  amount: BigInt!
+  totalDeposited: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type StakeWithdrawn implements Event & DepositEvent @entity(immutable: true) {
+  id: Bytes!
+  depositId: BigInt!
+  deposit: Deposit!
+  amount: BigInt!
+  remainingAmount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -66,24 +87,28 @@ type StakeWithdrawn implements Event @entity(immutable: true) {
 
 type SurrogateDeployed implements Event @entity(immutable: true) {
   id: Bytes!
-  delegatee: Bytes! # address
-  surrogate: Bytes! # address
+  delegatee: Bytes!
+  surrogate: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-# Higher Level Entities
+# Deposit
 
 type Deposit @entity {
-  id: String!
+  id: String! # depositId (BigInt converted to String)
   createdAt: Int!
   updatedAt: Int!
   owner: Account!
   delegatee: Account!
   beneficiary: Account!
   amount: BigInt!
+
+  events: [DepositEvent!]! @derivedFrom(field: "deposit")
 }
+
+# Surrogate
 
 type Surrogate @entity {
   id: Bytes!
@@ -91,10 +116,30 @@ type Surrogate @entity {
   delegatee: Account!
 }
 
+# Account
+
 type Account @entity {
   id: Bytes!
+  createdAt: Int!
+  claimedRewards: BigInt!
+
   ownerships: [Deposit!]! @derivedFrom(field: "owner")
   delegateeships: [Deposit!]! @derivedFrom(field: "delegatee")
   beneficiaryships: [Deposit!]! @derivedFrom(field: "beneficiary")
+
   delegateeSurrogates: [Surrogate!]! @derivedFrom(field: "delegatee")
+}
+
+# Uni Staker History
+
+type UniStakerHistory @entity {
+  id: String!
+  timestamp: Int!
+
+  totalStaked: BigInt!
+  totalWithdrawn: BigInt!
+  currentlyStaked: BigInt!
+
+  totalRewards: BigInt!
+  claimedRewards: BigInt!
 }

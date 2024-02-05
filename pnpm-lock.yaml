@@ -48,7 +48,7 @@ importers:
         version: 2.1.0
       connectkit:
         specifier: 1.7.0
-        version: 1.7.0(@babel/core@7.23.9)(@tanstack/react-query@5.18.1)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)(viem@2.7.3)(wagmi@2.5.5)
+        version: 1.7.0(@babel/core@7.23.9)(@tanstack/react-query@5.18.1)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)(viem@2.7.3)(wagmi@2.5.5)
       lucide-react:
         specifier: ^0.321.0
         version: 0.321.0(react@18.2.0)
@@ -2986,7 +2986,7 @@ packages:
   /@radix-ui/primitive@1.0.1:
     resolution: {integrity: sha512-yQ8oGX2GVsEYMWGxcovu1uGWPCxV5BFfeeYxqPmuAzUyLT9qmaMXSAhXpb0WrspIeqYzdJpkh2vHModJPgRIaw==}
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
     dev: false
 
   /@radix-ui/react-accordion@1.1.2(@types/react-dom@18.2.18)(@types/react@18.2.53)(react-dom@18.2.0)(react@18.2.0):
@@ -3002,7 +3002,7 @@ packages:
       '@types/react-dom':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@radix-ui/primitive': 1.0.1
       '@radix-ui/react-collapsible': 1.0.3(@types/react-dom@18.2.18)(@types/react@18.2.53)(react-dom@18.2.0)(react@18.2.0)
       '@radix-ui/react-collection': 1.0.3(@types/react-dom@18.2.18)(@types/react@18.2.53)(react-dom@18.2.0)(react@18.2.0)
@@ -3031,7 +3031,7 @@ packages:
       '@types/react-dom':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@radix-ui/primitive': 1.0.1
       '@radix-ui/react-compose-refs': 1.0.1(@types/react@18.2.53)(react@18.2.0)
       '@radix-ui/react-context': 1.0.1(@types/react@18.2.53)(react@18.2.0)
@@ -3059,7 +3059,7 @@ packages:
       '@types/react-dom':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@radix-ui/react-compose-refs': 1.0.1(@types/react@18.2.53)(react@18.2.0)
       '@radix-ui/react-context': 1.0.1(@types/react@18.2.53)(react@18.2.0)
       '@radix-ui/react-primitive': 1.0.3(@types/react-dom@18.2.18)(@types/react@18.2.53)(react-dom@18.2.0)(react@18.2.0)
@@ -3079,7 +3079,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@types/react': 18.2.53
       react: 18.2.0
     dev: false
@@ -3093,7 +3093,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@types/react': 18.2.53
       react: 18.2.0
     dev: false
@@ -3141,7 +3141,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@types/react': 18.2.53
       react: 18.2.0
     dev: false
@@ -3217,7 +3217,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@radix-ui/react-use-layout-effect': 1.0.1(@types/react@18.2.53)(react@18.2.0)
       '@types/react': 18.2.53
       react: 18.2.0
@@ -3334,7 +3334,7 @@ packages:
       '@types/react-dom':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@radix-ui/react-slot': 1.0.2(@types/react@18.2.53)(react@18.2.0)
       '@types/react': 18.2.53
       '@types/react-dom': 18.2.18
@@ -3412,7 +3412,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@radix-ui/react-use-callback-ref': 1.0.1(@types/react@18.2.53)(react@18.2.0)
       '@types/react': 18.2.53
       react: 18.2.0
@@ -3427,7 +3427,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.23.8
       '@radix-ui/react-use-callback-ref': 1.0.1(@types/react@18.2.53)(react@18.2.0)
       '@types/react': 18.2.53
       react: 18.2.0
@@ -5411,7 +5411,7 @@ packages:
       '@babel/plugin-syntax-jsx': 7.23.3(@babel/core@7.23.9)
       lodash: 4.17.21
       picomatch: 2.3.1
-      styled-components: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)
+      styled-components: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
     transitivePeerDependencies:
       - '@babel/core'
     dev: false
@@ -6000,7 +6000,7 @@ packages:
       - supports-color
     dev: false
 
-  /connectkit@1.7.0(@babel/core@7.23.9)(@tanstack/react-query@5.18.1)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)(viem@2.7.3)(wagmi@2.5.5):
+  /connectkit@1.7.0(@babel/core@7.23.9)(@tanstack/react-query@5.18.1)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)(viem@2.7.3)(wagmi@2.5.5):
     resolution: {integrity: sha512-yKvt3tZSSXIFY/ElAfwiqs+X3jc+4SxXSdvwsuZ4DLxijPzAluzfwWlnHcs+t7kb2qOVhNFhOB1OeI7GW6G3Jw==}
     engines: {node: '>=12.4'}
     peerDependencies:
@@ -6020,7 +6020,7 @@ packages:
       react-transition-state: 1.1.5(react-dom@18.2.0)(react@18.2.0)
       react-use-measure: 2.1.1(react-dom@18.2.0)(react@18.2.0)
       resize-observer-polyfill: 1.5.1
-      styled-components: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)
+      styled-components: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
       viem: 2.7.3(typescript@5.3.3)
       wagmi: 2.5.5(@tanstack/react-query@5.18.1)(@types/react@18.2.53)(react-dom@18.2.0)(react-native@0.73.3)(react@18.2.0)(typescript@5.3.3)(viem@2.7.3)
     transitivePeerDependencies:
@@ -10708,7 +10708,7 @@ packages:
     dependencies:
       object-assign: 4.1.1
       react: 18.2.0
-      react-is: 16.13.1
+      react-is: 18.2.0
     dev: false
 
   /react-style-singleton@2.2.1(@types/react@18.2.53)(react@18.2.0):
@@ -11559,7 +11559,7 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /styled-components@5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0):
+  /styled-components@5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-uuzIIfnVkagcVHv9nE0VPlHPSCmXIUGKfJ42LNjxCCTDTL5sgnJ8Z7GZBq0EnLYGln77tPpEpExt2+qa+cZqSw==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -11577,7 +11577,7 @@ packages:
       hoist-non-react-statics: 3.3.2
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      react-is: 16.13.1
+      react-is: 18.2.0
       shallowequal: 1.1.0
       supports-color: 5.5.0
     transitivePeerDependencies:

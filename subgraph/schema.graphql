@@ -1,4 +1,13 @@
-type BeneficiaryAltered @entity(immutable: true) {
+# Events
+
+interface Event {
+  id: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type BeneficiaryAltered implements Event @entity(immutable: true) {
   id: Bytes!
   depositId: BigInt! # uint256
   oldBeneficiary: Bytes! # address
@@ -8,7 +17,7 @@ type BeneficiaryAltered @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type DelegateeAltered @entity(immutable: true) {
+type DelegateeAltered implements Event @entity(immutable: true) {
   id: Bytes!
   depositId: BigInt! # uint256
   oldDelegatee: Bytes! # address
@@ -18,7 +27,7 @@ type DelegateeAltered @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type RewardClaimed @entity(immutable: true) {
+type RewardClaimed implements Event @entity(immutable: true) {
   id: Bytes!
   beneficiary: Bytes! # address
   amount: BigInt! # uint256
@@ -27,7 +36,7 @@ type RewardClaimed @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type RewardNotified @entity(immutable: true) {
+type RewardNotified implements Event @entity(immutable: true) {
   id: Bytes!
   amount: BigInt! # uint256
   blockNumber: BigInt!
@@ -35,7 +44,7 @@ type RewardNotified @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type StakeDeposited @entity(immutable: true) {
+type StakeDeposited implements Event @entity(immutable: true) {
   id: Bytes!
   depositId: BigInt! # uint256
   amount: BigInt! # uint256
@@ -45,7 +54,7 @@ type StakeDeposited @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type StakeWithdrawn @entity(immutable: true) {
+type StakeWithdrawn implements Event @entity(immutable: true) {
   id: Bytes!
   depositId: BigInt! # uint256
   amount: BigInt! # uint256
@@ -55,11 +64,37 @@ type StakeWithdrawn @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type SurrogateDeployed @entity(immutable: true) {
+type SurrogateDeployed implements Event @entity(immutable: true) {
   id: Bytes!
   delegatee: Bytes! # address
   surrogate: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+}
+
+# Higher Level Entities
+
+type Deposit @entity {
+  id: String!
+  createdAt: Int!
+  updatedAt: Int!
+  owner: Account!
+  delegatee: Account!
+  beneficiary: Account!
+  amount: BigInt!
+}
+
+type Surrogate @entity {
+  id: Bytes!
+  createdAt: Int!
+  delegatee: Account!
+}
+
+type Account @entity {
+  id: Bytes!
+  ownerships: [Deposit!]! @derivedFrom(field: "owner")
+  delegateeships: [Deposit!]! @derivedFrom(field: "delegatee")
+  beneficiaryships: [Deposit!]! @derivedFrom(field: "beneficiary")
+  delegateeSurrogates: [Surrogate!]! @derivedFrom(field: "delegatee")
 }

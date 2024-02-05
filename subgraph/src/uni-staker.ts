@@ -14,8 +14,11 @@ import {
   RewardNotified,
   StakeDeposited,
   StakeWithdrawn,
+  Surrogate,
   SurrogateDeployed
 } from "../generated/schema"
+import { getOrCreateAccount } from "./account"
+import { getDeposit, getOrCreateDeposit } from "./deposit"
 
 export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   let entity = new BeneficiaryAltered(
@@ -30,11 +33,15 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  let stakingPosition = getDeposit(event.params.depositId);
+  stakingPosition.beneficiary = getOrCreateAccount(event.params.newBeneficiary, event).id;
+  stakingPosition.save()
 }
 
 export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   let entity = new DelegateeAltered(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
+    event.transaction.hash.concatI32(event.logIndex.toI32()) 
   )
   entity.depositId = event.params.depositId
   entity.oldDelegatee = event.params.oldDelegatee
@@ -45,6 +52,10 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  let stakingPosition = getDeposit(event.params.depositId);
+  stakingPosition.delegatee = getOrCreateAccount(event.params.newDelegatee, event).id;
+  stakingPosition.save()
 }
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
@@ -87,6 +98,10 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  let stakingPosition = getOrCreateDeposit(event.params.depositId, event);
+  stakingPosition.amount = stakingPosition.amount.plus(event.params.amount);
+  stakingPosition.save()
 }
 
 export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
@@ -102,6 +117,10 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  let stakingPosition = getDeposit(event.params.depositId);
+  stakingPosition.amount = stakingPosition.amount.minus(event.params.amount);
+  stakingPosition.save()
 }
 
 export function handleSurrogateDeployed(event: SurrogateDeployedEvent): void {
@@ -116,4 +135,9 @@ export function handleSurrogateDeployed(event: SurrogateDeployedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  let surrogate = new Surrogate(event.params.surrogate);
+  surrogate.delegatee = event.params.delegatee;
+  surrogate.createdAt = event.block.timestamp.toI32();
+  surrogate.save()
 }

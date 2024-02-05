@@ -10,6 +10,7 @@ import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
 import { useCallback } from "react"
 import { useForm } from "react-hook-form"
@@ -17,19 +18,27 @@ import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
 import { useAccount, useReadContract } from "wagmi"
 
-const useStakeDialog = ({ availableForStakingUni }: { availableForStakingUni: bigint }) => {
+const useStakeDialog = ({ availableForStakingUni }: {
+  availableForStakingUni: bigint
+}) => {
   const account = useAccount()
-  const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    writeContract
-  } = useWriteContractWithToast()
 
-  const { data: allowance } = useReadContract({
+  const { data: allowance, queryKey: queryKeyAllowance } = useReadContract({
     address: governanceToken,
     abi: abiIERC20,
     functionName: "allowance",
     args: account.address === undefined ? undefined : [account.address, uniStaker]
+  })
+
+  const queryClient = useQueryClient()
+  const {
+    error: errorWrite,
+    isPending: isPendingWrite,
+    writeContract
+  } = useWriteContractWithToast({
+    mutation: {
+      onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
+    }
   })
 
   const form = useForm({

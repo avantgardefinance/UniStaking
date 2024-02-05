@@ -1,11 +1,10 @@
 import { AvailableUniForStaking } from "@/components/stake-card-available-uni"
+import { StakeCardRewards } from "@/components/stake-card-rewards"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
-import { Trophy } from "lucide-react"
 
 export function StakeCards(
-  { rewardsWeth, totalStakedUni }: {
+  { totalStakedUni }: {
     totalStakedUni: bigint
     rewardsWeth: bigint
   }
@@ -25,21 +24,7 @@ export function StakeCards(
             </h3>
           </CardContent>
         </Card>
-        <Card className="grow">
-          <CardHeader>
-            <CardDescription className="text-base font-medium">Rewards</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
-            <h3 className="space-x-2">
-              <BigIntDisplay value={rewardsWeth} decimals={18} />
-              <span>WETH</span>
-            </h3>
-            <Button size="lg" variant="outline" className="space-x-2">
-              <Trophy size={16} />
-              <span>Claim</span>
-            </Button>
-          </CardContent>
-        </Card>
+        <StakeCardRewards />
         <AvailableUniForStaking />
       </div>
     </div>

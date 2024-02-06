@@ -1,5 +1,5 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
-import { Account } from "../generated/schema"
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
+import { Account, AccountEvent } from "../generated/schema"
 
 export function getOrCreateAccount(address: Address, event: ethereum.Event): Account {
   let account = Account.load(address)
@@ -10,11 +10,20 @@ export function getOrCreateAccount(address: Address, event: ethereum.Event): Acc
 
   account = new Account(address)
   account.createdAt = event.block.timestamp.toI32()
-  account.totalStaked = BigInt.fromI32(0)
-  account.totalWithdrawn = BigInt.fromI32(0)
-  account.currentlyStaked = BigInt.fromI32(0)
-  account.claimedRewards = BigInt.fromI32(0)
+  account.totalStaked = BigInt.zero()
+  account.totalWithdrawn = BigInt.zero()
+  account.currentlyStaked = BigInt.zero()
+  account.claimedRewards = BigInt.zero()
   account.save()
 
   return account
+}
+
+export function trackAccountEvent(account: Address, eventId: Bytes, depositId: string | null): void {
+  const accountEventId = account.toHex() + "/" + eventId.toHex()
+  const accountEvent = new AccountEvent(accountEventId)
+  accountEvent.account = account
+  accountEvent.event = eventId
+  accountEvent.deposit = depositId
+  accountEvent.save()
 }

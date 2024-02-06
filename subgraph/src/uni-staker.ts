@@ -43,8 +43,10 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
-  trackAccountEvent(Address.fromBytes(deposit.owner), entityId)
-  trackAccountEvent(event.params.newBeneficiary, entityId)
+  if (event.params.oldBeneficiary.notEqual(Address.zero())) {
+    trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId)
+    trackAccountEvent(event.params.newBeneficiary, entityId, event.params.depositId)
+  }
 }
 
 export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
@@ -64,8 +66,10 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
-  trackAccountEvent(Address.fromBytes(deposit.owner), entityId)
-  trackAccountEvent(event.params.newDelegatee, entityId)
+  if (event.params.oldDelegatee.notEqual(Address.zero())) {
+    trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId)
+    trackAccountEvent(event.params.newDelegatee, entityId, event.params.depositId)
+  }
 }
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
@@ -83,8 +87,8 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   account.claimedRewards = account.claimedRewards.plus(event.params.amount)
   account.save()
 
-  trackAccountEvent(event.params.beneficiary, entityId)
-  trackUniStakerHistory(BigInt.fromI32(0), BigInt.fromI32(0), BigInt.fromI32(0), event.params.amount, event)
+  trackAccountEvent(event.params.beneficiary, entityId, null)
+  trackUniStakerHistory(BigInt.zero(), BigInt.zero(), BigInt.zero(), event.params.amount, event)
 }
 
 export function handleRewardNotified(event: RewardNotifiedEvent): void {
@@ -96,7 +100,7 @@ export function handleRewardNotified(event: RewardNotifiedEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
-  trackUniStakerHistory(BigInt.fromI32(0), BigInt.fromI32(0), event.params.amount, BigInt.fromI32(0), event)
+  trackUniStakerHistory(BigInt.zero(), BigInt.zero(), event.params.amount, BigInt.zero(), event)
 }
 
 export function handleStakeDeposited(event: StakeDepositedEvent): void {
@@ -121,8 +125,8 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   account.currentlyStaked = account.currentlyStaked.plus(event.params.amount)
   account.save()
 
-  trackAccountEvent(Address.fromBytes(deposit.owner), entityId)
-  trackUniStakerHistory(event.params.amount, BigInt.fromI32(0), BigInt.fromI32(0), BigInt.fromI32(0), event)
+  trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId)
+  trackUniStakerHistory(event.params.amount, BigInt.zero(), BigInt.zero(), BigInt.zero(), event)
 }
 
 export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
@@ -147,8 +151,8 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   account.currentlyStaked = account.currentlyStaked.minus(event.params.amount)
   account.save()
 
-  trackAccountEvent(Address.fromBytes(deposit.owner), entityId)
-  trackUniStakerHistory(BigInt.fromI32(0), event.params.amount, BigInt.fromI32(0), BigInt.fromI32(0), event)
+  trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId)
+  trackUniStakerHistory(BigInt.zero(), event.params.amount, BigInt.zero(), BigInt.zero(), event)
 }
 
 export function handleSurrogateDeployed(event: SurrogateDeployedEvent): void {

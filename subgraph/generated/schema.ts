@@ -1357,6 +1357,23 @@ export class AccountEvent extends Entity {
   set event(value: Bytes) {
     this.set("event", Value.fromBytes(value));
   }
+
+  get deposit(): string | null {
+    let value = this.get("deposit");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set deposit(value: string | null) {
+    if (!value) {
+      this.unset("deposit");
+    } else {
+      this.set("deposit", Value.fromString(<string>value));
+    }
+  }
 }
 
 export class UniStakerHistory extends Entity {

@@ -12,11 +12,11 @@ function getOrCreateUniStakerHistoryItem(id: string, event: ethereum.Event): Uni
 
   ush = new UniStakerHistory(id)
   ush.timestamp = event.block.timestamp.toI32()
-  ush.totalStaked = BigInt.fromI32(0)
-  ush.totalWithdrawn = BigInt.fromI32(0)
-  ush.currentlyStaked = BigInt.fromI32(0)
-  ush.totalRewards = BigInt.fromI32(0)
-  ush.claimedRewards = BigInt.fromI32(0)
+  ush.totalStaked = BigInt.zero()
+  ush.totalWithdrawn = BigInt.zero()
+  ush.currentlyStaked = BigInt.zero()
+  ush.totalRewards = BigInt.zero()
+  ush.claimedRewards = BigInt.zero()
   ush.save()
 
   return ush

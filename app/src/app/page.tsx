@@ -1,4 +1,4 @@
-import { FAQ } from "@/components/FAQ"
+import { FAQ } from "@/components/faq"
 import { StakeCards } from "@/components/stake-cards"
 
 export default function IndexPage() {

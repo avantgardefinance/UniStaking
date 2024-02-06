@@ -8,7 +8,7 @@ export function Jazzicon({ address, size }: { address: Address; size: number }) 
   return (
     <div
       className={`h-[${size}px] w-[${size}px]`}
-      dangerouslySetInnerHTML={{ __html: new XMLSerializer().serializeToString(jazziconData) }}
+      dangerouslySetInnerHTML={{ __html: jazziconData.outerHTML }}
     />
   )
 }

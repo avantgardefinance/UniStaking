@@ -1,3 +1,4 @@
+import { StakeMoreDialogContent } from "@/components/stake-more-dialog"
 import { AddressDisplay } from "@/components/ui/address-display"
 import { Badge } from "@/components/ui/badge"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
@@ -14,10 +15,12 @@ import { useAccount } from "wagmi"
 
 function useStakePositionCard({ owner }: { owner: Address }) {
   const account = useAccount()
-  return { isOwner: account.address ? isAddressEqual(account.address, owner) : false }
+  return {
+    isOwner: account.address ? isAddressEqual(account.address, owner) : false
+  }
 }
 
-export type StakePositionCardProps = {
+export type StakePosition = {
   stakeId: bigint
   stakedAmount: bigint
   createdAt: dayjs.Dayjs
@@ -26,9 +29,16 @@ export type StakePositionCardProps = {
   beneficiary: Address
   delegatee: Address
 }
+export type StakePositionCardProps = {
+  position: StakePosition
+  governanceTokenBalanceValue: bigint
+}
 
 export function StakePositionCard(
-  { beneficiary, createdAt, delegatee, owner, stakeId, stakedAmount, updatedAt }: StakePositionCardProps
+  {
+    governanceTokenBalanceValue,
+    position: { beneficiary, createdAt, delegatee, owner, stakeId, stakedAmount, updatedAt }
+  }: StakePositionCardProps
 ) {
   const { isOwner } = useStakePositionCard({ owner })
   return (
@@ -40,7 +50,7 @@ export function StakePositionCard(
           </Badge>
           <Badge className="p-2">
             <div className="flex items-center space-x-2">
-              <span>Owner</span> <AddressDisplay value={owner} />
+              <span>Owner</span> <AddressDisplay iconSize={12} value={owner} />
             </div>
           </Badge>
           <Badge className="p-2" variant="secondary">
@@ -67,7 +77,7 @@ export function StakePositionCard(
           </div>
           {isOwner && <Button variant="ghost">Edit</Button>}
         </div>
-        <div className="space-x-4">
+        <div className="flex flex-row items-center space-x-4">
           {isOwner ?
             (
               <>
@@ -85,10 +95,19 @@ export function StakePositionCard(
                     beneficiary={beneficiary}
                   />
                 </Dialog>
-
-                <Button variant="secondary" className="space-x-2">
-                  <Download size={16} /> <span>Stake</span>
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="secondary" disabled={governanceTokenBalanceValue === 0n} className="space-x-2">
+                      <Download size={16} /> <span>Stake</span>
+                    </Button>
+                  </DialogTrigger>
+                  <StakeMoreDialogContent
+                    availableForStakingUni={governanceTokenBalanceValue}
+                    stakeId={stakeId}
+                    delegatee={delegatee}
+                    beneficiary={beneficiary}
+                  />
+                </Dialog>
               </>
             ) :
             (

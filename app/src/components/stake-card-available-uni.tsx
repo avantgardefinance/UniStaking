@@ -6,23 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { NoSsr } from "@/components/ui/no-ssr"
-import { governanceToken } from "@/lib/consts"
+import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
 import { Download } from "lucide-react"
-import { useAccount, useBalance } from "wagmi"
-
-function useAvailableUniForStaking() {
-  const { address } = useAccount()
-  const { data, status } = useBalance({
-    address,
-    token: governanceToken
-  })
-
-  return { data, status }
-}
 
 export function AvailableUniForStaking() {
   return (
-    <Card className="grow">
+    <Card className="flex-1">
       <CardHeader>
         <CardDescription className="text-base font-medium">
           Available for staking
@@ -38,7 +27,7 @@ export function AvailableUniForStaking() {
 }
 
 function AvailableUniForStakingContent() {
-  const { data, status } = useAvailableUniForStaking()
+  const { data, status } = useGovernanceTokenBalance()
 
   if (status === "error") {
     return "Error"
@@ -58,7 +47,7 @@ function AvailableUniForStakingContent() {
         <span>
           <BigIntDisplay value={data.value} decimals={data.decimals} precision={2} />
         </span>
-        <span>{data.symbol}</span>
+        <span>UNI</span>
       </h3>
       <Dialog>
         <DialogTrigger asChild>

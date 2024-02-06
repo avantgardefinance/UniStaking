@@ -45,7 +45,7 @@ function AvailableUniForStakingContent() {
   }
 
   if (status === "pending") {
-    return "Loading"
+    return "Loading..."
   }
 
   if (data === undefined) {

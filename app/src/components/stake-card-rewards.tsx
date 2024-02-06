@@ -13,7 +13,7 @@ import { useAccount, useReadContract } from "wagmi"
 function useStakeCardRewards() {
   const account = useAccount()
 
-  const { data: rewards, isError, isLoading, queryKey } = useReadContract({
+  const { data: rewards, queryKey, status } = useReadContract({
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "earned",
@@ -38,38 +38,56 @@ function useStakeCardRewards() {
 
   const isAbleToClaim = rewards !== 0n && rewards !== undefined
 
-  return { rewards, writeClaim, isAbleToClaim, isError, isLoading }
+  return { rewards, writeClaim, isAbleToClaim, status }
 }
 
 export function StakeCardRewards() {
-  const { isAbleToClaim, isError, isLoading, rewards, writeClaim } = useStakeCardRewards()
-
   return (
     <Card className="grow">
       <CardHeader>
         <CardDescription className="text-base font-medium">Rewards</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
-        <h3 className="space-x-2">
-          {isLoading ? "Loading..." : isError || rewards === undefined ? "Error" : (
-            <>
-              <BigIntDisplay value={rewards} decimals={18} precision={4} />
-              <span>WETH</span>
-            </>
-          )}
-        </h3>
-
-        <Button
-          size="lg"
-          disabled={!isAbleToClaim}
-          variant="outline"
-          onClick={() => writeClaim()}
-          className="space-x-2"
-        >
-          <Trophy size={16} />
-          <span>Claim</span>
-        </Button>
+        <StakeCardRewardsContent />
       </CardContent>
     </Card>
+  )
+}
+
+function StakeCardRewardsContent() {
+  const { isAbleToClaim, rewards, status, writeClaim } = useStakeCardRewards()
+
+  if (status === "error") {
+    return "Error"
+  }
+
+  if (status === "pending") {
+    return "Loading..."
+  }
+
+  if (rewards === undefined) {
+    return "Not available"
+  }
+
+  return (
+    <>
+      <h3 className="space-x-2">
+        <>
+          <BigIntDisplay value={rewards} decimals={18} precision={4} />
+          <span>WETH</span>
+        </>
+      </h3>
+
+      <Button
+        size="lg"
+        disabled={!isAbleToClaim}
+        variant="outline"
+        onClick={() => writeClaim()}
+        className="space-x-2"
+      >
+        <Trophy size={16} />
+        <span>Claim</span>
+      </Button>
+    </>
   )
 }

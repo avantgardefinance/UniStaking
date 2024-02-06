@@ -1,10 +1,13 @@
 "use client"
-import { StakePositionCard, type StakePositionCardProps } from "@/components/stake-position-card"
+
+import { StakePositionCard } from "@/components/stake-position-card"
+import type { StakePosition } from "@/components/stake-position-card"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
 import dayjs from "dayjs"
 
 function useStakedAmounts() {
-  const positions: Array<StakePositionCardProps> = [
+  const positions: Array<StakePosition> = [
     {
       stakeId: 1n,
       stakedAmount: 100n,
@@ -34,32 +37,69 @@ function useStakedAmounts() {
     }
   ]
 
+  const { data: governanceTokenBalance, status: governanceTokenStatus } = useGovernanceTokenBalance()
+
   const isEmpty = positions.length === 0
-  return { positions, isEmpty }
+  return { positions, isEmpty, governanceTokenBalance, governanceTokenStatus }
 }
 
 export function StakedAmounts() {
-  const { isEmpty, positions } = useStakedAmounts()
-
   return (
     <div className="space-y-2">
       <h2 className="text-3xl font-bold">Staked Amounts</h2>
       <div className="flex flex-row flex-wrap gap-8">
-        {isEmpty && (
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>
-                No staked positions
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        )}
-        {positions.map((position) => (
-          <div key={position.stakeId} className="w-full">
-            <StakePositionCard {...position} />
-          </div>
-        ))}
+        <StakedAmountsContent />
       </div>
     </div>
+  )
+}
+
+function CardWithTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>
+          {children}
+        </CardTitle>
+      </CardHeader>
+    </Card>
+  )
+}
+
+function StakedAmountsContent() {
+  const { governanceTokenBalance, governanceTokenStatus, isEmpty, positions } = useStakedAmounts()
+
+  if (governanceTokenStatus === "pending") {
+    return <CardWithTitle>Loading...</CardWithTitle>
+  }
+
+  if (governanceTokenStatus === "error") {
+    return <CardWithTitle>Error</CardWithTitle>
+  }
+
+  if (governanceTokenBalance === undefined) {
+    return <CardWithTitle>Not available</CardWithTitle>
+  }
+
+  if (isEmpty) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>
+            No staked positions
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    )
+  }
+
+  return (
+    <>
+      {positions.map((position) => (
+        <div key={position.stakeId} className="w-full">
+          <StakePositionCard position={position} governanceTokenBalanceValue={governanceTokenBalance.value} />
+        </div>
+      ))}
+    </>
   )
 }

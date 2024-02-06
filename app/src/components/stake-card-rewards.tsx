@@ -38,10 +38,23 @@ function useStakeCardRewards() {
 
   const isAbleToClaim = rewards !== 0n && rewards !== undefined
 
-  return { rewards, status, writeClaim, isAbleToClaim }
+  return { rewards, writeClaim, isAbleToClaim, status }
 }
 
 export function StakeCardRewards() {
+  return (
+    <Card className="grow">
+      <CardHeader>
+        <CardDescription className="text-base font-medium">Rewards</CardDescription>
+      </CardHeader>
+      <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
+        <StakeCardRewardsContent />
+      </CardContent>
+    </Card>
+  )
+}
+
+function StakeCardRewardsContent() {
   const { isAbleToClaim, rewards, status, writeClaim } = useStakeCardRewards()
 
   if (status === "error") {
@@ -49,7 +62,7 @@ export function StakeCardRewards() {
   }
 
   if (status === "pending") {
-    return "Loading"
+    return "Loading..."
   }
 
   if (rewards === undefined) {
@@ -57,26 +70,24 @@ export function StakeCardRewards() {
   }
 
   return (
-    <Card className="grow">
-      <CardHeader>
-        <CardDescription className="text-base font-medium">Rewards</CardDescription>
-      </CardHeader>
-      <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
-        <h3 className="space-x-2">
-          <BigIntDisplay value={rewards} decimals={18} />
+    <>
+      <h3 className="space-x-2">
+        <>
+          <BigIntDisplay value={rewards} decimals={18} precision={4} />
           <span>WETH</span>
-        </h3>
-        <Button
-          size="lg"
-          disabled={!isAbleToClaim}
-          variant="outline"
-          onClick={() => writeClaim()}
-          className="space-x-2"
-        >
-          <Trophy size={16} />
-          <span>Claim</span>
-        </Button>
-      </CardContent>
-    </Card>
+        </>
+      </h3>
+
+      <Button
+        size="lg"
+        disabled={!isAbleToClaim}
+        variant="outline"
+        onClick={() => writeClaim()}
+        className="space-x-2"
+      >
+        <Trophy size={16} />
+        <span>Claim</span>
+      </Button>
+    </>
   )
 }

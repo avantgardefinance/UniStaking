@@ -12,7 +12,6 @@ import { governanceToken, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
-import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
@@ -55,7 +54,7 @@ const useStakeDialog = ({ availableForStakingUni }: {
 
   const hasEnoughAllowance = allowance !== undefined && parseUnits(amount, 18) <= allowance
 
-  const onSubmit = useCallback(async (values: {
+  const onSubmit = (values: {
     beneficiary: Address | undefined
     delegatee: Address | undefined
     amount: string
@@ -79,11 +78,9 @@ const useStakeDialog = ({ availableForStakingUni }: {
         args: [uniStaker, parseUnits(values.amount, 18)]
       })
     }
-  }, [hasEnoughAllowance, writeContract])
+  }
 
-  const setMaxAmount = useCallback(() => {
-    setValue("amount", formatUnits(availableForStakingUni, 18))
-  }, [availableForStakingUni, setValue])
+  const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18))
 
   return {
     form,
@@ -101,10 +98,10 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
   })
 
   return (
-    <DialogContent className="sm:max-w-[425px]">
+    <DialogContent>
       <DialogHeader>
         <DialogTitle>Stake</DialogTitle>
-        <DialogDescription>
+        <DialogDescription className="sr-only">
           Enter the amount, fee beneficiary and delegatee to stake
         </DialogDescription>
       </DialogHeader>
@@ -130,7 +127,7 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
                       }}
                       className="space-x-1 px-0"
                     >
-                      <BigIntDisplay value={availableForStakingUni} decimals={18} />
+                      <BigIntDisplay value={availableForStakingUni} decimals={18} precision={2} />
                       <span>UNI</span>
                     </Button>{" "}
                     in your balance

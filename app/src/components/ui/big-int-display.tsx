@@ -1,9 +1,9 @@
 import { formatUnits } from "viem"
 
-export function BigIntDisplay({ decimals, value }: { value: bigint; decimals: number }) {
+export function BigIntDisplay({ decimals, precision, value }: { value: bigint; decimals: number; precision: number }) {
   return (
     <span>
-      {formatUnits(value, decimals)}
+      {Number(formatUnits(value, decimals)).toFixed(precision)}
     </span>
   )
 }

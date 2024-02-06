@@ -19,7 +19,6 @@ endif
 
 FORGE := forge
 DOCKER := docker
-NETCAT := nc
 PNPM := pnpm
 
 SCRIPTS := contracts/scripts

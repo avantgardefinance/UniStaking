@@ -11,7 +11,6 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { RotateCw, Upload } from "lucide-react"
-import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
@@ -31,20 +30,17 @@ const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: bigint;
 
   const { setValue } = form
 
-  const onSubmit = useCallback(async (values: {
+  const onSubmit = (values: {
     amount: string
-  }) => {
+  }) =>
     writeContract({
       address: uniStaker,
       abi: abiUniStaker,
       functionName: "withdraw",
       args: [stakeId, parseUnits(values.amount, 18)]
     })
-  }, [stakeId, writeContract])
 
-  const setMaxAmount = useCallback(() => {
-    setValue("amount", formatUnits(availableForUnstaking, 18))
-  }, [availableForUnstaking, setValue])
+  const setMaxAmount = () => setValue("amount", formatUnits(availableForUnstaking, 18))
 
   return {
     form,

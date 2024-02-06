@@ -12,7 +12,6 @@ import { governanceToken, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
-import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
@@ -55,7 +54,7 @@ const useStakeDialog = ({ availableForStakingUni }: {
 
   const hasEnoughAllowance = allowance !== undefined && parseUnits(amount, 18) <= allowance
 
-  const onSubmit = useCallback(async (values: {
+  const onSubmit = (values: {
     beneficiary: Address | undefined
     delegatee: Address | undefined
     amount: string
@@ -79,11 +78,9 @@ const useStakeDialog = ({ availableForStakingUni }: {
         args: [uniStaker, parseUnits(values.amount, 18)]
       })
     }
-  }, [hasEnoughAllowance, writeContract])
+  }
 
-  const setMaxAmount = useCallback(() => {
-    setValue("amount", formatUnits(availableForStakingUni, 18))
-  }, [availableForStakingUni, setValue])
+  const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18))
 
   return {
     form,

@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button"
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
-import { RotateCw } from "lucide-react"
+import { RotateCw, Upload } from "lucide-react"
 import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
@@ -68,7 +69,7 @@ export function UnstakeDialogContent(
   })
 
   return (
-    <DialogContent className="sm:max-w-[425px]">
+    <DialogContent>
       <DialogHeader>
         <DialogTitle>Unstake</DialogTitle>
         <DialogDescription className="sr-only">
@@ -106,15 +107,18 @@ export function UnstakeDialogContent(
                 </FormItem>
               )}
             />
-            <div>
+
+            <div className="space-y-2">
               <div className="flex flex-col space-y-2">
                 <span>ID</span>
                 <span>{stakeId.toString()}</span>
               </div>
+              <Separator />
               <div className="flex flex-col space-y-2">
                 <span>Delegatee</span>
                 <span>{delegatee}</span>
               </div>
+              <Separator />
               <div className="flex flex-col space-y-2">
                 <span>Beneficiary</span>
                 <span>{beneficiary}</span>
@@ -135,7 +139,7 @@ export function UnstakeDialogContent(
             <Button type="submit" className="space-x-2" disabled={isPending}>
               {isPending
                 ? <RotateCw className="mr-2 size-4 animate-spin" />
-                : null}
+                : <Upload />}
               <span>Unstake</span>
             </Button>
           </DialogFooter>

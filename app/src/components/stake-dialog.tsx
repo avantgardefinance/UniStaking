@@ -101,10 +101,10 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
   })
 
   return (
-    <DialogContent className="sm:max-w-[425px]">
+    <DialogContent>
       <DialogHeader>
         <DialogTitle>Stake</DialogTitle>
-        <DialogDescription>
+        <DialogDescription className="sr-only">
           Enter the amount, fee beneficiary and delegatee to stake
         </DialogDescription>
       </DialogHeader>

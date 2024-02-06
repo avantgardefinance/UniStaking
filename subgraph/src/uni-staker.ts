@@ -18,7 +18,7 @@ import {
   StakeWithdrawn as StakeWithdrawnEvent,
   SurrogateDeployed as SurrogateDeployedEvent
 } from "../generated/UniStaker/UniStaker"
-import { getOrCreateAccount } from "./account"
+import { getOrCreateAccount, trackAccountEvent } from "./account"
 import { getDeposit, getOrCreateDeposit } from "./deposit"
 import { trackUniStakerHistory } from "./uni-staker-history"
 
@@ -31,7 +31,8 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   deposit.beneficiary = getOrCreateAccount(event.params.newBeneficiary, event).id
   deposit.save()
 
-  const entity = new BeneficiaryAltered(eventId(event))
+  const entityId = eventId(event)
+  const entity = new BeneficiaryAltered(entityId)
   entity.type = "BeneficiaryAltered"
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
@@ -41,6 +42,9 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
   entity.save()
+
+  trackAccountEvent(Address.fromBytes(deposit.owner), entityId)
+  trackAccountEvent(event.params.newBeneficiary, entityId)
 }
 
 export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
@@ -48,7 +52,8 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   deposit.delegatee = getOrCreateAccount(event.params.newDelegatee, event).id
   deposit.save()
 
-  const entity = new DelegateeAltered(eventId(event))
+  const entityId = eventId(event)
+  const entity = new DelegateeAltered(entityId)
   entity.type = "DelegateeAltered"
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
@@ -58,10 +63,14 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
   entity.save()
+
+  trackAccountEvent(Address.fromBytes(deposit.owner), entityId)
+  trackAccountEvent(event.params.newDelegatee, entityId)
 }
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
-  const entity = new RewardClaimed(eventId(event))
+  const entityId = eventId(event)
+  const entity = new RewardClaimed(entityId)
   entity.type = "RewardClaimed"
   entity.beneficiary = event.params.beneficiary
   entity.amount = event.params.amount
@@ -74,6 +83,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   account.claimedRewards = account.claimedRewards.plus(event.params.amount)
   account.save()
 
+  trackAccountEvent(event.params.beneficiary, entityId)
   trackUniStakerHistory(BigInt.fromI32(0), BigInt.fromI32(0), BigInt.fromI32(0), event.params.amount, event)
 }
 
@@ -94,7 +104,8 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   deposit.amount = deposit.amount.plus(event.params.amount)
   deposit.save()
 
-  const entity = new StakeDeposited(eventId(event))
+  const entityId = eventId(event)
+  const entity = new StakeDeposited(entityId)
   entity.type = "StakeDeposited"
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
@@ -110,6 +121,7 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   account.currentlyStaked = account.currentlyStaked.plus(event.params.amount)
   account.save()
 
+  trackAccountEvent(Address.fromBytes(deposit.owner), entityId)
   trackUniStakerHistory(event.params.amount, BigInt.fromI32(0), BigInt.fromI32(0), BigInt.fromI32(0), event)
 }
 
@@ -118,7 +130,8 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   deposit.amount = deposit.amount.minus(event.params.amount)
   deposit.save()
 
-  const entity = new StakeWithdrawn(eventId(event))
+  const entityId = eventId(event)
+  const entity = new StakeWithdrawn(entityId)
   entity.type = "StakeWithdrawn"
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
@@ -134,6 +147,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   account.currentlyStaked = account.currentlyStaked.minus(event.params.amount)
   account.save()
 
+  trackAccountEvent(Address.fromBytes(deposit.owner), entityId)
   trackUniStakerHistory(BigInt.fromI32(0), event.params.amount, BigInt.fromI32(0), BigInt.fromI32(0), event)
 }
 

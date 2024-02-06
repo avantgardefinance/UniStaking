@@ -1281,6 +1281,99 @@ export class Account extends Entity {
       "delegateeSurrogates",
     );
   }
+
+  get events(): AccountEventLoader {
+    return new AccountEventLoader(
+      "Account",
+      this.get("id")!.toBytes().toHexString(),
+      "events",
+    );
+  }
+}
+
+export class AccountEvent extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save AccountEvent entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type AccountEvent must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+      );
+      store.set("AccountEvent", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): AccountEvent | null {
+    return changetype<AccountEvent | null>(
+      store.get_in_block("AccountEvent", id),
+    );
+  }
+
+  static load(id: string): AccountEvent | null {
+    return changetype<AccountEvent | null>(store.get("AccountEvent", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
+  get event(): Bytes {
+    let value = this.get("event");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set event(value: Bytes) {
+    this.set("event", Value.fromBytes(value));
+  }
+
+  get deposit(): string | null {
+    let value = this.get("deposit");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set deposit(value: string | null) {
+    if (!value) {
+      this.unset("deposit");
+    } else {
+      this.set("deposit", Value.fromString(<string>value));
+    }
+  }
 }
 
 export class UniStakerHistory extends Entity {
@@ -1438,5 +1531,23 @@ export class SurrogateLoader extends Entity {
   load(): Surrogate[] {
     let value = store.loadRelated(this._entity, this._id, this._field);
     return changetype<Surrogate[]>(value);
+  }
+}
+
+export class AccountEventLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): AccountEvent[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<AccountEvent[]>(value);
   }
 }

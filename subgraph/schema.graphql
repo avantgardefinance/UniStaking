@@ -153,6 +153,15 @@ type Account @entity {
   beneficiaryships: [Deposit!]! @derivedFrom(field: "beneficiary")
 
   delegateeSurrogates: [Surrogate!]! @derivedFrom(field: "delegatee")
+
+  events: [AccountEvent!]! @derivedFrom(field: "account")
+}
+
+type AccountEvent @entity {
+  id: String!
+  account: Account!
+  event: Event!
+  deposit: Deposit
 }
 
 # Uni Staker History

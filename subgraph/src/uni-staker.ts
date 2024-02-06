@@ -43,9 +43,11 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
+  // Only tracking actual changes (beneficiary is initially set to address zero)
   if (event.params.oldBeneficiary.notEqual(Address.zero())) {
-    trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId)
-    trackAccountEvent(event.params.newBeneficiary, entityId, event.params.depositId)
+    trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId.toHex())
+    trackAccountEvent(Address.fromBytes(deposit.delegatee), entityId, event.params.depositId.toHex())
+    trackAccountEvent(event.params.newBeneficiary, entityId, event.params.depositId.toHex())
   }
 }
 
@@ -66,9 +68,11 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 
+  // Only tracking actual changes (delegatee is initially set to address zero)
   if (event.params.oldDelegatee.notEqual(Address.zero())) {
-    trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId)
-    trackAccountEvent(event.params.newDelegatee, entityId, event.params.depositId)
+    trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId.toHex())
+    trackAccountEvent(event.params.newDelegatee, entityId, event.params.depositId.toHex())
+    trackAccountEvent(Address.fromBytes(deposit.beneficiary), entityId, event.params.depositId.toHex())
   }
 }
 
@@ -125,7 +129,9 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   account.currentlyStaked = account.currentlyStaked.plus(event.params.amount)
   account.save()
 
-  trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId)
+  trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId.toHex())
+  trackAccountEvent(Address.fromBytes(deposit.delegatee), entityId, event.params.depositId.toHex())
+  trackAccountEvent(Address.fromBytes(deposit.beneficiary), entityId, event.params.depositId.toHex())
   trackUniStakerHistory(event.params.amount, BigInt.zero(), BigInt.zero(), BigInt.zero(), event)
 }
 
@@ -151,7 +157,9 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   account.currentlyStaked = account.currentlyStaked.minus(event.params.amount)
   account.save()
 
-  trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId)
+  trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId.toHex())
+  trackAccountEvent(Address.fromBytes(deposit.delegatee), entityId, event.params.depositId.toHex())
+  trackAccountEvent(Address.fromBytes(deposit.beneficiary), entityId, event.params.depositId.toHex())
   trackUniStakerHistory(BigInt.zero(), event.params.amount, BigInt.zero(), BigInt.zero(), event)
 }
 

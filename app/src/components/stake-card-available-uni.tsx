@@ -56,7 +56,7 @@ function AvailableUniForStakingContent() {
     <>
       <h3 className="space-x-2">
         <span>
-          <BigIntDisplay value={data.value} decimals={data.decimals} />
+          <BigIntDisplay value={data.value} decimals={data.decimals} precision={2} />
         </span>
         <span>{data.symbol}</span>
       </h3>

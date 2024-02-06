@@ -1,5 +1,6 @@
 import { FAQ } from "@/components/FAQ"
 import { StakeCards } from "@/components/stake-cards"
+import { StakedAmounts } from "@/components/staked-amounts"
 
 export default function IndexPage() {
   return (
@@ -9,6 +10,9 @@ export default function IndexPage() {
       </section>
       <section>
         <FAQ />
+      </section>
+      <section>
+        <StakedAmounts />
       </section>
     </div>
   )

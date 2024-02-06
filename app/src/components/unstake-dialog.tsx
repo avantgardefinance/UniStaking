@@ -6,19 +6,16 @@ import { Button } from "@/components/ui/button"
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { governanceToken, uniStaker } from "@/lib/consts"
+import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
-import { Download, RotateCw } from "lucide-react"
+import { RotateCw } from "lucide-react"
 import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
-import { useAccount, useReadContract } from "wagmi"
 
-const useUnstakeDialog = ({ availableForUnstaking }: { availableForUnstaking: bigint }) => {
-  const account = useAccount()
+const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: bigint; availableForUnstaking: bigint }) => {
   const {
     error: errorWrite,
     isPending: isPendingWrite,
@@ -34,39 +31,23 @@ const useUnstakeDialog = ({ availableForUnstaking }: { availableForUnstaking: bi
   const { setValue } = form
 
   const onSubmit = useCallback(async (values: {
-    beneficiary: Address | undefined
-    delegatee: Address | undefined
     amount: string
   }) => {
-    if (values.beneficiary === undefined || values.delegatee === undefined) {
-      return
-    }
-
-    if (hasEnoughAllowance) {
-      writeContract({
-        address: uniStaker,
-        abi: abiUniStaker,
-        functionName: "stake",
-        args: [parseUnits(values.amount, 18), values.delegatee, values.beneficiary]
-      })
-    } else {
-      writeContract({
-        address: governanceToken,
-        abi: abiIERC20,
-        functionName: "approve",
-        args: [uniStaker, parseUnits(values.amount, 18)]
-      })
-    }
-  }, [hasEnoughAllowance, writeContract])
+    writeContract({
+      address: uniStaker,
+      abi: abiUniStaker,
+      functionName: "withdraw",
+      args: [stakeId, parseUnits(values.amount, 18)]
+    })
+  }, [stakeId, writeContract])
 
   const setMaxAmount = useCallback(() => {
     setValue("amount", formatUnits(availableForUnstaking, 18))
-  }, [availableForStakingUni, setValue])
+  }, [availableForUnstaking, setValue])
 
   return {
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    hasEnoughAllowance,
     error: errorWrite,
     isPending: isPendingWrite,
     setMaxAmount
@@ -74,15 +55,16 @@ const useUnstakeDialog = ({ availableForUnstaking }: { availableForUnstaking: bi
 }
 
 export function UnstakeDialogContent(
-  { availableForUnstaking, beneficiary, delegatee, stakeID }: {
+  { availableForUnstaking, beneficiary, delegatee, stakeId }: {
     availableForUnstaking: bigint
-    stakeID: number
+    stakeId: bigint
     delegatee: Address
     beneficiary: Address
   }
 ) {
-  const { error, form, hasEnoughAllowance, isPending, onSubmit, setMaxAmount } = useUnstakeDialog({
-    availableForStakingUni
+  const { error, form, isPending, onSubmit, setMaxAmount } = useUnstakeDialog({
+    availableForUnstaking,
+    stakeId
   })
 
   return (
@@ -115,7 +97,7 @@ export function UnstakeDialogContent(
                       }}
                       className="space-x-1 px-0"
                     >
-                      <BigIntDisplay value={availableForUnstaking} decimals={18} />
+                      <BigIntDisplay value={availableForUnstaking} decimals={18} precision={2} />
                       <span>UNI</span>
                     </Button>{" "}
                     to unstake
@@ -124,13 +106,19 @@ export function UnstakeDialogContent(
                 </FormItem>
               )}
             />
-            <div className="flex flex-col space-y-2">
-              <span>Delegatee</span>
-              <span>{delegatee}</span>
-            </div>
-            <div className="flex flex-col space-y-2">
-              <span>Beneficiary</span>
-              <span>{beneficiary}</span>
+            <div>
+              <div className="flex flex-col space-y-2">
+                <span>ID</span>
+                <span>{stakeId.toString()}</span>
+              </div>
+              <div className="flex flex-col space-y-2">
+                <span>Delegatee</span>
+                <span>{delegatee}</span>
+              </div>
+              <div className="flex flex-col space-y-2">
+                <span>Beneficiary</span>
+                <span>{beneficiary}</span>
+              </div>
             </div>
             {error &&
               (
@@ -141,26 +129,14 @@ export function UnstakeDialogContent(
                   </AlertDescription>
                 </Alert>
               )}
-            {hasEnoughAllowance ? null : (
-              <Alert>
-                <AlertDescription>
-                  You don&apos;t have enough allowance to stake this amount. Please approve first.
-                </AlertDescription>
-              </Alert>
-            )}
           </div>
 
           <DialogFooter>
             <Button type="submit" className="space-x-2" disabled={isPending}>
               {isPending
                 ? <RotateCw className="mr-2 size-4 animate-spin" />
-                : hasEnoughAllowance
-                ? <Download size={16} />
                 : null}
-
-              {hasEnoughAllowance ?
-                <span>Stake</span> :
-                <span>Approve</span>}
+              <span>Unstake</span>
             </Button>
           </DialogFooter>
         </form>

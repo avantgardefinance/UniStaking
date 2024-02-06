@@ -63,7 +63,7 @@ export function StakeCardRewards() {
       </CardHeader>
       <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
         <h3 className="space-x-2">
-          <BigIntDisplay value={rewards} decimals={18} />
+          <BigIntDisplay value={rewards} decimals={18} precision={4} />
           <span>WETH</span>
         </h3>
         <Button

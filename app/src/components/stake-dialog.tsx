@@ -130,7 +130,7 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
                       }}
                       className="space-x-1 px-0"
                     >
-                      <BigIntDisplay value={availableForStakingUni} decimals={18} />
+                      <BigIntDisplay value={availableForStakingUni} decimals={18} precision={2} />
                       <span>UNI</span>
                     </Button>{" "}
                     in your balance

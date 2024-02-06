@@ -50,7 +50,7 @@ export function StakePositionCard(
           </Badge>
           <Badge className="p-2">
             <div className="flex items-center space-x-2">
-              <span>Owner</span> <AddressDisplay value={owner} />
+              <span>Owner</span> <AddressDisplay iconSize={12} value={owner} />
             </div>
           </Badge>
           <Badge className="p-2" variant="secondary">
@@ -97,7 +97,7 @@ export function StakePositionCard(
                 </Dialog>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="secondary" className="space-x-2">
+                    <Button variant="secondary" disabled={governanceTokenBalanceValue === 0n} className="space-x-2">
                       <Download size={16} /> <span>Stake</span>
                     </Button>
                   </DialogTrigger>

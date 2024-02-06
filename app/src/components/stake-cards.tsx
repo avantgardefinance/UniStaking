@@ -13,7 +13,7 @@ export function StakeCards(
     <div className="space-y-2">
       <h2 className="text-3xl font-bold">Stake</h2>
       <div className="flex flex-row flex-wrap gap-8">
-        <Card className="grow">
+        <Card className="flex-1">
           <CardHeader>
             <CardDescription className="text-base font-medium">Total Staked</CardDescription>
           </CardHeader>

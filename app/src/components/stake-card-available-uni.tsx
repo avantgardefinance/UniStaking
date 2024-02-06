@@ -11,7 +11,7 @@ import { Download } from "lucide-react"
 
 export function AvailableUniForStaking() {
   return (
-    <Card className="grow">
+    <Card className="flex-1">
       <CardHeader>
         <CardDescription className="text-base font-medium">
           Available for staking
@@ -47,7 +47,7 @@ function AvailableUniForStakingContent() {
         <span>
           <BigIntDisplay value={data.value} decimals={data.decimals} precision={2} />
         </span>
-        <span>{data.symbol}</span>
+        <span>UNI</span>
       </h3>
       <Dialog>
         <DialogTrigger asChild>

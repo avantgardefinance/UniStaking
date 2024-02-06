@@ -43,7 +43,7 @@ function useStakeCardRewards() {
 
 export function StakeCardRewards() {
   return (
-    <Card className="grow">
+    <Card className="flex-1">
       <CardHeader>
         <CardDescription className="text-base font-medium">Rewards</CardDescription>
       </CardHeader>

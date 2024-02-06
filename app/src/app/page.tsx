@@ -4,15 +4,15 @@ import { StakedAmounts } from "@/components/staked-amounts"
 
 export default function IndexPage() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <section>
         <StakeCards totalStakedUni={18n} rewardsWeth={20n ** 10n} />
       </section>
       <section>
-        <FAQ />
+        <StakedAmounts />
       </section>
       <section>
-        <StakedAmounts />
+        <FAQ />
       </section>
     </div>
   )

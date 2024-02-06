@@ -33,17 +33,19 @@ export function StakePositionCard(
   return (
     <Card>
       <CardHeader>
-        <div>
-          <Badge>
+        <div className="space-x-2">
+          <Badge className="p-2">
             ID #{stakeId.toString()}
           </Badge>
-          <Badge>
-            Owner <AddressDisplay value={owner} />
+          <Badge className="p-2">
+            <div className="flex items-center space-x-2">
+              <span>Owner</span> <AddressDisplay value={owner} />
+            </div>
           </Badge>
-          <Badge variant="secondary">
+          <Badge className="p-2" variant="secondary">
             Created {createdAt.format("YYYY-MM-DD HH:mm")}
           </Badge>
-          <Badge variant="secondary">
+          <Badge className="p-2" variant="secondary">
             Last update {updatedAt.format("YYYY-MM-DD HH:mm")}
           </Badge>
         </div>

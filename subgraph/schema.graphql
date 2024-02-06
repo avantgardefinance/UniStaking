@@ -1,65 +1,170 @@
-type BeneficiaryAltered @entity(immutable: true) {
+# Events
+
+interface Event {
   id: Bytes!
-  depositId: BigInt! # uint256
-  oldBeneficiary: Bytes! # address
-  newBeneficiary: Bytes! # address
+  type: EventType!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type DelegateeAltered @entity(immutable: true) {
+interface DepositEvent {
   id: Bytes!
-  depositId: BigInt! # uint256
-  oldDelegatee: Bytes! # address
-  newDelegatee: Bytes! # address
+  type: EventType!
+  depositId: BigInt!
+  deposit: Deposit!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RewardClaimed @entity(immutable: true) {
+interface RewardEvent {
   id: Bytes!
-  beneficiary: Bytes! # address
-  amount: BigInt! # uint256
+  type: EventType!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RewardNotified @entity(immutable: true) {
+enum EventType {
+  BeneficiaryAltered
+  DelegateeAltered
+  RewardClaimed
+  RewardNotified
+  StakeDeposited
+  StakeWithdrawn
+  SurrogateDeployed
+}
+
+type BeneficiaryAltered implements Event & DepositEvent
+  @entity(immutable: true) {
   id: Bytes!
-  amount: BigInt! # uint256
+  type: EventType!
+  depositId: BigInt!
+  deposit: Deposit!
+  oldBeneficiary: Bytes!
+  newBeneficiary: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type StakeDeposited @entity(immutable: true) {
+type DelegateeAltered implements Event & DepositEvent @entity(immutable: true) {
   id: Bytes!
-  depositId: BigInt! # uint256
-  amount: BigInt! # uint256
-  totalDeposited: BigInt! # uint256
+  type: EventType!
+  depositId: BigInt!
+  deposit: Deposit!
+  oldDelegatee: Bytes!
+  newDelegatee: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type StakeWithdrawn @entity(immutable: true) {
+type RewardClaimed implements Event & RewardEvent @entity(immutable: true) {
   id: Bytes!
-  depositId: BigInt! # uint256
-  amount: BigInt! # uint256
-  remainingAmount: BigInt! # uint256
+  type: EventType!
+  beneficiary: Bytes!
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type SurrogateDeployed @entity(immutable: true) {
+type RewardNotified implements Event & RewardEvent @entity(immutable: true) {
   id: Bytes!
-  delegatee: Bytes! # address
-  surrogate: Bytes! # address
+  type: EventType!
+  amount: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+}
+
+type StakeDeposited implements Event & DepositEvent @entity(immutable: true) {
+  id: Bytes!
+  type: EventType!
+  depositId: BigInt!
+  deposit: Deposit!
+  amount: BigInt!
+  totalDeposited: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type StakeWithdrawn implements Event & DepositEvent @entity(immutable: true) {
+  id: Bytes!
+  type: EventType!
+  depositId: BigInt!
+  deposit: Deposit!
+  amount: BigInt!
+  remainingAmount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SurrogateDeployed implements Event @entity(immutable: true) {
+  id: Bytes!
+  type: EventType!
+  delegatee: Bytes!
+  surrogate: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+# Deposit
+
+type Deposit @entity {
+  id: String! # depositId (BigInt converted to String)
+  createdAt: Int!
+  updatedAt: Int!
+  owner: Account!
+  delegatee: Account!
+  beneficiary: Account!
+  amount: BigInt!
+
+  events: [DepositEvent!]! @derivedFrom(field: "deposit")
+}
+
+# Surrogate
+
+type Surrogate @entity {
+  id: Bytes!
+  createdAt: Int!
+  delegatee: Account!
+}
+
+# Account
+
+type Account @entity {
+  id: Bytes!
+  createdAt: Int!
+
+  totalStaked: BigInt!
+  totalWithdrawn: BigInt!
+  currentlyStaked: BigInt!
+
+  claimedRewards: BigInt!
+
+  ownerships: [Deposit!]! @derivedFrom(field: "owner")
+  delegateeships: [Deposit!]! @derivedFrom(field: "delegatee")
+  beneficiaryships: [Deposit!]! @derivedFrom(field: "beneficiary")
+
+  delegateeSurrogates: [Surrogate!]! @derivedFrom(field: "delegatee")
+}
+
+# Uni Staker History
+
+type UniStakerHistory @entity {
+  id: String!
+  timestamp: Int!
+
+  totalStaked: BigInt!
+  totalWithdrawn: BigInt!
+  currentlyStaked: BigInt!
+
+  totalRewards: BigInt!
+  claimedRewards: BigInt!
 }

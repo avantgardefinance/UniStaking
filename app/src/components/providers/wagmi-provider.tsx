@@ -11,6 +11,7 @@ const config = createConfig(getDefaultConfig({
   transports: {
     [chain.id]: http(rpcUrl)
   },
+  ssr: true,
   walletConnectProjectId,
   // TODO: Fill in proper values for these.
   appName: "Uniswap Staking",

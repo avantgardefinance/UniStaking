@@ -4,6 +4,7 @@ import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { UnstakeDialogContent } from "@/components/unstake-dialog"
 import type * as dayjs from "dayjs"
@@ -32,7 +33,7 @@ export function StakePositionCard(
   const { isOwner } = useStakePositionCard({ owner })
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row justify-between">
         <div className="space-x-2">
           <Badge className="p-2">
             ID #{stakeId.toString()}
@@ -49,13 +50,13 @@ export function StakePositionCard(
             Last update {updatedAt.format("YYYY-MM-DD HH:mm")}
           </Badge>
         </div>
-        <div>
-          <BigIntDisplay value={stakedAmount} decimals={18} precision={2} />
-          <span>UNI</span>
+        <div className="text-2xl font-semibold">
+          <BigIntDisplay value={stakedAmount} decimals={18} precision={2} /> <span>UNI</span>
         </div>
       </CardHeader>
-      <CardContent>
-        <div>
+      <Separator className="mb-4" />
+      <CardContent className="flex flex-row items-center justify-between">
+        <div className="flex flex-row items-end space-x-4">
           <div>
             <span>Delegatee</span>
             <AddressDisplay value={delegatee} />
@@ -66,14 +67,15 @@ export function StakePositionCard(
           </div>
           {isOwner && <Button variant="ghost">Edit</Button>}
         </div>
-        <div className="space-x-2">
+        <div className="space-x-4">
           {isOwner ?
             (
               <>
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="ghost" className="space-x-2">
-                      <Upload size={16} />Unstake
+                      <Upload size={16} />
+                      <span>Unstake</span>
                     </Button>
                   </DialogTrigger>
                   <UnstakeDialogContent
@@ -85,7 +87,7 @@ export function StakePositionCard(
                 </Dialog>
 
                 <Button variant="secondary" className="space-x-2">
-                  <Download size={16} />Stake
+                  <Download size={16} /> <span>Stake</span>
                 </Button>
               </>
             ) :

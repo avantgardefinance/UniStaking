@@ -10,7 +10,7 @@ function useStakedAmounts() {
       stakedAmount: 100n,
       createdAt: dayjs(),
       updatedAt: dayjs(),
-      owner: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      owner: "0x1D12E5B92F5638d643C273F0dF2150D5AcC5e5d0",
       beneficiary: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
       delegatee: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
     },
@@ -54,7 +54,11 @@ export function StakedAmounts() {
             </CardHeader>
           </Card>
         )}
-        {positions.map((position) => <StakePositionCard key={position.stakeId} {...position} />)}
+        {positions.map((position) => (
+          <div key={position.stakeId} className="w-full">
+            <StakePositionCard {...position} />
+          </div>
+        ))}
       </div>
     </div>
   )

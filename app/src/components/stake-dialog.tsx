@@ -2,19 +2,21 @@
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { cn } from "@/lib/utils"
 import { useQueryClient } from "@tanstack/react-query"
-import { Download, RotateCw } from "lucide-react"
+import { Download, Info, RotateCw } from "lucide-react"
+import Link from "next/link"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
@@ -158,7 +160,24 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
               name="beneficiary"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Beneficiary</FormLabel>
+                  <FormLabel>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="flex flex-row space-x-2">
+                            <span>Beneficiary</span>
+                            <Info size={16} />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            You can assign the fees your staked position earns to any address. The default address is
+                            your own.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -172,7 +191,37 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
               name="delegateeOption"
               render={({ field: delegateeOptionField }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Delegatee</FormLabel>
+                  <FormLabel>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="flex flex-row space-x-2">
+                            <span>Delegatee</span>
+                            <Info size={16} />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            You must delegate your UNI&apos;s votes. The default address is your own, however there are
+                            many active delegatees to choose from. You can view delegatee profiles
+                            <Link href="https://www.tally.xyz/gov/uniswap" target="_blank">
+                              {" "}
+                              <div
+                                className={cn(
+                                  buttonVariants({
+                                    variant: "link"
+                                  }),
+                                  "space-x-2 p-0"
+                                )}
+                              >
+                                here
+                              </div>
+                            </Link>.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={delegateeOptionField.onChange}

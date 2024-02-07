@@ -1,72 +1,59 @@
 "use client"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { governanceToken, uniStaker } from "@/lib/consts"
+import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { cn } from "@/lib/utils"
-import { useQueryClient } from "@tanstack/react-query"
-import { Download, Info, RotateCw } from "lucide-react"
+import { Info, RotateCw } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
-import { formatUnits, parseUnits } from "viem"
-import { useAccount, useReadContract } from "wagmi"
+import { encodeFunctionData, isAddressEqual } from "viem"
 
-const useStakeDialog = ({ availableForStakingUni }: {
-  availableForStakingUni: bigint
+const useEditBeneficiaryDelegateeDialog = ({ beneficiary: currentBeneficiary, delegatee: currentDelegatee, stakeId }: {
+  beneficiary: Address
+  delegatee: Address
+  stakeId: bigint
 }) => {
-  const account = useAccount()
-
-  const { data: allowance, queryKey: queryKeyAllowance } = useReadContract({
-    address: governanceToken,
-    abi: abiIERC20,
-    functionName: "allowance",
-    args: account.address === undefined ? undefined : [account.address, uniStaker]
-  })
-
-  const queryClient = useQueryClient()
   const {
     error: errorWrite,
     isPending: isPendingWrite,
     writeContract
-  } = useWriteContractWithToast({
-    mutation: {
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
-    }
-  })
+  } = useWriteContractWithToast()
+  const tallyDelegatees = [{ label: "tally 1", address: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" }, {
+    label: "tally 2",
+    address: "0x1D12E5B92F5638d643C273F0dF2150D5AcC5e5d0"
+  }] as const
+
+  const tallyDelegatee = tallyDelegatees.find((delegatee) => isAddressEqual(delegatee.address, currentDelegatee))
 
   const form = useForm({
     defaultValues: {
-      beneficiary: account.address,
-      customDelegatee: account.address,
-      tallyDelegatee: undefined,
-      amount: formatUnits(availableForStakingUni, 18),
-      delegateeOption: "custom"
+      beneficiary: currentBeneficiary,
+      customDelegatee: currentDelegatee,
+      tallyDelegatee: tallyDelegatee?.address,
+      delegateeOption: tallyDelegatee === undefined ? "custom" : "tally"
     }
   })
 
-  const { setValue, watch } = form
+  const { watch } = form
 
-  const [amount, delegateeOption] = watch(["amount", "delegateeOption"])
-
-  const hasEnoughAllowance = allowance !== undefined && parseUnits(amount, 18) <= allowance
+  const [delegateeOption] = watch(["delegateeOption"])
 
   const onSubmit = (values: {
     beneficiary: Address | undefined
     customDelegatee: Address | undefined
     tallyDelegatee: Address | undefined
     delegateeOption: string
-    amount: string
   }) => {
     console.log({ values })
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
@@ -77,87 +64,80 @@ const useStakeDialog = ({ availableForStakingUni }: {
       return
     }
 
-    if (hasEnoughAllowance) {
+    if (isAddressEqual(values.beneficiary, currentBeneficiary)) {
       writeContract({
         address: uniStaker,
         abi: abiUniStaker,
-        functionName: "stake",
-        args: [parseUnits(values.amount, 18), delegatee, values.beneficiary]
+        functionName: "alterDelegatee",
+        args: [stakeId, delegatee]
       })
-    } else {
-      writeContract({
-        address: governanceToken,
-        abi: abiIERC20,
-        functionName: "approve",
-        args: [uniStaker, parseUnits(values.amount, 18)]
-      })
+
+      return
     }
+
+    if (isAddressEqual(delegatee, currentDelegatee)) {
+      writeContract({
+        address: uniStaker,
+        abi: abiUniStaker,
+        functionName: "alterBeneficiary",
+        args: [stakeId, values.beneficiary]
+      })
+
+      return
+    }
+
+    const encodedDataAlterDelegatee = encodeFunctionData({
+      abi: abiUniStaker,
+      functionName: "alterDelegatee",
+      args: [stakeId, delegatee]
+    })
+    const encodedDataAlterBeneficiary = encodeFunctionData({
+      abi: abiUniStaker,
+      functionName: "alterBeneficiary",
+      args: [stakeId, values.beneficiary]
+    })
+    writeContract({
+      address: uniStaker,
+      abi: abiUniStaker,
+      functionName: "multicall",
+      args: [[encodedDataAlterDelegatee, encodedDataAlterBeneficiary]]
+    })
   }
-
-  const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18))
-
-  const tallyDelegatees = [{ label: "tally 1", address: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" }, {
-    label: "tally 2",
-    address: "0x1D12E5B92F5638d643C273F0dF2150D5AcC5e5d0"
-  }] as const
 
   return {
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    hasEnoughAllowance,
     error: errorWrite,
     isPending: isPendingWrite,
-    setMaxAmount,
     delegateeOption,
     tallyDelegatees
   }
 }
 
-export function StakeDialogContent({ availableForStakingUni }: { availableForStakingUni: bigint }) {
-  const { delegateeOption, error, form, hasEnoughAllowance, isPending, onSubmit, setMaxAmount, tallyDelegatees } =
-    useStakeDialog({
-      availableForStakingUni
-    })
+export function EditBeneficiaryDelegateeDialogContent({ beneficiary, delegatee, stakeId }: {
+  beneficiary: Address
+  delegatee: Address
+  stakeId: bigint
+}) {
+  const { delegateeOption, error, form, isPending, onSubmit, tallyDelegatees } = useEditBeneficiaryDelegateeDialog({
+    beneficiary,
+    delegatee,
+    stakeId
+  })
 
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Stake</DialogTitle>
-        <DialogDescription className="sr-only">
-          Enter the amount, fee beneficiary and delegatee to stake
-        </DialogDescription>
+        <DialogTitle>Edit beneficiary and delegatee</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-4">
+          <div className="flex flex-col space-y-2">
+            <span>ID</span>
+            <span>{stakeId.toString()}</span>
+          </div>
+          <Separator />
           <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    You have{" "}
-                    <Button
-                      variant="link"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setMaxAmount()
-                      }}
-                      className="space-x-1 px-0"
-                    >
-                      <BigIntDisplay value={availableForStakingUni} decimals={18} precision={2} />
-                      <span>UNI</span>
-                    </Button>{" "}
-                    in your balance
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="beneficiary"
@@ -326,26 +306,15 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
                   </AlertDescription>
                 </Alert>
               )}
-            {hasEnoughAllowance ? null : (
-              <Alert>
-                <AlertDescription>
-                  You don&apos;t have enough allowance to stake this amount. Please approve first.
-                </AlertDescription>
-              </Alert>
-            )}
           </div>
 
           <DialogFooter>
             <Button type="submit" className="space-x-2" disabled={isPending}>
               {isPending
                 ? <RotateCw className="mr-2 size-4 animate-spin" />
-                : hasEnoughAllowance
-                ? <Download size={16} />
                 : null}
 
-              {hasEnoughAllowance ?
-                <span>Stake</span> :
-                <span>Approve</span>}
+              <span>Confirm</span>
             </Button>
           </DialogFooter>
         </form>

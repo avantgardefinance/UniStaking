@@ -7,10 +7,12 @@ import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTit
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { cn } from "@/lib/utils"
 import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -53,7 +55,7 @@ const useStakeDialog = ({ availableForStakingUni }: {
 
   const { setValue, watch } = form
 
-  const amount = watch("amount")
+  const [amount, delegateeOption] = watch(["amount", "delegateeOption"])
 
   const hasEnoughAllowance = allowance !== undefined && parseUnits(amount, 18) <= allowance
 
@@ -92,20 +94,25 @@ const useStakeDialog = ({ availableForStakingUni }: {
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18))
 
+  const tallyDelegatees = ["tally 1", "tally 2"] as const
+
   return {
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
     hasEnoughAllowance,
     error: errorWrite,
     isPending: isPendingWrite,
-    setMaxAmount
+    setMaxAmount,
+    delegateeOption,
+    tallyDelegatees
   }
 }
 
 export function StakeDialogContent({ availableForStakingUni }: { availableForStakingUni: bigint }) {
-  const { error, form, hasEnoughAllowance, isPending, onSubmit, setMaxAmount } = useStakeDialog({
-    availableForStakingUni
-  })
+  const { delegateeOption, error, form, hasEnoughAllowance, isPending, onSubmit, setMaxAmount, tallyDelegatees } =
+    useStakeDialog({
+      availableForStakingUni
+    })
 
   return (
     <DialogContent>
@@ -163,16 +170,24 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
             <FormField
               control={form.control}
               name="delegateeOption"
-              render={({ field }) => (
+              render={({ field: delegateeOptionField }) => (
                 <FormItem className="space-y-3">
                   <FormLabel>Delegatee</FormLabel>
                   <FormControl>
                     <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      onValueChange={delegateeOptionField.onChange}
+                      defaultValue={delegateeOptionField.value}
+                      value={delegateeOptionField.value}
                       className="flex flex-col space-y-1"
                     >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormItem
+                        className={cn(
+                          "flex items-center space-x-3 rounded-lg border-2 border-none border-blue-700 p-2",
+                          {
+                            "border-solid": delegateeOption === "custom"
+                          }
+                        )}
+                      >
                         <FormControl>
                           <RadioGroupItem value="custom" />
                         </FormControl>
@@ -184,7 +199,15 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
                             render={({ field: customDelegateeField }) => (
                               <FormItem>
                                 <FormControl>
-                                  <Input {...customDelegateeField} />
+                                  <Input
+                                    {...customDelegateeField}
+                                    onChange={(...values) => {
+                                      customDelegateeField.onChange(...values)
+                                      if (delegateeOption !== "custom") {
+                                        delegateeOptionField.onChange("custom")
+                                      }
+                                    }}
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -192,11 +215,49 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
                           />
                         </FormLabel>
                       </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormItem
+                        className={cn(
+                          "flex items-center space-x-3 rounded-lg border-2 border-none border-blue-700 p-2",
+                          {
+                            "border-solid": delegateeOption === "tally"
+                          }
+                        )}
+                      >
                         <FormControl>
                           <RadioGroupItem value="tally" />
                         </FormControl>
-                        <FormLabel className="font-normal">Top 30 delegatees from Tally</FormLabel>
+                        <FormLabel className="w-full space-y-1 font-normal">
+                          <span>Top 30 delegatees from Tally</span>
+                          <FormField
+                            control={form.control}
+                            name="tallyDelegatee"
+                            render={({ field: fieldTallyDelegatee }) => (
+                              <FormItem>
+                                <Select
+                                  onValueChange={(value) => {
+                                    fieldTallyDelegatee.onChange(value)
+                                    delegateeOptionField.onChange("tally")
+                                  }}
+                                  defaultValue={fieldTallyDelegatee.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {tallyDelegatees.map((delegatee) => (
+                                      <SelectItem key={delegatee} value={delegatee}>
+                                        {delegatee}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>

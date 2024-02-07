@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { abi as abiIERC20 } from "@/lib/abi/IERC20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
@@ -43,8 +44,10 @@ const useStakeDialog = ({ availableForStakingUni }: {
   const form = useForm({
     defaultValues: {
       beneficiary: account.address,
-      delegatee: account.address,
-      amount: formatUnits(availableForStakingUni, 18)
+      customDelegatee: account.address,
+      tallyDelegatee: undefined,
+      amount: formatUnits(availableForStakingUni, 18),
+      delegateeOption: "custom"
     }
   })
 
@@ -56,10 +59,17 @@ const useStakeDialog = ({ availableForStakingUni }: {
 
   const onSubmit = (values: {
     beneficiary: Address | undefined
-    delegatee: Address | undefined
+    customDelegatee: Address | undefined
+    tallyDelegatee: Address | undefined
+    delegateeOption: string
     amount: string
   }) => {
-    if (values.beneficiary === undefined || values.delegatee === undefined) {
+    console.log({ values })
+    const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
+
+    if (
+      values.beneficiary === undefined || delegatee === undefined
+    ) {
       return
     }
 
@@ -68,7 +78,7 @@ const useStakeDialog = ({ availableForStakingUni }: {
         address: uniStaker,
         abi: abiUniStaker,
         functionName: "stake",
-        args: [parseUnits(values.amount, 18), values.delegatee, values.beneficiary]
+        args: [parseUnits(values.amount, 18), delegatee, values.beneficiary]
       })
     } else {
       writeContract({
@@ -149,14 +159,46 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
-              name="delegatee"
+              name="delegateeOption"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-3">
                   <FormLabel>Delegatee</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="custom" />
+                        </FormControl>
+                        <FormLabel className="w-full space-y-2 font-normal">
+                          <span>Custom address</span>
+                          <FormField
+                            control={form.control}
+                            name="customDelegatee"
+                            render={({ field: customDelegateeField }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input {...customDelegateeField} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="tally" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Top 30 delegatees from Tally</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

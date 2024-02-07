@@ -64,5 +64,5 @@ dataSources:
         - event: AdminSet(indexed address,indexed address)
           handler: handleAdminSet
         - event: FeesClaimed(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: handleFeesClaime
+          handler: handleFeesClaimed
       file: ./src/v3-factory-owner.ts

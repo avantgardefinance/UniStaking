@@ -1,3 +1,4 @@
+import { EditBeneficiaryDelegateeDialogContent } from "@/components/edit-beneficiary-delegatee-dialog"
 import { StakeMoreDialogContent } from "@/components/stake-more-dialog"
 import { AddressDisplay } from "@/components/ui/address-display"
 import { Badge } from "@/components/ui/badge"
@@ -75,7 +76,19 @@ export function StakePositionCard(
             <span>Beneficiary</span>
             <AddressDisplay value={beneficiary} />
           </div>
-          {isOwner && <Button variant="ghost">Edit</Button>}
+          {isOwner &&
+            (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost">Edit</Button>
+                </DialogTrigger>
+                <EditBeneficiaryDelegateeDialogContent
+                  stakeId={stakeId}
+                  delegatee={delegatee}
+                  beneficiary={beneficiary}
+                />
+              </Dialog>
+            )}
         </div>
         <div className="flex flex-row items-center space-x-4">
           {isOwner ?

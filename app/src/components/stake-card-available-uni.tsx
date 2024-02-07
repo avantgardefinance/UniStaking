@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { NoSsr } from "@/components/ui/no-ssr"
 import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
-import { Download } from "lucide-react"
+import { Plus } from "lucide-react"
 
 export function AvailableUniForStaking() {
   return (
@@ -52,8 +52,8 @@ function AvailableUniForStakingContent() {
       <Dialog>
         <DialogTrigger asChild>
           <Button size="lg" className="space-x-2">
-            <Download size={16} />
-            <span>Stake</span>
+            <Plus size={16} />
+            <span>Create position</span>
           </Button>
         </DialogTrigger>
         <StakeDialogContent availableForStakingUni={data.value} />

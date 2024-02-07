@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity 0.8.23;
 
 import "forge-std/console2.sol";
 import {Script} from "./shared/Script.sol";
-import {UniStaker} from "scopelift/src/UniStaker.sol";
-import {V3FactoryOwner} from "scopelift/src/V3FactoryOwner.sol";
-import {ERC20VotesMock} from "scopelift/test/mocks/MockERC20Votes.sol";
-import {ERC20Fake} from "scopelift/test/fakes/ERC20Fake.sol";
+import {UniStaker} from "src/UniStaker.sol";
+import {IUniswapV3FactoryOwnerActions} from "src/interfaces/IUniswapV3FactoryOwnerActions.sol";
+import {V3FactoryOwner} from "src/V3FactoryOwner.sol";
+import {ERC20VotesMock} from "test/mocks/MockERC20Votes.sol";
+import {ERC20Fake} from "test/fakes/ERC20Fake.sol";
 
 contract Deploy is Script {
     function run() external {
@@ -26,12 +27,14 @@ contract Deploy is Script {
 
         console2.log("Deploying V3 Factory Owner Contract: %s", address(V3_FACTORY_OWNER));
         address V3_FACTORY_OWNER =
-            address(new V3FactoryOwner{salt: 0}(ADMIN.addr, FACTORY.addr, REWARDS_TOKEN, 10 ** 19, UNI_STAKER));
+            address(new V3FactoryOwner{salt: 0}(ADMIN.addr, IUniswapV3FactoryOwnerActions(address(0xdeadbeef)), REWARDS_TOKEN, 10 ** 19, UNI_STAKER));
         assert(uniStaker == address(UNI_STAKER));
 
         vm.stopBroadcast();
 
-        vm.broadcast(ADMIN.privateKey);
+        vm.startBroadcast(ADMIN.privateKey);
+        UNI_STAKER.setRewardsNotifier({_rewardsNotifier: ADMIN.addr, _isEnabled: true});
         UNI_STAKER.setRewardsNotifier({_rewardsNotifier: V3_FACTORY_OWNER, _isEnabled: true});
+        vm.stopBroadcast();
     }
 }

@@ -4,4 +4,5 @@ erc4626-tests/=contracts/lib/scopelift/lib/openzeppelin-contracts/lib/erc4626-te
 forge-std/=contracts/lib/forge-std/src/
 openzeppelin-contracts/=contracts/lib/scopelift/lib/openzeppelin-contracts/
 openzeppelin/=contracts/lib/scopelift/lib/openzeppelin-contracts/contracts/
-scopelift/=contracts/lib/scopelift/
+src/=contracts/lib/scopelift/src/
+test/=contracts/lib/scopelift/test/

@@ -180,15 +180,22 @@ type UniStakerHistory @entity {
 
 # V3FactoryOwner Event
 
+type AdminSet @entity {
+  id: Bytes!
+  oldAdmin: Bytes!
+  newAdmin: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type FeesClaimed @entity {
   id: Bytes!
-
   pool: Bytes!
   caller: Bytes!
   recipient: Bytes!
   amount0: BigInt!
   amount1: BigInt!
-
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

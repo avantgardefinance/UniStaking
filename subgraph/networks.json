@@ -1,7 +1,11 @@
 {
   "mainnet": {
     "UniStaker": {
-      "address": "0x3d82654b0B0415BE70EF235c6E9847908b68DC6B",
+      "address": "0x3d82654b0b0415be70ef235c6e9847908b68dc6b",
+      "startBlock": 19061305
+    },
+    "V3FactoryOwner": {
+      "address": "0x079b7428c9d980692b6dc38dcb66bc781151130e",
       "startBlock": 19061305
     }
   }

@@ -55,7 +55,6 @@ const useEditBeneficiaryDelegateeDialog = ({ beneficiary: currentBeneficiary, de
     tallyDelegatee: Address | undefined
     delegateeOption: string
   }) => {
-    console.log({ values })
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
 
     if (

@@ -14,65 +14,30 @@ abstract contract Script is StdCheats, ForgeScript {
         uint256 privateKey;
     }
 
-    string constant MNEMONIC =
-        "test test test test test test test test test test test junk";
+    string constant MNEMONIC = "test test test test test test test test test test test junk";
 
-    Wallet public DEPLOYER =
-        Wallet({
-            addr: vm.addr(vm.deriveKey(MNEMONIC, 0)),
-            privateKey: vm.deriveKey(MNEMONIC, 0)
-        });
-    Wallet public ADMIN =
-        Wallet({
-            addr: vm.addr(vm.deriveKey(MNEMONIC, 2)),
-            privateKey: vm.deriveKey(MNEMONIC, 2)
-        });
-    Wallet public FACTORY =
-        Wallet({
-            addr: vm.addr(vm.deriveKey(MNEMONIC, 3)),
-            privateKey: vm.deriveKey(MNEMONIC, 3)
-        });
+    Wallet public DEPLOYER = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 0)), privateKey: vm.deriveKey(MNEMONIC, 0)});
+    Wallet public ADMIN = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 2)), privateKey: vm.deriveKey(MNEMONIC, 2)});
+    Wallet public FACTORY = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 3)), privateKey: vm.deriveKey(MNEMONIC, 3)});
 
     ERC20VotesMock public immutable GOVERNANCE_TOKEN =
-        ERC20VotesMock(
-            vm.computeCreate2Address(
-                0,
-                hashInitCode(type(ERC20VotesMock).creationCode)
-            )
-        );
+        ERC20VotesMock(vm.computeCreate2Address(0, hashInitCode(type(ERC20VotesMock).creationCode)));
     ERC20Fake public immutable REWARDS_TOKEN =
-        ERC20Fake(
-            vm.computeCreate2Address(
-                0,
-                hashInitCode(type(ERC20Fake).creationCode)
+        ERC20Fake(vm.computeCreate2Address(0, hashInitCode(type(ERC20Fake).creationCode)));
+    UniStaker public immutable UNI_STAKER = UniStaker(
+        vm.computeCreate2Address(
+            0, hashInitCode(type(UniStaker).creationCode, abi.encode(REWARDS_TOKEN, GOVERNANCE_TOKEN, ADMIN.addr))
+        )
+    );
+    V3FactoryOwner public immutable V3_FACTORY_OWNER = V3FactoryOwner(
+        vm.computeCreate2Address(
+            0,
+            hashInitCode(
+                type(V3FactoryOwner).creationCode,
+                abi.encode(ADMIN.addr, FACTORY.addr, REWARDS_TOKEN, 10 ** 19, UNI_STAKER)
             )
-        );
-    UniStaker public immutable UNI_STAKER =
-        UniStaker(
-            vm.computeCreate2Address(
-                0,
-                hashInitCode(
-                    type(UniStaker).creationCode,
-                    abi.encode(REWARDS_TOKEN, GOVERNANCE_TOKEN, ADMIN.addr)
-                )
-            )
-        );
-    V3FactoryOwner public immutable V3_FACTORY_OWNER =
-        V3FactoryOwner(
-            vm.computeCreate2Address(
-                0,
-                hashInitCode(
-                    type(V3FactoryOwner).creationCode,
-                    abi.encode(
-                        ADMIN.addr,
-                        FACTORY.addr,
-                        REWARDS_TOKEN,
-                        10 ** 19,
-                        UNI_STAKER
-                    )
-                )
-            )
-        );
+        )
+    );
 
     constructor() {
         vm.label(ADMIN.addr, "Admin UniStaker");
@@ -91,11 +56,10 @@ abstract contract Script is StdCheats, ForgeScript {
         vm.stopBroadcast();
     }
 
-    function stake(
-        uint32 who,
-        uint256 amount,
-        address delegatee
-    ) public returns (UniStaker.DepositIdentifier delegateId) {
+    function stake(uint32 who, uint256 amount, address delegatee)
+        public
+        returns (UniStaker.DepositIdentifier delegateId)
+    {
         uint256 key = vm.deriveKey(MNEMONIC, who);
 
         vm.startBroadcast(key);

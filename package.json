@@ -1,6 +1,6 @@
 {
   "private": true,
-  "packageManager": "pnpm@8.14.2",
+  "packageManager": "pnpm@8.15.1",
   "scripts": {
     "lint": "pnpm --recursive --parallel run lint",
     "format": "pnpm --recursive --parallel run format",

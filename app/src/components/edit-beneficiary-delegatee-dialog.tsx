@@ -23,19 +23,20 @@ export function EditBeneficiaryDelegateeDialogContent({ beneficiary, delegatee, 
   delegatee: Address
   stakeId: bigint
 }) {
-  const { isError, isLoading, tallyDelegatees } = useTallyDelegates()
+  const { error: tallyDelegateesError, isLoading, tallyDelegatees } = useTallyDelegates()
 
   return (
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Edit beneficiary and delegatee</DialogTitle>
       </DialogHeader>
-      {isLoading ? "Loading..." : isError ? "Error" : (
+      {isLoading ? "Loading..." : (
         <EditBeneficiaryDelegateeForm
           tallyDelegatees={tallyDelegatees}
           beneficiary={beneficiary}
           delegatee={delegatee}
           stakeId={stakeId}
+          tallyDelegateesError={tallyDelegateesError}
         />
       )}
     </DialogContent>
@@ -43,11 +44,12 @@ export function EditBeneficiaryDelegateeDialogContent({ beneficiary, delegatee, 
 }
 
 const useEditBeneficiaryDelegateeForm = (
-  { beneficiary: currentBeneficiary, delegatee: currentDelegatee, stakeId, tallyDelegatees }: {
+  { beneficiary: currentBeneficiary, delegatee: currentDelegatee, stakeId, tallyDelegatees, tallyDelegateesError }: {
     beneficiary: Address
     delegatee: Address
     stakeId: bigint
     tallyDelegatees: Array<TallyDelegatee>
+    tallyDelegateesError: Error | null
   }
 ) => {
   const {
@@ -57,8 +59,6 @@ const useEditBeneficiaryDelegateeForm = (
   } = useWriteContractWithToast()
 
   const tallyDelegatee = tallyDelegatees.find((delegatee) => isAddressEqual(delegatee.address, currentDelegatee))
-
-  console.log({ currentDelegatee })
 
   const form = useForm({
     defaultValues: {
@@ -126,22 +126,24 @@ const useEditBeneficiaryDelegateeForm = (
   return {
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    error: errorWrite,
+    error: errorWrite ?? tallyDelegateesError,
     isPending: isPendingWrite
   }
 }
 
-function EditBeneficiaryDelegateeForm({ beneficiary, delegatee, stakeId, tallyDelegatees }: {
+function EditBeneficiaryDelegateeForm({ beneficiary, delegatee, stakeId, tallyDelegatees, tallyDelegateesError }: {
   beneficiary: Address
   delegatee: Address
   stakeId: bigint
   tallyDelegatees: Array<TallyDelegatee>
+  tallyDelegateesError: Error | null
 }) {
   const { error, form, isPending, onSubmit } = useEditBeneficiaryDelegateeForm({
     beneficiary,
     delegatee,
     stakeId,
-    tallyDelegatees
+    tallyDelegatees,
+    tallyDelegateesError
   })
 
   return (

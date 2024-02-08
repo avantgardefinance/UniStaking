@@ -53,7 +53,7 @@ export async function GET() {
       account: {
         address: string
         name: string
-        ens?: string | null | undefined
+        ens: string
       }
     }
 

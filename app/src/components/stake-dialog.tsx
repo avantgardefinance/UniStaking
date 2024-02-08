@@ -213,7 +213,7 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
           <DialogFooter>
             <Button type="submit" className="space-x-2" disabled={isPending}>
               {isPending
-                ? <RotateCw className="mr-2 size-4 animate-spin" />
+                ? <RotateCw size={16} className="mr-2 size-4 animate-spin" />
                 : hasEnoughAllowance
                 ? <Download size={16} />
                 : null}

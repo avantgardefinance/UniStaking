@@ -36,7 +36,6 @@ export function useTransactionToast(
         toast({ title: "Pending ...", action })
         break
       case "idle":
-        toast({ title: "Idle", action })
         break
       case "error":
         toast({ title: "Failed", action, variant: "destructive" })

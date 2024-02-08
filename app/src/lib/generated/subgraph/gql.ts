@@ -13,7 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query StakeDeposited {\n    stakeDepositeds {\n      id\n    }\n  }\n": types.StakeDepositedDocument,
+    "\n    query Deposits($account: String) {\n      deposits(where: { amount_gt: 0, owner: $account, delegatee: $account, beneficiary: $account}) {\n        beneficiary {\n          id\n        }\n        delegatee {\n          id\n        }\n        owner {\n          id\n        }\n        id\n        amount\n        createdAt\n        updatedAt\n      }\n  }\n": types.DepositsDocument,
 };
 
 /**
@@ -33,7 +33,7 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query StakeDeposited {\n    stakeDepositeds {\n      id\n    }\n  }\n"): (typeof documents)["\n  query StakeDeposited {\n    stakeDepositeds {\n      id\n    }\n  }\n"];
+export function graphql(source: "\n    query Deposits($account: String) {\n      deposits(where: { amount_gt: 0, owner: $account, delegatee: $account, beneficiary: $account}) {\n        beneficiary {\n          id\n        }\n        delegatee {\n          id\n        }\n        owner {\n          id\n        }\n        id\n        amount\n        createdAt\n        updatedAt\n      }\n  }\n"): (typeof documents)["\n    query Deposits($account: String) {\n      deposits(where: { amount_gt: 0, owner: $account, delegatee: $account, beneficiary: $account}) {\n        beneficiary {\n          id\n        }\n        delegatee {\n          id\n        }\n        owner {\n          id\n        }\n        id\n        amount\n        createdAt\n        updatedAt\n      }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

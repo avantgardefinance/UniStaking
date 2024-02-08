@@ -134,8 +134,8 @@ export function UnstakeDialogContent(
           <DialogFooter>
             <Button type="submit" className="space-x-2" disabled={isPending}>
               {isPending
-                ? <RotateCw className="mr-2 size-4 animate-spin" />
-                : <Upload />}
+                ? <RotateCw size={16} className="mr-2 size-4 animate-spin" />
+                : <Upload size={16} />}
               <span>Unstake</span>
             </Button>
           </DialogFooter>

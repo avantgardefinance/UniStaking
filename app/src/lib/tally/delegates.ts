@@ -5,14 +5,12 @@ export const DelegatesQuery = graphql(`
     delegates(input: $input) {
       nodes {
         ... on Delegate {
-          id
           account {
             address
             name
-            twitter
+            ens
           }
           votesCount
-          delegatorsCount
         }
       }
       pageInfo {

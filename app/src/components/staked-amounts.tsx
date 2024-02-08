@@ -1,46 +1,49 @@
 "use client"
 
-import { StakePositionCard } from "@/components/stake-position-card"
-import type { StakePosition } from "@/components/stake-position-card"
+import { StakeDepositCard } from "@/components/stake-deposit-card"
+import type { StakeDeposit } from "@/components/stake-deposit-card"
+import { Alert } from "@/components/ui/alert"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
+import { useQuery } from "@tanstack/react-query"
 import dayjs from "dayjs"
+import { useAccount } from "wagmi"
 
 function useStakedAmounts() {
-  const positions: Array<StakePosition> = [
-    {
-      stakeId: 1n,
-      stakedAmount: 100n,
-      createdAt: dayjs(),
-      updatedAt: dayjs(),
-      owner: "0x1D12E5B92F5638d643C273F0dF2150D5AcC5e5d0",
-      beneficiary: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      delegatee: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+  const account = useAccount()
+
+  const { data: deposits, error: errorDeposits, isLoading: isLoadingDeposits } = useQuery({
+    queryKey: ["deposits", account.address],
+    queryFn: async () => {
+      const response = await fetch(`/api/deposits?account=${account.address}`)
+      return response.json()
     },
-    {
-      stakeId: 2n,
-      stakedAmount: 10n ** 18n,
-      createdAt: dayjs(),
-      updatedAt: dayjs(),
-      owner: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      beneficiary: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      delegatee: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
-    },
-    {
-      stakeId: 3n,
-      stakedAmount: 100n,
-      createdAt: dayjs(),
-      updatedAt: dayjs(),
-      owner: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      beneficiary: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      delegatee: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+    enabled: account.address !== undefined
+  })
+
+  // TODO improve types
+  const parsedDeposits: Array<StakeDeposit> = deposits?.map((deposit: any) => {
+    return {
+      ...deposit,
+      createdAt: dayjs.unix(deposit.createdAt),
+      updatedAt: dayjs.unix(deposit.updatedAt)
     }
-  ]
+  }) ?? []
 
-  const { data: governanceTokenBalance, status: governanceTokenStatus } = useGovernanceTokenBalance()
+  const {
+    data: governanceTokenBalance,
+    error: errorGovernanceTokenBalance,
+    isLoading: isLoadingGovernanceTokenBalance
+  } = useGovernanceTokenBalance()
 
-  const isEmpty = positions.length === 0
-  return { positions, isEmpty, governanceTokenBalance, governanceTokenStatus }
+  const isEmpty = parsedDeposits.length === 0
+  return {
+    deposits: parsedDeposits,
+    isEmpty,
+    governanceTokenBalance,
+    error: errorGovernanceTokenBalance ?? errorDeposits,
+    isLoading: isLoadingGovernanceTokenBalance ?? isLoadingDeposits
+  }
 }
 
 export function StakedAmounts() {
@@ -67,14 +70,18 @@ function CardWithTitle({ children }: { children: React.ReactNode }) {
 }
 
 function StakedAmountsContent() {
-  const { governanceTokenBalance, governanceTokenStatus, isEmpty, positions } = useStakedAmounts()
+  const { deposits, error, governanceTokenBalance, isEmpty, isLoading } = useStakedAmounts()
 
-  if (governanceTokenStatus === "pending") {
+  if (isLoading) {
     return <CardWithTitle>Loading...</CardWithTitle>
   }
 
-  if (governanceTokenStatus === "error") {
-    return <CardWithTitle>Error</CardWithTitle>
+  if (error !== null) {
+    return (
+      <CardWithTitle>
+        <Alert variant="destructive">{error.message}</Alert>
+      </CardWithTitle>
+    )
   }
 
   if (governanceTokenBalance === undefined) {
@@ -86,7 +93,7 @@ function StakedAmountsContent() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>
-            No staked positions
+            No deposits
           </CardTitle>
         </CardHeader>
       </Card>
@@ -95,9 +102,10 @@ function StakedAmountsContent() {
 
   return (
     <>
-      {positions.map((position) => (
-        <div key={position.stakeId} className="w-full">
-          <StakePositionCard position={position} governanceTokenBalanceValue={governanceTokenBalance.value} />
+      {/*TODO improve types*/}
+      {deposits.map((deposit: any) => (
+        <div key={deposit.stakeId} className="w-full">
+          <StakeDepositCard deposit={deposit} governanceTokenBalanceValue={governanceTokenBalance.value} />
         </div>
       ))}
     </>

@@ -14,14 +14,14 @@ import { Download, Info, Upload } from "lucide-react"
 import { type Address, isAddressEqual } from "viem"
 import { useAccount } from "wagmi"
 
-function useStakePositionCard({ owner }: { owner: Address }) {
+function useStakeDepositCard({ owner }: { owner: Address }) {
   const account = useAccount()
   return {
     isOwner: account.address ? isAddressEqual(account.address, owner) : false
   }
 }
 
-export type StakePosition = {
+export type StakeDeposit = {
   stakeId: bigint
   stakedAmount: bigint
   createdAt: dayjs.Dayjs
@@ -30,18 +30,18 @@ export type StakePosition = {
   beneficiary: Address
   delegatee: Address
 }
-export type StakePositionCardProps = {
-  position: StakePosition
+export type StakeDepositCardProps = {
+  deposit: StakeDeposit
   governanceTokenBalanceValue: bigint
 }
 
-export function StakePositionCard(
+export function StakeDepositCard(
   {
-    governanceTokenBalanceValue,
-    position: { beneficiary, createdAt, delegatee, owner, stakeId, stakedAmount, updatedAt }
-  }: StakePositionCardProps
+    deposit: { beneficiary, createdAt, delegatee, owner, stakeId, stakedAmount, updatedAt },
+    governanceTokenBalanceValue
+  }: StakeDepositCardProps
 ) {
-  const { isOwner } = useStakePositionCard({ owner })
+  const { isOwner } = useStakeDepositCard({ owner })
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between">

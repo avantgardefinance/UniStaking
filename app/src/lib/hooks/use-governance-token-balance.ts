@@ -3,10 +3,10 @@ import { useAccount, useBalance } from "wagmi"
 
 export function useGovernanceTokenBalance() {
   const { address } = useAccount()
-  const { data, status } = useBalance({
+  const { data, error, isLoading, status } = useBalance({
     address,
     token: governanceToken
   })
 
-  return { data, status }
+  return { data, error, isLoading, status }
 }

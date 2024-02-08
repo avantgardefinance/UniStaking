@@ -1,6 +1,6 @@
 "use client"
 
-import { DelegateeField, type TallyDelegatee } from "@/components/form/DelegateeField"
+import { DelegateeField } from "@/components/form/DelegateeField"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -10,54 +10,20 @@ import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
+import { useTallyDelegates } from "@/lib/hooks/use-tally-delegates"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
-import { useQuery } from "@tanstack/react-query"
+import type { TallyDelegatee } from "@/lib/types"
 import { Info, RotateCw } from "lucide-react"
 import { FormProvider, useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { encodeFunctionData, isAddressEqual } from "viem"
-
-const useEditBeneficiaryDelegateeDialog = () => {
-  const tallyDelegateesQuery = useQuery({
-    queryKey: ["delegatees"],
-    queryFn: async () => {
-      const response = await fetch("/api/delegates")
-      return response.json()
-    }
-  })
-
-  // TODO: type that properly. Parse the tally response from api, and infer type from it
-  const tallyDelegatees: Array<TallyDelegatee> = tallyDelegateesQuery.data?.map((
-    delegatee: any
-  ) => {
-    const { account: { address, ens, name }, votesCount } = delegatee
-
-    const label = name !== ""
-      ? name
-      : ens !== ""
-      ? ens
-      : address
-
-    return {
-      votesCount,
-      label,
-      address
-    }
-  }) ?? []
-
-  return {
-    tallyDelegatees,
-    isLoading: tallyDelegateesQuery.isLoading,
-    isError: tallyDelegateesQuery.isError
-  }
-}
 
 export function EditBeneficiaryDelegateeDialogContent({ beneficiary, delegatee, stakeId }: {
   beneficiary: Address
   delegatee: Address
   stakeId: bigint
 }) {
-  const { isError, isLoading, tallyDelegatees } = useEditBeneficiaryDelegateeDialog()
+  const { isError, isLoading, tallyDelegatees } = useTallyDelegates()
 
   return (
     <DialogContent>

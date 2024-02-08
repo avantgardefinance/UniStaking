@@ -5,12 +5,10 @@ import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import type { TallyDelegatee } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Info, Link } from "lucide-react"
 import { useFormContext } from "react-hook-form"
-import type { Address } from "viem"
-
-export type TallyDelegatee = { address: Address; label: string; votesCount: bigint }
 
 function useDelegateeField({ name }: { name: string }) {
   const form = useFormContext()

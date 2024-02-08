@@ -1,4 +1,4 @@
-# Events
+# UniStaker Contract Events
 
 interface Event {
   id: Bytes!
@@ -176,4 +176,27 @@ type UniStakerHistory @entity {
 
   totalRewards: BigInt!
   claimedRewards: BigInt!
+}
+
+# V3FactoryOwner Event
+
+type AdminSet @entity {
+  id: Bytes!
+  oldAdmin: Bytes!
+  newAdmin: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FeesClaimed @entity {
+  id: Bytes!
+  pool: Bytes!
+  caller: Bytes!
+  recipient: Bytes!
+  amount0: BigInt!
+  amount1: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
 }

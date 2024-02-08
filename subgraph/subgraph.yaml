@@ -4,11 +4,11 @@ indexerHints:
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: UniStaker
     network: mainnet
     source:
-      address: "0x604e45c3756a14539699c6eb07ed8f079537fafe"
+      address: "0x3d82654b0b0415be70ef235c6e9847908b68dc6b"
       abi: UniStaker
       startBlock: 19061305
     mapping:
@@ -42,3 +42,27 @@ dataSources:
         - event: SurrogateDeployed(indexed address,indexed address)
           handler: handleSurrogateDeployed
       file: ./src/uni-staker.ts
+
+  - kind: ethereum/contract
+    name: V3FactoryOwner
+    network: mainnet
+    source:
+      address: "0x079b7428c9d980692b6dc38dcb66bc781151130e"
+      abi: V3FactoryOwner
+      startBlock: 19061305
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AdminSet
+        - FeesClaime
+      abis:
+        - name: V3FactoryOwner
+          file: ./abis/V3FactoryOwner.json
+      eventHandlers:
+        - event: AdminSet(indexed address,indexed address)
+          handler: handleAdminSet
+        - event: FeesClaimed(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleFeesClaimed
+      file: ./src/v3-factory-owner.ts

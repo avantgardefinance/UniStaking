@@ -3,9 +3,10 @@ pragma solidity ^0.8.13;
 
 import {Script as ForgeScript} from "forge-std/Script.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
-import {ERC20VotesMock} from "scopelift/test/mocks/MockERC20Votes.sol";
-import {ERC20Fake} from "scopelift/test/fakes/ERC20Fake.sol";
-import {UniStaker} from "scopelift/src/UniStaker.sol";
+import {ERC20VotesMock} from "test/mocks/MockERC20Votes.sol";
+import {ERC20Fake} from "test/fakes/ERC20Fake.sol";
+import {UniStaker} from "src/UniStaker.sol";
+import {V3FactoryOwner} from "src/V3FactoryOwner.sol";
 
 abstract contract Script is StdCheats, ForgeScript {
     struct Wallet {
@@ -16,8 +17,6 @@ abstract contract Script is StdCheats, ForgeScript {
     string constant MNEMONIC = "test test test test test test test test test test test junk";
 
     Wallet public DEPLOYER = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 0)), privateKey: vm.deriveKey(MNEMONIC, 0)});
-    Wallet public REWARDS_NOTIFIER =
-        Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 1)), privateKey: vm.deriveKey(MNEMONIC, 1)});
     Wallet public ADMIN = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 2)), privateKey: vm.deriveKey(MNEMONIC, 2)});
 
     ERC20VotesMock public immutable GOVERNANCE_TOKEN =
@@ -29,13 +28,22 @@ abstract contract Script is StdCheats, ForgeScript {
             0, hashInitCode(type(UniStaker).creationCode, abi.encode(REWARDS_TOKEN, GOVERNANCE_TOKEN, ADMIN.addr))
         )
     );
+    V3FactoryOwner public immutable V3_FACTORY_OWNER = V3FactoryOwner(
+        vm.computeCreate2Address(
+            0,
+            hashInitCode(
+                type(V3FactoryOwner).creationCode,
+                abi.encode(ADMIN.addr, address(0xdeadbeef), REWARDS_TOKEN, 10 ** 19, UNI_STAKER)
+            )
+        )
+    );
 
     constructor() {
-        vm.label(REWARDS_NOTIFIER.addr, "Rewards Notifier");
         vm.label(ADMIN.addr, "Admin UniStaker");
         vm.label(address(REWARDS_TOKEN), "Rewards Token");
         vm.label(address(GOVERNANCE_TOKEN), "Governance Token");
         vm.label(address(UNI_STAKER), "UniStaker");
+        vm.label(address(V3_FACTORY_OWNER), "V3FactoryOwner");
     }
 
     function dealToDerivedKey(uint32 who, uint256 amount) public {
@@ -60,8 +68,9 @@ abstract contract Script is StdCheats, ForgeScript {
     }
 
     function distributeRewards(uint256 _amount) public {
-        vm.startBroadcast(REWARDS_NOTIFIER.privateKey);
         REWARDS_TOKEN.mint(address(UNI_STAKER), _amount);
+
+        vm.startBroadcast(ADMIN.privateKey);
         UNI_STAKER.notifyRewardsAmount(_amount);
         vm.stopBroadcast();
     }

@@ -1,0 +1,297 @@
+[
+    {
+        "type": "constructor",
+        "inputs": [
+            {
+                "name": "_admin",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "_factory",
+                "type": "address",
+                "internalType": "contract IUniswapV3FactoryOwnerActions"
+            },
+            {
+                "name": "_payoutToken",
+                "type": "address",
+                "internalType": "contract IERC20"
+            },
+            {
+                "name": "_payoutAmount",
+                "type": "uint256",
+                "internalType": "uint256"
+            },
+            {
+                "name": "_rewardReceiver",
+                "type": "address",
+                "internalType": "contract INotifiableRewardReceiver"
+            }
+        ],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "FACTORY",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "contract IUniswapV3FactoryOwnerActions"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "PAYOUT_AMOUNT",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256",
+                "internalType": "uint256"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "PAYOUT_TOKEN",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "contract IERC20"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "REWARD_RECEIVER",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "contract INotifiableRewardReceiver"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "admin",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "claimFees",
+        "inputs": [
+            {
+                "name": "_pool",
+                "type": "address",
+                "internalType": "contract IUniswapV3PoolOwnerActions"
+            },
+            {
+                "name": "_recipient",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "_amount0Requested",
+                "type": "uint128",
+                "internalType": "uint128"
+            },
+            {
+                "name": "_amount1Requested",
+                "type": "uint128",
+                "internalType": "uint128"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "enableFeeAmount",
+        "inputs": [
+            {
+                "name": "_fee",
+                "type": "uint24",
+                "internalType": "uint24"
+            },
+            {
+                "name": "_tickSpacing",
+                "type": "int24",
+                "internalType": "int24"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "setAdmin",
+        "inputs": [
+            {
+                "name": "_newAdmin",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "setFeeProtocol",
+        "inputs": [
+            {
+                "name": "_pool",
+                "type": "address",
+                "internalType": "contract IUniswapV3PoolOwnerActions"
+            },
+            {
+                "name": "_feeProtocol0",
+                "type": "uint8",
+                "internalType": "uint8"
+            },
+            {
+                "name": "_feeProtocol1",
+                "type": "uint8",
+                "internalType": "uint8"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "transferFactoryOwnership",
+        "inputs": [
+            {
+                "name": "_newOwner",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "event",
+        "name": "AdminSet",
+        "inputs": [
+            {
+                "name": "oldAmin",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
+            {
+                "name": "newAdmin",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "FeesClaimed",
+        "inputs": [
+            {
+                "name": "pool",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
+            {
+                "name": "caller",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
+            {
+                "name": "recipient",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
+            {
+                "name": "amount0",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            },
+            {
+                "name": "amount1",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "error",
+        "name": "AddressEmptyCode",
+        "inputs": [
+            {
+                "name": "target",
+                "type": "address",
+                "internalType": "address"
+            }
+        ]
+    },
+    {
+        "type": "error",
+        "name": "AddressInsufficientBalance",
+        "inputs": [
+            {
+                "name": "account",
+                "type": "address",
+                "internalType": "address"
+            }
+        ]
+    },
+    {
+        "type": "error",
+        "name": "FailedInnerCall",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "SafeERC20FailedOperation",
+        "inputs": [
+            {
+                "name": "token",
+                "type": "address",
+                "internalType": "address"
+            }
+        ]
+    },
+    {
+        "type": "error",
+        "name": "V3FactoryOwner__InvalidAddress",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "V3FactoryOwner__Unauthorized",
+        "inputs": []
+    }
+]

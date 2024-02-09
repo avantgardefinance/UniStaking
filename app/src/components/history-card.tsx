@@ -76,7 +76,6 @@ export function HistoryCard(item: HistoryItem) {
       )
     case EventTypes.RewardClaimed:
       return <ClaimRewardsCard amount={item.amount} beneficiary={item.beneficiary} date={item.date} />
-
     default:
       never(type, `Unhandled event type for history card ${type}`)
   }
@@ -85,10 +84,13 @@ export function HistoryCard(item: HistoryItem) {
 function StakeCard({ amount, date, owner, stakeId }: { date: Dayjs; stakeId: string; owner: Address; amount: bigint }) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Stake">
-      <div>
+      <div className="flex flex-row justify-between items-center">
         <span>Amount</span>
         <div>
-          <BigIntDisplay value={amount} decimals={18} precision={2} /> <span>UNI</span>
+          <span className="text-lg font-semibold">
+            <BigIntDisplay value={amount} decimals={18} precision={2} />
+          </span>{" "}
+          <span>UNI</span>
         </div>
       </div>
     </HistoryCardTemplate>
@@ -103,10 +105,13 @@ function UnstakeCard({
 }: { date: Dayjs; stakeId: string; owner: Address; amount: bigint }) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Unstake">
-      <div>
+      <div className="flex flex-row justify-between items-center">
         <span>Amount</span>
         <div>
-          <BigIntDisplay value={amount} decimals={18} precision={2} /> <span>UNI</span>
+          <span className="text-lg font-semibold">
+            <BigIntDisplay value={amount} decimals={18} precision={2} />
+          </span>{" "}
+          <span>UNI</span>
         </div>
       </div>
     </HistoryCardTemplate>
@@ -116,10 +121,13 @@ function UnstakeCard({
 function ClaimRewardsCard({ amount, beneficiary, date }: { date: Dayjs; amount: bigint; beneficiary: Address }) {
   return (
     <HistoryCardTemplate date={date} beneficiary={beneficiary} title="Claim Rewards">
-      <div>
+      <div className="flex flex-row justify-between items-center w-full">
         <span>Amount</span>
         <div>
-          <BigIntDisplay value={amount} decimals={18} precision={4} /> <span>WETH</span>
+          <span className="text-lg font-semibold">
+            <BigIntDisplay value={amount} decimals={18} precision={4} />
+          </span>{" "}
+          <span>WETH</span>
         </div>
       </div>
     </HistoryCardTemplate>
@@ -141,13 +149,15 @@ function ChangeDelegateeCard({
 }) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Change Delegatee">
-      <div>
-        <span>From</span>
-        <AddressDisplay value={oldDelegatee} />
-      </div>
-      <div>
-        <span>To</span>
-        <AddressDisplay value={newDelegatee} />
+      <div className="space-y-2">
+        <div className="flex flex-row justify-between">
+          <span>From</span>
+          <AddressDisplay value={oldDelegatee} />
+        </div>
+        <div className="flex flex-row justify-between">
+          <span>To</span>
+          <AddressDisplay value={newDelegatee} />
+        </div>
       </div>
     </HistoryCardTemplate>
   )
@@ -168,13 +178,15 @@ function ChangeBeneficiaryCard({
 }) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Change Beneficiary">
-      <div>
-        <span>From</span>
-        <AddressDisplay value={oldBeneficiary} />
-      </div>
-      <div>
-        <span>To</span>
-        <AddressDisplay value={newBeneficiary} />
+      <div className="space-y-2">
+        <div className="flex flex-row justify-between">
+          <span>From</span>
+          <AddressDisplay value={oldBeneficiary} />
+        </div>
+        <div className="flex flex-row justify-between">
+          <span>To</span>
+          <AddressDisplay value={newBeneficiary} />
+        </div>
       </div>
     </HistoryCardTemplate>
   )
@@ -199,9 +211,9 @@ function HistoryCardTemplate({
 }) {
   return (
     <Card>
-      <CardContent className="flex flex-row justify-between items-center p-6">
-        <div>
-          <h3>{title}</h3>
+      <CardContent className="flex flex-row justify-between p-6">
+        <div className="flex flex-col justify-between">
+          <h3 className="text-xl font-semibold">{title}</h3>
           <div className="space-x-2">
             {stakeId === undefined ? null : <Badge className="p-2">ID #{stakeId}</Badge>}
             {owner === undefined ? null : (
@@ -231,7 +243,9 @@ function HistoryCardTemplate({
           </div>
         </div>
         <Card className="flex">
-          <CardContent className="p-6">{children}</CardContent>
+          <CardContent className="p-6 min-w-80 min-h-24 flex items-center">
+            <div className="w-full">{children}</div>
+          </CardContent>
         </Card>
       </CardContent>
     </Card>

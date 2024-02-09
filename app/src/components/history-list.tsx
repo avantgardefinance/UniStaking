@@ -24,7 +24,7 @@ function useHistoryList() {
     data?.map((event: any) => {
       return {
         ...event,
-        amount: BigInt(event.amount),
+        amount: event.amount === undefined ? undefined : BigInt(event.amount),
         date: dayjs.unix(event.date)
       }
     }) ?? []
@@ -47,5 +47,11 @@ export function HistoryList() {
     return <Alert variant="destructive">{error.message}</Alert>
   }
 
-  return data.map((item) => <HistoryCard key={item.id} {...item} />)
+  return (
+    <div className="space-y-4">
+      {data.map((item) => (
+        <HistoryCard key={item.id} {...item} />
+      ))}
+    </div>
+  )
 }

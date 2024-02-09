@@ -2,7 +2,8 @@ import { graphql } from "@/lib/generated/subgraph/gql"
 
 export const AccountEventsQuery = graphql(`
     query AccountEvents($account: String!) {
-      accountEvents(where: { account: $account }) {
+      # TODO add this: orderBy: event__blockTimestamp, orderDirection: desc
+      accountEvents(where: { account: $account}, first: 1000) {
         event {
           __typename
           id

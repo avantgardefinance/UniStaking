@@ -22,7 +22,7 @@ function useStakeDepositCard({ owner }: { owner: Address }) {
 }
 
 export type StakeDeposit = {
-  stakeId: bigint
+  stakeId: string
   stakedAmount: bigint
   createdAt: dayjs.Dayjs
   updatedAt: dayjs.Dayjs
@@ -47,7 +47,7 @@ export function StakeDepositCard(
       <CardHeader className="flex flex-row justify-between">
         <div className="space-x-2">
           <Badge className="p-2">
-            ID #{stakeId.toString()}
+            ID #{stakeId}
           </Badge>
           <Badge className="p-2">
             <div className="flex items-center space-x-2">

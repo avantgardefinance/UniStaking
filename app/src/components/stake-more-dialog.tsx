@@ -20,7 +20,7 @@ import { useAccount, useReadContract } from "wagmi"
 
 const useStakeMoreDialog = ({ availableForStakingUni, stakeId }: {
   availableForStakingUni: bigint
-  stakeId: bigint
+  stakeId: string
 }) => {
   const account = useAccount()
 
@@ -62,7 +62,7 @@ const useStakeMoreDialog = ({ availableForStakingUni, stakeId }: {
         address: uniStaker,
         abi: abiUniStaker,
         functionName: "stakeMore",
-        args: [stakeId, parseUnits(values.amount, 18)]
+        args: [BigInt(stakeId), parseUnits(values.amount, 18)]
       })
     } else {
       writeContract({
@@ -89,7 +89,7 @@ const useStakeMoreDialog = ({ availableForStakingUni, stakeId }: {
 export function StakeMoreDialogContent(
   { availableForStakingUni, beneficiary, delegatee, stakeId }: {
     availableForStakingUni: bigint
-    stakeId: bigint
+    stakeId: string
     delegatee: Address
     beneficiary: Address
   }
@@ -141,7 +141,7 @@ export function StakeMoreDialogContent(
             <div className="space-y-2">
               <div className="flex flex-col space-y-2">
                 <span>ID</span>
-                <span>{stakeId.toString()}</span>
+                <span>{stakeId}</span>
               </div>
               <Separator />
               <div className="flex flex-col space-y-2">

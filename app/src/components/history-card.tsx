@@ -208,11 +208,11 @@ function HistoryCardTemplate(
 ) {
   return (
     <Card>
-      <CardContent className="">
+      <CardContent className="flex flex-row justify-between items-center p-6">
         <div>
           <h3>{title}</h3>
-          <div>
-            {stakeId === undefined ? null : <Badge className="p-2">ID #{stakeId.toString()}</Badge>}
+          <div className="space-x-2">
+            {stakeId === undefined ? null : <Badge className="p-2">ID #{stakeId}</Badge>}
             {owner === undefined ? null : (
               <Badge className="p-2">
                 <div className="flex items-center space-x-2">
@@ -239,8 +239,8 @@ function HistoryCardTemplate(
             </Badge>
           </div>
         </div>
-        <Card>
-          <CardContent>
+        <Card className="flex">
+          <CardContent className="p-6">
             {children}
           </CardContent>
         </Card>

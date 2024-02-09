@@ -21,7 +21,7 @@ import { encodeFunctionData, isAddressEqual } from "viem"
 export function EditBeneficiaryDelegateeDialogContent({ beneficiary, delegatee, stakeId }: {
   beneficiary: Address
   delegatee: Address
-  stakeId: bigint
+  stakeId: string
 }) {
   const { error: tallyDelegateesError, isLoading, tallyDelegatees } = useTallyDelegates()
 
@@ -47,7 +47,7 @@ const useEditBeneficiaryDelegateeForm = (
   { beneficiary: currentBeneficiary, delegatee: currentDelegatee, stakeId, tallyDelegatees, tallyDelegateesError }: {
     beneficiary: Address
     delegatee: Address
-    stakeId: bigint
+    stakeId: string
     tallyDelegatees: Array<TallyDelegatee>
     tallyDelegateesError: Error | null
   }
@@ -88,7 +88,7 @@ const useEditBeneficiaryDelegateeForm = (
         address: uniStaker,
         abi: abiUniStaker,
         functionName: "alterDelegatee",
-        args: [stakeId, delegatee]
+        args: [BigInt(stakeId), delegatee]
       })
 
       return
@@ -99,7 +99,7 @@ const useEditBeneficiaryDelegateeForm = (
         address: uniStaker,
         abi: abiUniStaker,
         functionName: "alterBeneficiary",
-        args: [stakeId, values.beneficiary]
+        args: [BigInt(stakeId), values.beneficiary]
       })
 
       return
@@ -108,12 +108,12 @@ const useEditBeneficiaryDelegateeForm = (
     const encodedDataAlterDelegatee = encodeFunctionData({
       abi: abiUniStaker,
       functionName: "alterDelegatee",
-      args: [stakeId, delegatee]
+      args: [BigInt(stakeId), delegatee]
     })
     const encodedDataAlterBeneficiary = encodeFunctionData({
       abi: abiUniStaker,
       functionName: "alterBeneficiary",
-      args: [stakeId, values.beneficiary]
+      args: [BigInt(stakeId), values.beneficiary]
     })
     writeContract({
       address: uniStaker,
@@ -134,7 +134,7 @@ const useEditBeneficiaryDelegateeForm = (
 function EditBeneficiaryDelegateeForm({ beneficiary, delegatee, stakeId, tallyDelegatees, tallyDelegateesError }: {
   beneficiary: Address
   delegatee: Address
-  stakeId: bigint
+  stakeId: string
   tallyDelegatees: Array<TallyDelegatee>
   tallyDelegateesError: Error | null
 }) {
@@ -151,7 +151,7 @@ function EditBeneficiaryDelegateeForm({ beneficiary, delegatee, stakeId, tallyDe
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="flex flex-col space-y-2">
           <span>ID</span>
-          <span>{stakeId.toString()}</span>
+          <span>{stakeId}</span>
         </div>
         <Separator />
         <div className="space-y-4">

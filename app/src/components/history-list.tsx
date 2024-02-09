@@ -53,12 +53,14 @@ export function HistoryListWrapper() {
 }
 
 function useHistoryList({ items }: { items: HistoryItem[] }) {
-  const [historyToDisplay, setHistoryToDisplaya] = useState(items.slice(0, 20))
+  const initialItems = 20
+  const [historyToDisplay, setHistoryToDisplaya] = useState(items.slice(0, initialItems))
 
   const canLoadMore = historyToDisplay.length < items.length
 
+  const loadMoreItems = 10
   const loadMore = () => {
-    setHistoryToDisplaya(items.slice(0, historyToDisplay.length + 10))
+    setHistoryToDisplaya(items.slice(0, historyToDisplay.length + loadMoreItems))
   }
 
   return { historyToDisplay, canLoadMore, loadMore }

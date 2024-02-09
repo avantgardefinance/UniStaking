@@ -4,6 +4,7 @@ export const AccountEventsQuery = graphql(`
     query AccountEvents($account: String!) {
       accountEvents(where: { account: $account }) {
         event {
+          __typename
           id
           blockTimestamp
           ... on BeneficiaryAltered {

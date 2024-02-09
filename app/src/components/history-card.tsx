@@ -29,21 +29,21 @@ export type HistoryItem =
     id: string
   }
   & (
-    | { type: typeof EventTypes.StakeDeposited; amount: bigint; owner: Address; stakeId: number }
-    | { type: typeof EventTypes.StakeWithdrawn; amount: bigint; owner: Address; stakeId: number }
+    | { type: typeof EventTypes.StakeDeposited; amount: bigint; owner: Address; stakeId: string }
+    | { type: typeof EventTypes.StakeWithdrawn; amount: bigint; owner: Address; stakeId: string }
     | {
       type: typeof EventTypes.BeneficiaryAltered
       oldBeneficiary: Address
       newBeneficiary: Address
       owner: Address
-      stakeId: number
+      stakeId: string
     }
     | {
       type: typeof EventTypes.DelegateeAltered
       oldDelegatee: Address
       newDelegatee: Address
       owner: Address
-      stakeId: number
+      stakeId: string
     }
     | { type: typeof EventTypes.RewardClaimed; beneficiary: Address; amount: bigint }
   )
@@ -79,11 +79,11 @@ export function HistoryCard(item: HistoryItem) {
       return <ClaimRewardsCard amount={item.amount} beneficiary={item.beneficiary} date={item.date} />
 
     default:
-      never(type, "Unhandled event type")
+      never(type, `Unhandled event type for history card ${type}`)
   }
 }
 
-function StakeCard({ amount, date, owner, stakeId }: { date: Dayjs; stakeId: number; owner: Address; amount: bigint }) {
+function StakeCard({ amount, date, owner, stakeId }: { date: Dayjs; stakeId: string; owner: Address; amount: bigint }) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Stake">
       <div>
@@ -102,7 +102,7 @@ function StakeCard({ amount, date, owner, stakeId }: { date: Dayjs; stakeId: num
 }
 
 function UnstakeCard(
-  { amount, date, owner, stakeId }: { date: Dayjs; stakeId: number; owner: Address; amount: bigint }
+  { amount, date, owner, stakeId }: { date: Dayjs; stakeId: string; owner: Address; amount: bigint }
 ) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Unstake">
@@ -144,7 +144,7 @@ function ClaimRewardsCard(
 function ChangeDelegateeCard(
   { date, newDelegatee, oldDelegatee, owner, stakeId }: {
     date: Dayjs
-    stakeId: number
+    stakeId: string
     owner: Address
     oldDelegatee: Address
     newDelegatee: Address
@@ -171,7 +171,7 @@ function ChangeDelegateeCard(
 function ChangeBeneficiaryCard(
   { date, newBeneficiary, oldBeneficiary, owner, stakeId }: {
     date: Dayjs
-    stakeId: number
+    stakeId: string
     owner: Address
     oldBeneficiary: Address
     newBeneficiary: Address
@@ -200,7 +200,7 @@ function HistoryCardTemplate(
     title: string
     date: Dayjs
     children: React.ReactNode
-    stakeId?: number
+    stakeId?: string
     owner?: Address
     beneficiary?: Address
     delegatee?: Address

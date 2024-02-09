@@ -3,7 +3,7 @@ import { HistoryList } from "@/components/history-list"
 export default function HistoryPage() {
   return (
     <div>
-      history
+      <h1>History</h1>
       <HistoryList />
     </div>
   )

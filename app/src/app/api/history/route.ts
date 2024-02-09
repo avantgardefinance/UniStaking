@@ -22,6 +22,7 @@ export async function GET(request: Request) {
     }
   })
 
+
   const parsedAccountEvents = accountEvents.map((accountEvent) => {
     const eventTypename = accountEvent.event.__typename
     switch (eventTypename) {
@@ -31,7 +32,8 @@ export async function GET(request: Request) {
           amount: accountEvent.event.amount,
           date: accountEvent.event.blockTimestamp,
           owner: accountEvent.event.deposit.owner.id,
-          id: accountEvent.event.id
+          id: accountEvent.event.id,
+          type: eventTypename
         }
       case "StakeWithdrawn":
         return {
@@ -39,7 +41,8 @@ export async function GET(request: Request) {
           amount: accountEvent.event.amount,
           date: accountEvent.event.blockTimestamp,
           owner: accountEvent.event.deposit.owner.id,
-          id: accountEvent.event.id
+          id: accountEvent.event.id,
+          type: eventTypename
         }
       case "BeneficiaryAltered":
         return {
@@ -48,7 +51,8 @@ export async function GET(request: Request) {
           date: accountEvent.event.blockTimestamp,
           oldBeneficiary: accountEvent.event.oldBeneficiary,
           newBeneficiary: accountEvent.event.newBeneficiary,
-          id: accountEvent.event.id
+          id: accountEvent.event.id,
+          type: eventTypename
         }
       case "DelegateeAltered":
         return {
@@ -57,21 +61,23 @@ export async function GET(request: Request) {
           date: accountEvent.event.blockTimestamp,
           oldDelegatee: accountEvent.event.oldDelegatee,
           newDelegatee: accountEvent.event.newDelegatee,
-          id: accountEvent.event.id
+          id: accountEvent.event.id,
+          type: eventTypename
         }
       case "RewardClaimed":
         return {
           date: accountEvent.event.blockTimestamp,
           beneficiary: accountEvent.event.beneficiary,
           amount: accountEvent.event.amount,
-          id: accountEvent.event.id
+          id: accountEvent.event.id,
+          type: eventTypename
         }
       case "RewardNotified":
       case "SurrogateDeployed":
       case undefined:
         return new Response(null, { status: 500 })
       default:
-        never(eventTypename, "Unhandled event type")
+        never(eventTypename, `Unhandled event type for route ${eventTypename}`)
     }
   })
 

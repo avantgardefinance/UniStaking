@@ -19,10 +19,12 @@ function useHistoryList() {
     enabled: account.address !== undefined
   })
 
+
   // TODO improve types
   const parsedData: Array<HistoryItem> = data?.map((event: any) => {
     return {
       ...event,
+      amount: BigInt(event.amount),
       date: dayjs.unix(event.date)
     }
   }) ?? []

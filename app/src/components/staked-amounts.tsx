@@ -7,12 +7,17 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
 import { useQuery } from "@tanstack/react-query"
 import dayjs from "dayjs"
+import { ReactNode } from "react"
 import { useAccount } from "wagmi"
 
 function useStakedAmounts() {
   const account = useAccount()
 
-  const { data: deposits, error: errorDeposits, isLoading: isLoadingDeposits } = useQuery({
+  const {
+    data: deposits,
+    error: errorDeposits,
+    isLoading: isLoadingDeposits
+  } = useQuery({
     queryKey: ["deposits", account.address],
     queryFn: async () => {
       const response = await fetch(`/api/deposits?account=${account.address}`)
@@ -22,13 +27,14 @@ function useStakedAmounts() {
   })
 
   // TODO improve types
-  const parsedDeposits: Array<StakeDeposit> = deposits?.map((deposit: any) => {
-    return {
-      ...deposit,
-      createdAt: dayjs.unix(deposit.createdAt),
-      updatedAt: dayjs.unix(deposit.updatedAt)
-    }
-  }) ?? []
+  const parsedDeposits: Array<StakeDeposit> =
+    deposits?.map((deposit: any) => {
+      return {
+        ...deposit,
+        createdAt: dayjs.unix(deposit.createdAt),
+        updatedAt: dayjs.unix(deposit.updatedAt)
+      }
+    }) ?? []
 
   const {
     data: governanceTokenBalance,
@@ -57,13 +63,11 @@ export function StakedAmounts() {
   )
 }
 
-function CardWithTitle({ children }: { children: React.ReactNode }) {
+function CardWithTitle({ children }: { children: ReactNode }) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>
-          {children}
-        </CardTitle>
+        <CardTitle>{children}</CardTitle>
       </CardHeader>
     </Card>
   )
@@ -92,9 +96,7 @@ function StakedAmountsContent() {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>
-            No deposits
-          </CardTitle>
+          <CardTitle>No deposits</CardTitle>
         </CardHeader>
       </Card>
     )

@@ -35,20 +35,16 @@ export type StakeDepositCardProps = {
   governanceTokenBalanceValue: bigint
 }
 
-export function StakeDepositCard(
-  {
-    deposit: { beneficiary, createdAt, delegatee, owner, stakeId, stakedAmount, updatedAt },
-    governanceTokenBalanceValue
-  }: StakeDepositCardProps
-) {
+export function StakeDepositCard({
+  deposit: { beneficiary, createdAt, delegatee, owner, stakeId, stakedAmount, updatedAt },
+  governanceTokenBalanceValue
+}: StakeDepositCardProps) {
   const { isOwner } = useStakeDepositCard({ owner })
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between">
         <div className="space-x-2">
-          <Badge className="p-2">
-            ID #{stakeId.toString()}
-          </Badge>
+          <Badge className="p-2">ID #{stakeId.toString()}</Badge>
           <Badge className="p-2">
             <div className="flex items-center space-x-2">
               <span>Owner</span> <AddressDisplay iconSize={12} value={owner} />
@@ -76,65 +72,62 @@ export function StakeDepositCard(
             <span>Beneficiary</span>
             <AddressDisplay value={beneficiary} />
           </div>
-          {isOwner &&
-            (
+          {isOwner && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost">Edit</Button>
+              </DialogTrigger>
+              <EditBeneficiaryDelegateeDialogContent
+                stakeId={stakeId}
+                delegatee={delegatee}
+                beneficiary={beneficiary}
+              />
+            </Dialog>
+          )}
+        </div>
+        <div className="flex flex-row items-center space-x-4">
+          {isOwner ? (
+            <>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="ghost">Edit</Button>
+                  <Button variant="ghost" className="space-x-2">
+                    <Upload size={16} />
+                    <span>Unstake</span>
+                  </Button>
                 </DialogTrigger>
-                <EditBeneficiaryDelegateeDialogContent
+                <UnstakeDialogContent
+                  availableForUnstaking={stakedAmount}
                   stakeId={stakeId}
                   delegatee={delegatee}
                   beneficiary={beneficiary}
                 />
               </Dialog>
-            )}
-        </div>
-        <div className="flex flex-row items-center space-x-4">
-          {isOwner ?
-            (
-              <>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" className="space-x-2">
-                      <Upload size={16} />
-                      <span>Unstake</span>
-                    </Button>
-                  </DialogTrigger>
-                  <UnstakeDialogContent
-                    availableForUnstaking={stakedAmount}
-                    stakeId={stakeId}
-                    delegatee={delegatee}
-                    beneficiary={beneficiary}
-                  />
-                </Dialog>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="secondary" disabled={governanceTokenBalanceValue === 0n} className="space-x-2">
-                      <Download size={16} /> <span>Stake</span>
-                    </Button>
-                  </DialogTrigger>
-                  <StakeMoreDialogContent
-                    availableForStakingUni={governanceTokenBalanceValue}
-                    stakeId={stakeId}
-                    delegatee={delegatee}
-                    beneficiary={beneficiary}
-                  />
-                </Dialog>
-              </>
-            ) :
-            (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>You are not an owner of this stake</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="secondary" disabled={governanceTokenBalanceValue === 0n} className="space-x-2">
+                    <Download size={16} /> <span>Stake</span>
+                  </Button>
+                </DialogTrigger>
+                <StakeMoreDialogContent
+                  availableForStakingUni={governanceTokenBalanceValue}
+                  stakeId={stakeId}
+                  delegatee={delegatee}
+                  beneficiary={beneficiary}
+                />
+              </Dialog>
+            </>
+          ) : (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>You are not an owner of this stake</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </CardContent>
     </Card>

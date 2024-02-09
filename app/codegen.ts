@@ -24,7 +24,7 @@ const config: CodegenConfig = {
       preset: "client"
     }
   },
-  config: { namingConvention: 'keep' }
+  config: { namingConvention: "keep" }
 }
 
 export default config

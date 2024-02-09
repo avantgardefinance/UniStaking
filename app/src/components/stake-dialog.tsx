@@ -20,7 +20,9 @@ import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
 import { useAccount, useReadContract } from "wagmi"
 
-const useStakeDialog = ({ availableForStakingUni }: {
+const useStakeDialog = ({
+  availableForStakingUni
+}: {
   availableForStakingUni: bigint
 }) => {
   const account = useAccount()
@@ -69,9 +71,7 @@ const useStakeDialog = ({ availableForStakingUni }: {
   }) => {
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
 
-    if (
-      values.beneficiary === undefined || delegatee === undefined
-    ) {
+    if (values.beneficiary === undefined || delegatee === undefined) {
       return
     }
 
@@ -189,18 +189,17 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
                 </FormItem>
               )}
             />
-            {isLoadingTallyDelegatees
-              ? "Loading..."
-              : <DelegateeField name="delegateeOption" tallyDelegatees={tallyDelegatees} />}
-            {error &&
-              (
-                <Alert variant="destructive">
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription className="break-all">
-                    {error.message}
-                  </AlertDescription>
-                </Alert>
-              )}
+            {isLoadingTallyDelegatees ? (
+              "Loading..."
+            ) : (
+              <DelegateeField name="delegateeOption" tallyDelegatees={tallyDelegatees} />
+            )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription className="break-all">{error.message}</AlertDescription>
+              </Alert>
+            )}
             {hasEnoughAllowance ? null : (
               <Alert>
                 <AlertDescription>
@@ -212,15 +211,13 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
 
           <DialogFooter>
             <Button type="submit" className="space-x-2" disabled={isPending}>
-              {isPending
-                ? <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-                : hasEnoughAllowance
-                ? <Download size={16} />
-                : null}
+              {isPending ? (
+                <RotateCw size={16} className="mr-2 size-4 animate-spin" />
+              ) : hasEnoughAllowance ? (
+                <Download size={16} />
+              ) : null}
 
-              {hasEnoughAllowance ?
-                <span>Stake</span> :
-                <span>Approve</span>}
+              {hasEnoughAllowance ? <span>Stake</span> : <span>Approve</span>}
             </Button>
           </DialogFooter>
         </form>

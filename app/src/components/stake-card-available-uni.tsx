@@ -13,9 +13,7 @@ export function AvailableUniForStaking() {
   return (
     <Card className="flex-1">
       <CardHeader>
-        <CardDescription className="text-base font-medium">
-          Available for staking
-        </CardDescription>
+        <CardDescription className="text-base font-medium">Available for staking</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
         <NoSsr>

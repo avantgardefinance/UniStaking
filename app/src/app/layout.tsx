@@ -1,4 +1,5 @@
 import "@/styles/globals.css"
+
 import { Providers } from "@/components/providers/providers"
 import { SiteHeader } from "@/components/site-header"
 import { TailwindIndicator } from "@/components/tailwind-indicator"
@@ -7,6 +8,7 @@ import { siteConfig } from "@/config/site"
 import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import type { Metadata } from "next"
+import { ReactNode } from "react"
 
 export const metadata: Metadata = {
   title: {
@@ -19,21 +21,13 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: light)"
-          color="white"
-        />
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: dark)"
-          color="black"
-        />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" color="white" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" color="black" />
       </head>
       <body className={cn("min-h-screen font-sans antialiased", fontSans.variable)}>
         <div className="mx-5 md:mx-20 lg:mx-40">

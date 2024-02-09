@@ -44,11 +44,12 @@ export async function GET() {
     }
   })
 
-  const delegates = [...first.delegates.nodes, ...second.delegates.nodes].map((
-    delegatee
-  ) => {
+  const delegates = [...first.delegates.nodes, ...second.delegates.nodes].map((delegatee) => {
     // TODO: type that properly. Parse the tally response from api, and infer type from it
-    const { account: { address, ens, name }, votesCount } = delegatee as {
+    const {
+      account: { address, ens, name },
+      votesCount
+    } = delegatee as {
       votesCount: string
       account: {
         address: string
@@ -57,11 +58,7 @@ export async function GET() {
       }
     }
 
-    const label = name !== ""
-      ? name
-      : ens !== ""
-      ? ens
-      : address
+    const label = name !== "" ? name : ens !== "" ? ens : address
 
     return {
       votesCount,

@@ -2,11 +2,12 @@
   "private": true,
   "packageManager": "pnpm@8.15.1",
   "scripts": {
-    "lint": "pnpm --recursive --parallel run lint",
-    "format": "pnpm --recursive --parallel run format",
+    "lint": "biome check .",
+    "format": "biome check --apply-unsafe .",
     "dev": "pnpm --filter app run dev"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.5.3",
     "typescript": "^5"
   },
   "pnpm": {

@@ -18,7 +18,10 @@ import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
 import { useAccount, useReadContract } from "wagmi"
 
-const useStakeMoreDialog = ({ availableForStakingUni, stakeId }: {
+const useStakeMoreDialog = ({
+  availableForStakingUni,
+  stakeId
+}: {
   availableForStakingUni: bigint
   stakeId: bigint
 }) => {
@@ -86,14 +89,17 @@ const useStakeMoreDialog = ({ availableForStakingUni, stakeId }: {
   }
 }
 
-export function StakeMoreDialogContent(
-  { availableForStakingUni, beneficiary, delegatee, stakeId }: {
-    availableForStakingUni: bigint
-    stakeId: bigint
-    delegatee: Address
-    beneficiary: Address
-  }
-) {
+export function StakeMoreDialogContent({
+  availableForStakingUni,
+  beneficiary,
+  delegatee,
+  stakeId
+}: {
+  availableForStakingUni: bigint
+  stakeId: bigint
+  delegatee: Address
+  beneficiary: Address
+}) {
   const { error, form, hasEnoughAllowance, isPending, onSubmit, setMaxAmount } = useStakeMoreDialog({
     availableForStakingUni,
     stakeId
@@ -103,9 +109,7 @@ export function StakeMoreDialogContent(
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Stake</DialogTitle>
-        <DialogDescription className="sr-only">
-          Enter the amount to stake
-        </DialogDescription>
+        <DialogDescription className="sr-only">Enter the amount to stake</DialogDescription>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-4">
@@ -155,15 +159,12 @@ export function StakeMoreDialogContent(
               </div>
             </div>
 
-            {error &&
-              (
-                <Alert variant="destructive">
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription className="break-all">
-                    {error.message}
-                  </AlertDescription>
-                </Alert>
-              )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription className="break-all">{error.message}</AlertDescription>
+              </Alert>
+            )}
             {hasEnoughAllowance ? null : (
               <Alert>
                 <AlertDescription>
@@ -175,15 +176,13 @@ export function StakeMoreDialogContent(
 
           <DialogFooter>
             <Button type="submit" className="space-x-2" disabled={isPending}>
-              {isPending
-                ? <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-                : hasEnoughAllowance
-                ? <Download size={16} />
-                : null}
+              {isPending ? (
+                <RotateCw size={16} className="mr-2 size-4 animate-spin" />
+              ) : hasEnoughAllowance ? (
+                <Download size={16} />
+              ) : null}
 
-              {hasEnoughAllowance ?
-                <span>Stake</span> :
-                <span>Approve</span>}
+              {hasEnoughAllowance ? <span>Stake</span> : <span>Approve</span>}
             </Button>
           </DialogFooter>
         </form>

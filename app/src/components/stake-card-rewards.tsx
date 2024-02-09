@@ -13,7 +13,11 @@ import { useAccount, useReadContract } from "wagmi"
 function useStakeCardRewards() {
   const account = useAccount()
 
-  const { data: rewards, queryKey, status } = useReadContract({
+  const {
+    data: rewards,
+    queryKey,
+    status
+  } = useReadContract({
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "earned",
@@ -21,9 +25,7 @@ function useStakeCardRewards() {
   })
 
   const queryClient = useQueryClient()
-  const {
-    writeContract
-  } = useWriteContractWithToast({
+  const { writeContract } = useWriteContractWithToast({
     mutation: {
       onSuccess: () => queryClient.invalidateQueries({ queryKey })
     }
@@ -78,13 +80,7 @@ function StakeCardRewardsContent() {
         </>
       </h3>
 
-      <Button
-        size="lg"
-        disabled={!isAbleToClaim}
-        variant="outline"
-        onClick={() => writeClaim()}
-        className="space-x-2"
-      >
+      <Button size="lg" disabled={!isAbleToClaim} variant="outline" onClick={() => writeClaim()} className="space-x-2">
         <Trophy size={16} />
         <span>Claim</span>
       </Button>

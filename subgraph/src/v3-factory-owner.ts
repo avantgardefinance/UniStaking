@@ -1,5 +1,5 @@
-import { AdminSet, FeesClaimed } from "../generated/schema"
 import { AdminSet as AdminSetEvent, FeesClaimed as FeesClaimedEvent } from "../generated/V3FactoryOwner/V3FactoryOwner"
+import { AdminSet, FeesClaimed } from "../generated/schema"
 
 export function handleAdminSet(event: AdminSetEvent): void {
   const entity = new AdminSet(event.transaction.hash.concatI32(event.logIndex.toI32()))

@@ -8,15 +8,11 @@ export function FAQ() {
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
             <AccordionTrigger>What is staking?</AccordionTrigger>
-            <AccordionContent>
-              TODO
-            </AccordionContent>
+            <AccordionContent>TODO</AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
             <AccordionTrigger>How and why staking in Uniswap?</AccordionTrigger>
-            <AccordionContent>
-              TODO
-            </AccordionContent>
+            <AccordionContent>TODO</AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3">
             <AccordionTrigger>What are rewards?</AccordionTrigger>

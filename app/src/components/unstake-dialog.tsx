@@ -16,11 +16,7 @@ import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
 
 const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: bigint; availableForUnstaking: bigint }) => {
-  const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    writeContract
-  } = useWriteContractWithToast()
+  const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
 
   const form = useForm({
     defaultValues: {
@@ -51,14 +47,17 @@ const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: bigint;
   }
 }
 
-export function UnstakeDialogContent(
-  { availableForUnstaking, beneficiary, delegatee, stakeId }: {
-    availableForUnstaking: bigint
-    stakeId: bigint
-    delegatee: Address
-    beneficiary: Address
-  }
-) {
+export function UnstakeDialogContent({
+  availableForUnstaking,
+  beneficiary,
+  delegatee,
+  stakeId
+}: {
+  availableForUnstaking: bigint
+  stakeId: bigint
+  delegatee: Address
+  beneficiary: Address
+}) {
   const { error, form, isPending, onSubmit, setMaxAmount } = useUnstakeDialog({
     availableForUnstaking,
     stakeId
@@ -68,9 +67,7 @@ export function UnstakeDialogContent(
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Unstake</DialogTitle>
-        <DialogDescription className="sr-only">
-          Enter the amount to unstake
-        </DialogDescription>
+        <DialogDescription className="sr-only">Enter the amount to unstake</DialogDescription>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-4">
@@ -120,22 +117,17 @@ export function UnstakeDialogContent(
                 <span>{beneficiary}</span>
               </div>
             </div>
-            {error &&
-              (
-                <Alert variant="destructive">
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription className="break-all">
-                    {error.message}
-                  </AlertDescription>
-                </Alert>
-              )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription className="break-all">{error.message}</AlertDescription>
+              </Alert>
+            )}
           </div>
 
           <DialogFooter>
             <Button type="submit" className="space-x-2" disabled={isPending}>
-              {isPending
-                ? <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-                : <Upload size={16} />}
+              {isPending ? <RotateCw size={16} className="mr-2 size-4 animate-spin" /> : <Upload size={16} />}
               <span>Unstake</span>
             </Button>
           </DialogFooter>

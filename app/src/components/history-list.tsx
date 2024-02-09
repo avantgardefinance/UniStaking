@@ -3,11 +3,13 @@
 import { HistoryCard } from "@/components/history-card"
 import type { HistoryItem } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
 import { useQuery } from "@tanstack/react-query"
 import * as dayjs from "dayjs"
+import { useState } from "react"
 import { useAccount } from "wagmi"
 
-function useHistoryList() {
+function useHistoryListWrapper() {
   const account = useAccount()
 
   const { data, error, isLoading } = useQuery({
@@ -36,8 +38,8 @@ function useHistoryList() {
   }
 }
 
-export function HistoryList() {
-  const { data, error, isLoading } = useHistoryList()
+export function HistoryListWrapper() {
+  const { data, error, isLoading } = useHistoryListWrapper()
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -47,11 +49,32 @@ export function HistoryList() {
     return <Alert variant="destructive">{error.message}</Alert>
   }
 
+  return <HistoryList items={data} />
+}
+
+function useHistoryList({ items }: { items: HistoryItem[] }) {
+  const [historyToDisplay, setHistoryToDisplaya] = useState(items.slice(0, 20))
+
+  const canLoadMore = historyToDisplay.length < items.length
+
+  const loadMore = () => {
+    setHistoryToDisplaya(items.slice(0, historyToDisplay.length + 10))
+  }
+
+  return { historyToDisplay, canLoadMore, loadMore }
+}
+
+function HistoryList({ items }: { items: HistoryItem[] }) {
+  const { historyToDisplay, canLoadMore, loadMore } = useHistoryList({ items })
+
   return (
-    <div className="space-y-4">
-      {data.map((item) => (
-        <HistoryCard key={item.id} {...item} />
-      ))}
+    <div className="flex items-center flex-col space-y-4">
+      <div className="w-full space-y-4">
+        {historyToDisplay.map((item) => (
+          <HistoryCard key={item.id} {...item} />
+        ))}
+      </div>
+      {canLoadMore && <Button onClick={loadMore}>Load more</Button>}
     </div>
   )
 }

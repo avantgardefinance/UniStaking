@@ -1,4 +1,4 @@
-import { graphql } from "@/lib/generated/subgraph/gql";
+import { graphql } from "@/lib/generated/subgraph/gql"
 
 export const DepositsQuery = graphql(`
     query Deposits($account: String) {
@@ -18,4 +18,4 @@ export const DepositsQuery = graphql(`
         updatedAt
       }
   }
-`);
+`)

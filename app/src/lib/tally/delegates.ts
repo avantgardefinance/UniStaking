@@ -1,4 +1,4 @@
-import { graphql } from "@/lib/generated/tally/gql";
+import { graphql } from "@/lib/generated/tally/gql"
 
 export const DelegatesQuery = graphql(`
   query Delegates($input: DelegatesInput!) {
@@ -19,4 +19,4 @@ export const DelegatesQuery = graphql(`
       }
     }
   }
-`);
+`)

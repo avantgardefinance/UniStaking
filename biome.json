@@ -7,7 +7,7 @@
     "ignore": [
       ".direnv/",
       ".next/",
-      "lib/",
+      "contracts/",
       "dist/",
       "out/",
       "build/",

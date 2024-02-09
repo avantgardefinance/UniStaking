@@ -1,17 +1,17 @@
-import { buttonVariants } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { never } from "@/lib/assertion";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { useEffect } from "react";
-import type { Hash } from "viem";
-import type { UseWriteContractReturnType } from "wagmi";
+import { buttonVariants } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
+import { never } from "@/lib/assertion"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { useEffect } from "react"
+import type { Hash } from "viem"
+import type { UseWriteContractReturnType } from "wagmi"
 
 export function useTransactionToast({
   status,
-  txHash,
+  txHash
 }: { status: UseWriteContractReturnType["status"]; txHash?: Hash }) {
-  const { toast } = useToast();
+  const { toast } = useToast()
 
   useEffect(() => {
     const action =
@@ -21,29 +21,29 @@ export function useTransactionToast({
             className={cn(
               "space-x-2",
               buttonVariants({
-                variant: "outline",
-              }),
+                variant: "outline"
+              })
             )}
           >
             Transaction {txHash.slice(0, 10)}...
           </div>
         </Link>
-      );
+      )
 
     switch (status) {
       case "success":
-        toast({ title: "Success", action });
-        break;
+        toast({ title: "Success", action })
+        break
       case "pending":
-        toast({ title: "Pending ...", action });
-        break;
+        toast({ title: "Pending ...", action })
+        break
       case "idle":
-        break;
+        break
       case "error":
-        toast({ title: "Failed", action, variant: "destructive" });
-        break;
+        toast({ title: "Failed", action, variant: "destructive" })
+        break
       default:
-        never(status, "Unhandled state");
+        never(status, "Unhandled state")
     }
-  }, [status, toast, txHash]);
+  }, [status, toast, txHash])
 }

@@ -22,24 +22,24 @@ export async function GET(request: Request) {
     }
   })
 
-  const parsedDeposits = accountEvents.map((accountEvent) => {
+  const parsedAccountEvents = accountEvents.map((accountEvent) => {
     const eventTypename = accountEvent.event.__typename
     switch (eventTypename) {
       case "StakeDeposited":
         return {
           stakeId: accountEvent.event.deposit.id,
-          stakedAmount: accountEvent.event.amount,
+          amount: accountEvent.event.amount,
           date: accountEvent.event.blockTimestamp,
           owner: accountEvent.event.deposit.owner.id,
-          amount: accountEvent.event.amount
+          id: accountEvent.event.id
         }
       case "StakeWithdrawn":
         return {
           stakeId: accountEvent.event.deposit.id,
-          stakedAmount: accountEvent.event.amount,
+          amount: accountEvent.event.amount,
           date: accountEvent.event.blockTimestamp,
           owner: accountEvent.event.deposit.owner.id,
-          amount: accountEvent.event.amount
+          id: accountEvent.event.id
         }
       case "BeneficiaryAltered":
         return {
@@ -47,7 +47,8 @@ export async function GET(request: Request) {
           owner: accountEvent.event.deposit.owner.id,
           date: accountEvent.event.blockTimestamp,
           oldBeneficiary: accountEvent.event.oldBeneficiary,
-          newBeneficiary: accountEvent.event.newBeneficiary
+          newBeneficiary: accountEvent.event.newBeneficiary,
+          id: accountEvent.event.id
         }
       case "DelegateeAltered":
         return {
@@ -55,13 +56,15 @@ export async function GET(request: Request) {
           owner: accountEvent.event.deposit.owner.id,
           date: accountEvent.event.blockTimestamp,
           oldDelegatee: accountEvent.event.oldDelegatee,
-          newDelegatee: accountEvent.event.newDelegatee
+          newDelegatee: accountEvent.event.newDelegatee,
+          id: accountEvent.event.id
         }
       case "RewardClaimed":
         return {
           date: accountEvent.event.blockTimestamp,
           beneficiary: accountEvent.event.beneficiary,
-          amount: accountEvent.event.amount
+          amount: accountEvent.event.amount,
+          id: accountEvent.event.id
         }
       case "RewardNotified":
       case "SurrogateDeployed":
@@ -72,7 +75,7 @@ export async function GET(request: Request) {
     }
   })
 
-  return Response.json(parsedDeposits)
+  return Response.json(parsedAccountEvents)
 }
 
 export const runtime = "edge"

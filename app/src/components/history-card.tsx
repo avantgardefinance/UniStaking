@@ -2,13 +2,88 @@ import { AddressDisplay } from "@/components/ui/address-display"
 import { Badge } from "@/components/ui/badge"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Card, CardContent } from "@/components/ui/card"
+import { never } from "@/lib/assertion"
+import type { AccountEventsQuery } from "@/lib/generated/subgraph/graphql"
 import type { Dayjs } from "dayjs"
+import type dayjs from "dayjs"
 import type { Address } from "viem"
 
-export function HistoryCard() {
+type EventType = Exclude<
+  AccountEventsQuery["accountEvents"][number]["event"]["__typename"],
+  "RewardNotified" | "SurrogateDeployed" | undefined
+>
+
+type SameKeyAndValue<T extends string> = { [K in T]: K }
+
+const EventTypes: SameKeyAndValue<EventType> = {
+  BeneficiaryAltered: "BeneficiaryAltered",
+  StakeDeposited: "StakeDeposited",
+  StakeWithdrawn: "StakeWithdrawn",
+  DelegateeAltered: "DelegateeAltered",
+  RewardClaimed: "RewardClaimed"
+} as const
+
+export type HistoryItem =
+  & {
+    date: dayjs.Dayjs
+    id: string
+  }
+  & (
+    | { type: typeof EventTypes.StakeDeposited; amount: bigint; owner: Address; stakeId: number }
+    | { type: typeof EventTypes.StakeWithdrawn; amount: bigint; owner: Address; stakeId: number }
+    | {
+      type: typeof EventTypes.BeneficiaryAltered
+      oldBeneficiary: Address
+      newBeneficiary: Address
+      owner: Address
+      stakeId: number
+    }
+    | {
+      type: typeof EventTypes.DelegateeAltered
+      oldDelegatee: Address
+      newDelegatee: Address
+      owner: Address
+      stakeId: number
+    }
+    | { type: typeof EventTypes.RewardClaimed; beneficiary: Address; amount: bigint }
+  )
+
+export function HistoryCard(item: HistoryItem) {
+  const type = item.type
+  switch (type) {
+    case EventTypes.StakeDeposited:
+      return <StakeCard amount={item.amount} date={item.date} owner={item.owner} stakeId={item.stakeId} />
+    case EventTypes.StakeWithdrawn:
+      return <UnstakeCard amount={item.amount} date={item.date} owner={item.owner} stakeId={item.stakeId} />
+    case EventTypes.BeneficiaryAltered:
+      return (
+        <ChangeBeneficiaryCard
+          date={item.date}
+          newBeneficiary={item.newBeneficiary}
+          oldBeneficiary={item.oldBeneficiary}
+          owner={item.owner}
+          stakeId={item.stakeId}
+        />
+      )
+    case EventTypes.DelegateeAltered:
+      return (
+        <ChangeDelegateeCard
+          date={item.date}
+          newDelegatee={item.newDelegatee}
+          oldDelegatee={item.oldDelegatee}
+          owner={item.owner}
+          stakeId={item.stakeId}
+        />
+      )
+    case EventTypes.RewardClaimed:
+      return <ClaimRewardsCard amount={item.amount} beneficiary={item.beneficiary} date={item.date} />
+
+    default:
+      never(type, "Unhandled event type")
+  }
 }
 
-function StakeCard({ amount, date, owner, stakeId }: { date: Dayjs; stakeId: bigint; owner: Address; amount: bigint }) {
+function StakeCard({ amount, date, owner, stakeId }: { date: Dayjs; stakeId: number; owner: Address; amount: bigint }) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Stake">
       <div>
@@ -27,7 +102,7 @@ function StakeCard({ amount, date, owner, stakeId }: { date: Dayjs; stakeId: big
 }
 
 function UnstakeCard(
-  { amount, date, owner, stakeId }: { date: Dayjs; stakeId: bigint; owner: Address; amount: bigint }
+  { amount, date, owner, stakeId }: { date: Dayjs; stakeId: number; owner: Address; amount: bigint }
 ) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Unstake">
@@ -47,7 +122,7 @@ function UnstakeCard(
 }
 
 function ClaimRewardsCard(
-  { amount, beneficiary, date }: { date: Dayjs; owner: Address; amount: bigint; beneficiary: Address }
+  { amount, beneficiary, date }: { date: Dayjs; amount: bigint; beneficiary: Address }
 ) {
   return (
     <HistoryCardTemplate date={date} beneficiary={beneficiary} title="Claim Rewards">
@@ -69,7 +144,7 @@ function ClaimRewardsCard(
 function ChangeDelegateeCard(
   { date, newDelegatee, oldDelegatee, owner, stakeId }: {
     date: Dayjs
-    stakeId: bigint
+    stakeId: number
     owner: Address
     oldDelegatee: Address
     newDelegatee: Address
@@ -96,7 +171,7 @@ function ChangeDelegateeCard(
 function ChangeBeneficiaryCard(
   { date, newBeneficiary, oldBeneficiary, owner, stakeId }: {
     date: Dayjs
-    stakeId: bigint
+    stakeId: number
     owner: Address
     oldBeneficiary: Address
     newBeneficiary: Address
@@ -125,7 +200,7 @@ function HistoryCardTemplate(
     title: string
     date: Dayjs
     children: React.ReactNode
-    stakeId?: bigint
+    stakeId?: number
     owner?: Address
     beneficiary?: Address
     delegatee?: Address

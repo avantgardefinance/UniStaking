@@ -4,8 +4,9 @@ export const AccountEventsQuery = graphql(`
     query AccountEvents($account: String!) {
       accountEvents(where: { account: $account }) {
         event {
+          id
+          blockTimestamp
           ... on BeneficiaryAltered {
-            type
             deposit {
               owner {
                 id
@@ -14,24 +15,19 @@ export const AccountEventsQuery = graphql(`
             }
             oldBeneficiary
             newBeneficiary
-            blockTimestamp
           }
           ... on DelegateeAltered {
             newDelegatee
             oldDelegatee
-            blockTimestamp
             deposit {
               owner {
                 id
               }
               id
             }
-            type
           }
           ... on StakeDeposited {
-            type
             amount
-            blockTimestamp
             deposit {
               owner {
                 id
@@ -41,20 +37,16 @@ export const AccountEventsQuery = graphql(`
           }
           ... on RewardClaimed {
             beneficiary
-            blockTimestamp
             amount
-            type
           }
           ... on StakeWithdrawn {
             amount
-            blockTimestamp
             deposit {
               owner {
                 id
               }
               id
             }
-            type
           }
         }
       }

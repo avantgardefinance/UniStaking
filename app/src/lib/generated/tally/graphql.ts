@@ -883,14 +883,16 @@ export type Governance = {
   chainId: Scalars['ChainID']['output'];
   contracts: Contracts;
   delegatedVotingPower: Scalars['Uint256']['output'];
+  /** @deprecated use root level `delegates` */
   delegates: Array<Participation>;
   features?: Maybe<Array<FeatureState>>;
   id: Scalars['AccountID']['output'];
+  isBehind: Scalars['Boolean']['output'];
   isIndexing: Scalars['Boolean']['output'];
   kind: MultiGovernanceSupport;
   name: Scalars['String']['output'];
   organization?: Maybe<Organization>;
-  parameters: GovernanceParameters;
+  parameters: GovernorParameters;
   proposalThreshold: Scalars['Uint256']['output'];
   proposals: Array<Proposal>;
   quorum: Scalars['Uint256']['output'];
@@ -935,18 +937,6 @@ export type GovernancetallyProposalsArgs = {
   sort?: InputMaybe<TallyProposalSort>;
 };
 
-export type GovernanceParameters = GovernorAaveParameters | GovernorAlphaParameters | GovernorBravoParameters | NounsForkGovernorParameters | OpenZeppelinGovernorParameters;
-
-export type GovernanceSort = {
-  field?: InputMaybe<GovernanceSortField>;
-  order?: InputMaybe<SortOrder>;
-};
-
-export enum GovernanceSortField {
-  ACTIVE_PROPOSALS = 'ACTIVE_PROPOSALS',
-  TOTAL_PROPOSALS = 'TOTAL_PROPOSALS'
-}
-
 export type GovernanceStats = {
   __typename?: 'GovernanceStats';
   proposals: ProposalStats;
@@ -970,12 +960,13 @@ export type GovernanceTokenStats = {
   voters: Scalars['Int']['output'];
 };
 
+/** Governor contract type */
 export enum GovernanceType {
-  AAVE = 'AAVE',
-  GOVERNORALPHA = 'GOVERNORALPHA',
-  GOVERNORBRAVO = 'GOVERNORBRAVO',
-  NOUNSFORK = 'NOUNSFORK',
-  OPENZEPPELINGOVERNOR = 'OPENZEPPELINGOVERNOR'
+  aave = 'aave',
+  governoralpha = 'governoralpha',
+  governorbravo = 'governorbravo',
+  nounsfork = 'nounsfork',
+  openzeppelingovernor = 'openzeppelingovernor'
 }
 
 export type GovernanceTypeData = {
@@ -989,6 +980,7 @@ export type Governor = {
   __typename?: 'Governor';
   /** Current tokens owned by a particular address */
   balance: Scalars['Uint256']['output'];
+  contracts: Contracts;
   /** Current voting power of a particular address */
   delegatedVotingPower: Scalars['Uint256']['output'];
   /**
@@ -996,7 +988,11 @@ export type Governor = {
    * @deprecated use root level `delegates`
    */
   delegates: Array<Participation>;
+  features?: Maybe<Array<FeatureState>>;
   id: Scalars['AccountID']['output'];
+  isBehind: Scalars['Boolean']['output'];
+  isIndexing: Scalars['Boolean']['output'];
+  kind: MultiGovernanceSupport;
   /** Last block that Tally has indexed.  Sometimes our indexer needs to catch up.  Our indexer is usually ~1min behind depending on chain so we don't serve data that might later be reorged. */
   lastIndexedBlock: Block;
   /** Tally name of the governor contract */
@@ -1005,6 +1001,7 @@ export type Governor = {
   parameters: GovernorParameters;
   /** Counts of total, active, failed, and passed proosals. */
   proposalStats: ProposalStats;
+  proposalThreshold: Scalars['Uint256']['output'];
   /** Proposals created using this Governor contract */
   proposals: Array<Proposal>;
   /** The minumum amount of votes (total or for depending on type) that are currently required to pass a proposal. */
@@ -1013,10 +1010,11 @@ export type Governor = {
   slug: Scalars['String']['output'];
   /** Chain scoped address of the timelock contract for this governor if it exists. */
   timelockId?: Maybe<Scalars['AccountID']['output']>;
-  /** List of related tokens used to operate this contract. Most governors only have one. */
+  tokenStats: GovernanceTokenStats;
+  /** List of related tokens used to operate this contract.  Most governors only have one. */
   tokens: Array<Token>;
   /** Governor contract type */
-  type: GovernorType;
+  type: GovernanceType;
 };
 
 
@@ -1124,6 +1122,11 @@ export type GovernorExecutableCallInput = {
   value: Scalars['Uint256']['input'];
 };
 
+export type GovernorInput = {
+  id?: InputMaybe<Scalars['AccountID']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type GovernorParameters = GovernorAaveParameters | GovernorAlphaParameters | GovernorBravoParameters | NounsForkGovernorParameters | OpenZeppelinGovernorParameters;
 
 export type GovernorSort = {
@@ -1151,20 +1154,34 @@ export type GovernorTokenStats = {
 
 /** Governor contract type */
 export enum GovernorType {
-  AAVE = 'AAVE',
-  GOVERNORALPHA = 'GOVERNORALPHA',
-  GOVERNORBRAVO = 'GOVERNORBRAVO',
-  NOUNSFORK = 'NOUNSFORK',
-  OPENZEPPELINGOVERNOR = 'OPENZEPPELINGOVERNOR'
+  aave = 'aave',
+  governoralpha = 'governoralpha',
+  governorbravo = 'governorbravo',
+  nounsfork = 'nounsfork',
+  openzeppelingovernor = 'openzeppelingovernor'
 }
 
 export type GovernorV2 = {
   __typename?: 'GovernorV2';
   id: Scalars['AccountID']['output'];
-  parameters: GovernorParameters;
+  parameters: GovernorV2Parameters;
   timelockId?: Maybe<Scalars['AccountID']['output']>;
   tokenId: Scalars['AssetID']['output'];
   type: GovernorType;
+};
+
+export type GovernorV2Parameters = {
+  __typename?: 'GovernorV2Parameters';
+  clockMode?: Maybe<Scalars['String']['output']>;
+  fullWeightDuration?: Maybe<Scalars['Uint256']['output']>;
+  gracePeriod?: Maybe<Scalars['Uint256']['output']>;
+  nomineeVettingDuration?: Maybe<Scalars['Uint256']['output']>;
+  proposalThreshold?: Maybe<Scalars['Uint256']['output']>;
+  quorumDenominator?: Maybe<Scalars['Uint256']['output']>;
+  quorumNumerator?: Maybe<Scalars['Uint256']['output']>;
+  quorumVotes?: Maybe<Scalars['Uint256']['output']>;
+  votingDelay?: Maybe<Scalars['Uint256']['output']>;
+  votingPeriod?: Maybe<Scalars['Uint256']['output']>;
 };
 
 export type GovernorsFiltersInput = {
@@ -1319,6 +1336,9 @@ export type Mutation = {
   createDelegateStatementV2: DelegateStatement;
   /** Creates a `DelegationAttempt` with the user intended to delegate */
   createDelegationAttempt: Scalars['Boolean']['output'];
+  /** Creates a Governance on Tally associated with an Organization.  If the Governance is already indexed it only updates the Organization. */
+  createGovernance: Scalars['Boolean']['output'];
+  createGovernanceV2: Scalars['Boolean']['output'];
   /** Creates an organization with a governor and token. */
   createGovernorOrganization: Organization;
   /** Creates an organization for a group. Adds a demo proposal for that group. */
@@ -1478,6 +1498,30 @@ export type MutationcreateDelegationAttemptArgs = {
   delegatorId: Scalars['AccountID']['input'];
   governanceId: Scalars['AccountID']['input'];
   txID: Scalars['Bytes32']['input'];
+};
+
+
+export type MutationcreateGovernanceArgs = {
+  address: Scalars['Address']['input'];
+  chainId: Scalars['ChainID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  organization: Scalars['ID']['input'];
+  slug?: InputMaybe<Scalars['String']['input']>;
+  start: Scalars['Int']['input'];
+  tokenId: Scalars['AssetID']['input'];
+  type: GovernanceType;
+};
+
+
+export type MutationcreateGovernanceV2Args = {
+  address: Scalars['Address']['input'];
+  chainId: Scalars['ChainID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  organizationId: Scalars['IntID']['input'];
+  slug?: InputMaybe<Scalars['String']['input']>;
+  start: Scalars['Int']['input'];
+  tokenId: Scalars['AssetID']['input'];
+  type: GovernanceType;
 };
 
 
@@ -1913,7 +1957,7 @@ export type OrganizationgovernancesArgs = {
   ids?: InputMaybe<Array<Scalars['AccountID']['input']>>;
   includeInactive?: InputMaybe<Scalars['Boolean']['input']>;
   pagination?: InputMaybe<Pagination>;
-  sort?: InputMaybe<GovernanceSort>;
+  sort?: InputMaybe<GovernorSort>;
 };
 
 export type OrganizationAdminData = {
@@ -1932,7 +1976,7 @@ export type OrganizationGovernorInput = {
   id: Scalars['AccountID']['input'];
   /** The block height at which the Governor contract was originally deployed. */
   start: Scalars['Int']['input'];
-  type: GovernorType;
+  type: GovernanceType;
 };
 
 export type OrganizationInput = {
@@ -2100,7 +2144,6 @@ export type Pagination = {
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
-/** Convenience type representing the activity a particular `Account` has in a `Governor` contract or it's related `Token` contract. */
 export type Participation = {
   __typename?: 'Participation';
   account: Account;
@@ -2124,27 +2167,23 @@ export type Participation = {
 };
 
 
-/** Convenience type representing the activity a particular `Account` has in a `Governor` contract or it's related `Token` contract. */
 export type ParticipationdelegationsInArgs = {
   pagination?: InputMaybe<Pagination>;
 };
 
 
-/** Convenience type representing the activity a particular `Account` has in a `Governor` contract or it's related `Token` contract. */
 export type ParticipationproposalsArgs = {
   pagination?: InputMaybe<Pagination>;
   sort?: InputMaybe<ProposalSort>;
 };
 
 
-/** Convenience type representing the activity a particular `Account` has in a `Governor` contract or it's related `Token` contract. */
 export type ParticipationvotesArgs = {
   pagination?: InputMaybe<Pagination>;
   sort?: InputMaybe<VoteSort>;
 };
 
 
-/** Convenience type representing the activity a particular `Account` has in a `Governor` contract or it's related `Token` contract. */
 export type ParticipationvotingPowerChangesArgs = {
   earliest?: InputMaybe<Scalars['Timestamp']['input']>;
   interval?: InputMaybe<TimeInterval>;
@@ -2153,7 +2192,6 @@ export type ParticipationvotingPowerChangesArgs = {
 };
 
 
-/** Convenience type representing the activity a particular `Account` has in a `Governor` contract or it's related `Token` contract. */
 export type ParticipationweightChangesArgs = {
   earliest?: InputMaybe<Scalars['Timestamp']['input']>;
   interval?: InputMaybe<TimeInterval>;
@@ -2484,12 +2522,11 @@ export type Query = {
   governanceTypes?: Maybe<Array<GovernanceTypeData>>;
   governances: Array<Governance>;
   governancesV2: Array<Governance>;
+  governor: GovernorV2;
   /** Returns a list of governors that match the provided filters.  Note: Tally may deactivate governors from time to time.  If you wish to include those set `includeInactive` to `true`. */
   governors: Array<Governor>;
   governorsV2: PaginatedOutput;
   issues?: Maybe<Array<Maybe<Issue>>>;
-  /** [Deprecated] Returns `Account` given a legacy indentity id. */
-  legacyAccount: Account;
   me: Account;
   memberRound: MemberRound;
   metaTransactions?: Maybe<Array<MetaTransaction>>;
@@ -2515,7 +2552,7 @@ export type Query = {
   tallyProposalsV2: Array<TallyProposal>;
   tokenSyncs?: Maybe<Array<TokenSync>>;
   /** Fetches the last vote attempt from a given user on a proposal. */
-  voteAttempt: VoteAttempt;
+  voteAttempt?: Maybe<VoteAttempt>;
   whitelabelDomains?: Maybe<Array<Scalars['String']['output']>>;
 };
 
@@ -2702,7 +2739,7 @@ export type QuerygovernancesArgs = {
   includeUnlinked?: InputMaybe<Scalars['Boolean']['input']>;
   organizationIds?: InputMaybe<Array<Scalars['ID']['input']>>;
   pagination?: InputMaybe<Pagination>;
-  sort?: InputMaybe<GovernanceSort>;
+  sort?: InputMaybe<GovernorSort>;
 };
 
 
@@ -2713,7 +2750,12 @@ export type QuerygovernancesV2Args = {
   includeUnlinked?: InputMaybe<Scalars['Boolean']['input']>;
   organizationIds?: InputMaybe<Array<Scalars['Int']['input']>>;
   pagination?: InputMaybe<Pagination>;
-  sort?: InputMaybe<GovernanceSort>;
+  sort?: InputMaybe<GovernorSort>;
+};
+
+
+export type QuerygovernorArgs = {
+  input: GovernorInput;
 };
 
 
@@ -2736,11 +2778,6 @@ export type QuerygovernorsV2Args = {
 
 export type QueryissuesArgs = {
   input?: InputMaybe<IssuesInput>;
-};
-
-
-export type QuerylegacyAccountArgs = {
-  id: Scalars['String']['input'];
 };
 
 

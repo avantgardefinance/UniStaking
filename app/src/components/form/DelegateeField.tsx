@@ -54,7 +54,8 @@ export function DelegateeField({ name, tallyDelegatees }: { name: string; tallyD
                       >
                         here
                       </div>
-                    </Link>.
+                    </Link>
+                    .
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -68,12 +69,9 @@ export function DelegateeField({ name, tallyDelegatees }: { name: string; tallyD
               className="flex flex-col space-y-1"
             >
               <FormItem
-                className={cn(
-                  "flex items-center space-x-3 rounded-lg border-2 border-none border-blue-700 p-2",
-                  {
-                    "border-solid": delegateeOption === "custom"
-                  }
-                )}
+                className={cn("flex items-center space-x-3 rounded-lg border-2 border-none border-blue-700 p-2", {
+                  "border-solid": delegateeOption === "custom"
+                })}
               >
                 <FormControl>
                   <RadioGroupItem value="custom" />
@@ -103,12 +101,9 @@ export function DelegateeField({ name, tallyDelegatees }: { name: string; tallyD
                 </FormLabel>
               </FormItem>
               <FormItem
-                className={cn(
-                  "flex items-center space-x-3 rounded-lg border-2 border-none border-blue-700 p-2",
-                  {
-                    "border-solid": delegateeOption === "tally"
-                  }
-                )}
+                className={cn("flex items-center space-x-3 rounded-lg border-2 border-none border-blue-700 p-2", {
+                  "border-solid": delegateeOption === "tally"
+                })}
               >
                 <FormControl>
                   <RadioGroupItem value="tally" />
@@ -134,10 +129,7 @@ export function DelegateeField({ name, tallyDelegatees }: { name: string; tallyD
                           </FormControl>
                           <SelectContent>
                             {tallyDelegatees.map((delegatee) => (
-                              <SelectItem
-                                key={delegatee.address}
-                                value={delegatee.address}
-                              >
+                              <SelectItem key={delegatee.address} value={delegatee.address}>
                                 <div className="flex items-start">
                                   <span>{delegatee.label}</span>
                                 </div>

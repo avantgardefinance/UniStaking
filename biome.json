@@ -1,0 +1,55 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignore": [
+      ".direnv/",
+      ".next/",
+      "contracts/",
+      "dist/",
+      "out/",
+      "build/",
+      "coverage/",
+      "generated/",
+      "pnpm-lock.yaml",
+      "tsconfig.json",
+      "tsconfig.*.json"
+    ]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "javascript": {
+    "formatter": {
+      "trailingComma": "none",
+      "semicolons": "asNeeded"
+    }
+  },
+  "linter": {
+    "rules": {
+      "all": true,
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off"
+      },
+      "style": {
+        "noParameterProperties": "off"
+      },
+      "nursery": {
+        "useImportRestrictions": "off"
+      },
+      "complexity": {
+        "noBannedTypes": "off"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      }
+    }
+  },
+  "organizeImports": {
+    "enabled": true
+  }
+}

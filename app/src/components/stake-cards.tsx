@@ -3,12 +3,12 @@ import { StakeCardRewards } from "@/components/stake-card-rewards"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 
-export function StakeCards(
-  { totalStakedUni }: {
-    totalStakedUni: bigint
-    rewardsWeth: bigint
-  }
-) {
+export function StakeCards({
+  totalStakedUni
+}: {
+  totalStakedUni: bigint
+  rewardsWeth: bigint
+}) {
   return (
     <div className="space-y-2">
       <h2 className="text-3xl font-bold">Stake</h2>

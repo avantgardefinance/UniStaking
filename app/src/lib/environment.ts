@@ -25,8 +25,10 @@ export const rpcUrl = (() => {
   return `${window.location.origin}/rpc`
 })()
 
-export const chain = !isDevelopment ? mainnet : {
-  ...mainnet,
-  name: "Local",
-  id: 31337
-}
+export const chain = !isDevelopment
+  ? mainnet
+  : {
+      ...mainnet,
+      name: "Local",
+      id: 31337
+    }

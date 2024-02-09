@@ -1,4 +1,14 @@
+// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
+import {
+  BeneficiaryAltered as BeneficiaryAlteredEvent,
+  DelegateeAltered as DelegateeAlteredEvent,
+  RewardClaimed as RewardClaimedEvent,
+  RewardNotified as RewardNotifiedEvent,
+  StakeDeposited as StakeDepositedEvent,
+  StakeWithdrawn as StakeWithdrawnEvent,
+  SurrogateDeployed as SurrogateDeployedEvent
+} from "../generated/UniStaker/UniStaker"
 import {
   BeneficiaryAltered,
   DelegateeAltered,
@@ -9,15 +19,6 @@ import {
   Surrogate,
   SurrogateDeployed
 } from "../generated/schema"
-import {
-  BeneficiaryAltered as BeneficiaryAlteredEvent,
-  DelegateeAltered as DelegateeAlteredEvent,
-  RewardClaimed as RewardClaimedEvent,
-  RewardNotified as RewardNotifiedEvent,
-  StakeDeposited as StakeDepositedEvent,
-  StakeWithdrawn as StakeWithdrawnEvent,
-  SurrogateDeployed as SurrogateDeployedEvent
-} from "../generated/UniStaker/UniStaker"
 import { getOrCreateAccount, trackAccountEvent } from "./account"
 import { getDeposit, getOrCreateDeposit } from "./deposit"
 import { trackUniStakerHistory } from "./uni-staker-history"

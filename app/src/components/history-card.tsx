@@ -6,6 +6,7 @@ import { never } from "@/lib/assertion"
 import type { AccountEventsQuery } from "@/lib/generated/subgraph/graphql"
 import type { Dayjs } from "dayjs"
 import type dayjs from "dayjs"
+import { ReactNode } from "react"
 import type { Address } from "viem"
 
 type EventType = Exclude<
@@ -23,30 +24,28 @@ const EventTypes: SameKeyAndValue<EventType> = {
   RewardClaimed: "RewardClaimed"
 } as const
 
-export type HistoryItem =
-  & {
-    date: dayjs.Dayjs
-    id: string
-  }
-  & (
-    | { type: typeof EventTypes.StakeDeposited; amount: bigint; owner: Address; stakeId: string }
-    | { type: typeof EventTypes.StakeWithdrawn; amount: bigint; owner: Address; stakeId: string }
-    | {
+export type HistoryItem = {
+  date: dayjs.Dayjs
+  id: string
+} & (
+  | { type: typeof EventTypes.StakeDeposited; amount: bigint; owner: Address; stakeId: string }
+  | { type: typeof EventTypes.StakeWithdrawn; amount: bigint; owner: Address; stakeId: string }
+  | {
       type: typeof EventTypes.BeneficiaryAltered
       oldBeneficiary: Address
       newBeneficiary: Address
       owner: Address
       stakeId: string
     }
-    | {
+  | {
       type: typeof EventTypes.DelegateeAltered
       oldDelegatee: Address
       newDelegatee: Address
       owner: Address
       stakeId: string
     }
-    | { type: typeof EventTypes.RewardClaimed; beneficiary: Address; amount: bigint }
-  )
+  | { type: typeof EventTypes.RewardClaimed; beneficiary: Address; amount: bigint }
+)
 
 export function HistoryCard(item: HistoryItem) {
   const type = item.type
@@ -87,125 +86,117 @@ function StakeCard({ amount, date, owner, stakeId }: { date: Dayjs; stakeId: str
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Stake">
       <div>
-        <span>
-          Amount
-        </span>
+        <span>Amount</span>
         <div>
-          <BigIntDisplay value={amount} decimals={18} precision={2} />{" "}
-          <span>
-            UNI
-          </span>
+          <BigIntDisplay value={amount} decimals={18} precision={2} /> <span>UNI</span>
         </div>
       </div>
     </HistoryCardTemplate>
   )
 }
 
-function UnstakeCard(
-  { amount, date, owner, stakeId }: { date: Dayjs; stakeId: string; owner: Address; amount: bigint }
-) {
+function UnstakeCard({
+  amount,
+  date,
+  owner,
+  stakeId
+}: { date: Dayjs; stakeId: string; owner: Address; amount: bigint }) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Unstake">
       <div>
-        <span>
-          Amount
-        </span>
+        <span>Amount</span>
         <div>
-          <BigIntDisplay value={amount} decimals={18} precision={2} />{" "}
-          <span>
-            UNI
-          </span>
+          <BigIntDisplay value={amount} decimals={18} precision={2} /> <span>UNI</span>
         </div>
       </div>
     </HistoryCardTemplate>
   )
 }
 
-function ClaimRewardsCard(
-  { amount, beneficiary, date }: { date: Dayjs; amount: bigint; beneficiary: Address }
-) {
+function ClaimRewardsCard({ amount, beneficiary, date }: { date: Dayjs; amount: bigint; beneficiary: Address }) {
   return (
     <HistoryCardTemplate date={date} beneficiary={beneficiary} title="Claim Rewards">
       <div>
-        <span>
-          Amount
-        </span>
+        <span>Amount</span>
         <div>
-          <BigIntDisplay value={amount} decimals={18} precision={4} />{" "}
-          <span>
-            WETH
-          </span>
+          <BigIntDisplay value={amount} decimals={18} precision={4} /> <span>WETH</span>
         </div>
       </div>
     </HistoryCardTemplate>
   )
 }
 
-function ChangeDelegateeCard(
-  { date, newDelegatee, oldDelegatee, owner, stakeId }: {
-    date: Dayjs
-    stakeId: string
-    owner: Address
-    oldDelegatee: Address
-    newDelegatee: Address
-  }
-) {
+function ChangeDelegateeCard({
+  date,
+  newDelegatee,
+  oldDelegatee,
+  owner,
+  stakeId
+}: {
+  date: Dayjs
+  stakeId: string
+  owner: Address
+  oldDelegatee: Address
+  newDelegatee: Address
+}) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Change Delegatee">
       <div>
-        <span>
-          From
-        </span>
+        <span>From</span>
         <AddressDisplay value={oldDelegatee} />
       </div>
       <div>
-        <span>
-          To
-        </span>
+        <span>To</span>
         <AddressDisplay value={newDelegatee} />
       </div>
     </HistoryCardTemplate>
   )
 }
 
-function ChangeBeneficiaryCard(
-  { date, newBeneficiary, oldBeneficiary, owner, stakeId }: {
-    date: Dayjs
-    stakeId: string
-    owner: Address
-    oldBeneficiary: Address
-    newBeneficiary: Address
-  }
-) {
+function ChangeBeneficiaryCard({
+  date,
+  newBeneficiary,
+  oldBeneficiary,
+  owner,
+  stakeId
+}: {
+  date: Dayjs
+  stakeId: string
+  owner: Address
+  oldBeneficiary: Address
+  newBeneficiary: Address
+}) {
   return (
     <HistoryCardTemplate date={date} owner={owner} stakeId={stakeId} title="Change Beneficiary">
       <div>
-        <span>
-          From
-        </span>
+        <span>From</span>
         <AddressDisplay value={oldBeneficiary} />
       </div>
       <div>
-        <span>
-          To
-        </span>
+        <span>To</span>
         <AddressDisplay value={newBeneficiary} />
       </div>
     </HistoryCardTemplate>
   )
 }
 
-function HistoryCardTemplate(
-  { beneficiary, children, date, delegatee, owner, stakeId, title }: {
-    title: string
-    date: Dayjs
-    children: React.ReactNode
-    stakeId?: string
-    owner?: Address
-    beneficiary?: Address
-    delegatee?: Address
-  }
-) {
+function HistoryCardTemplate({
+  beneficiary,
+  children,
+  date,
+  delegatee,
+  owner,
+  stakeId,
+  title
+}: {
+  title: string
+  date: Dayjs
+  children: ReactNode
+  stakeId?: string
+  owner?: Address
+  beneficiary?: Address
+  delegatee?: Address
+}) {
   return (
     <Card>
       <CardContent className="flex flex-row justify-between items-center p-6">
@@ -240,9 +231,7 @@ function HistoryCardTemplate(
           </div>
         </div>
         <Card className="flex">
-          <CardContent className="p-6">
-            {children}
-          </CardContent>
+          <CardContent className="p-6">{children}</CardContent>
         </Card>
       </CardContent>
     </Card>

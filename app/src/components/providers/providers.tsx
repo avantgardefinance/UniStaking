@@ -9,9 +9,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
       <QueryClientProvider>
-        <WagmiProvider>
-          {children}
-        </WagmiProvider>
+        <WagmiProvider>{children}</WagmiProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )

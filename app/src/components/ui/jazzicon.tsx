@@ -8,6 +8,7 @@ export function Jazzicon({ address, size }: { address: Address; size: number }) 
   return (
     <div
       className={`h-[${size}px] w-[${size}px]`}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
       dangerouslySetInnerHTML={{ __html: jazziconData.outerHTML }}
     />
   )

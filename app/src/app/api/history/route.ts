@@ -22,7 +22,6 @@ export async function GET(request: Request) {
     }
   })
 
-
   const parsedAccountEvents = accountEvents.map((accountEvent) => {
     const eventTypename = accountEvent.event.__typename
     switch (eventTypename) {

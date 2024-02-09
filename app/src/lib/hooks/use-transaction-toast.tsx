@@ -7,26 +7,28 @@ import { useEffect } from "react"
 import type { Hash } from "viem"
 import type { UseWriteContractReturnType } from "wagmi"
 
-export function useTransactionToast(
-  { status, txHash }: { status: UseWriteContractReturnType["status"]; txHash?: Hash }
-) {
+export function useTransactionToast({
+  status,
+  txHash
+}: { status: UseWriteContractReturnType["status"]; txHash?: Hash }) {
   const { toast } = useToast()
 
   useEffect(() => {
-    const action = txHash === undefined ? undefined : (
-      <Link href={`https://etherscan.io/tx/${txHash}`} target="_blank">
-        <div
-          className={cn(
-            "space-x-2",
-            buttonVariants({
-              variant: "outline"
-            })
-          )}
-        >
-          Transaction {txHash.slice(0, 10)}...
-        </div>
-      </Link>
-    )
+    const action =
+      txHash === undefined ? undefined : (
+        <Link href={`https://etherscan.io/tx/${txHash}`} target="_blank">
+          <div
+            className={cn(
+              "space-x-2",
+              buttonVariants({
+                variant: "outline"
+              })
+            )}
+          >
+            Transaction {txHash.slice(0, 10)}...
+          </div>
+        </Link>
+      )
 
     switch (status) {
       case "success":

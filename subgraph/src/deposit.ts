@@ -1,6 +1,7 @@
+// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts"
-import { Deposit } from "../generated/schema"
 import { UniStaker } from "../generated/UniStaker/UniStaker"
+import { Deposit } from "../generated/schema"
 
 export function getOrCreateDeposit(positionId: BigInt, event: ethereum.Event): Deposit {
   let deposit = Deposit.load(positionId.toString())
@@ -15,7 +16,7 @@ export function getOrCreateDeposit(positionId: BigInt, event: ethereum.Event): D
   let owner: Address = Address.zero()
   let delegatee: Address = Address.zero()
   let beneficiary: Address = Address.zero()
-  if (depositInformation.reverted == false) {
+  if (depositInformation.reverted === false) {
     owner = depositInformation.value.value1
     delegatee = depositInformation.value.value2
     beneficiary = depositInformation.value.value3

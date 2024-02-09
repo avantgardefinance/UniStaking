@@ -18,7 +18,11 @@ import { FormProvider, useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { encodeFunctionData, isAddressEqual } from "viem"
 
-export function EditBeneficiaryDelegateeDialogContent({ beneficiary, delegatee, stakeId }: {
+export function EditBeneficiaryDelegateeDialogContent({
+  beneficiary,
+  delegatee,
+  stakeId
+}: {
   beneficiary: Address
   delegatee: Address
   stakeId: string
@@ -30,7 +34,9 @@ export function EditBeneficiaryDelegateeDialogContent({ beneficiary, delegatee, 
       <DialogHeader>
         <DialogTitle>Edit beneficiary and delegatee</DialogTitle>
       </DialogHeader>
-      {isLoading ? "Loading..." : (
+      {isLoading ? (
+        "Loading..."
+      ) : (
         <EditBeneficiaryDelegateeForm
           tallyDelegatees={tallyDelegatees}
           beneficiary={beneficiary}
@@ -43,20 +49,20 @@ export function EditBeneficiaryDelegateeDialogContent({ beneficiary, delegatee, 
   )
 }
 
-const useEditBeneficiaryDelegateeForm = (
-  { beneficiary: currentBeneficiary, delegatee: currentDelegatee, stakeId, tallyDelegatees, tallyDelegateesError }: {
-    beneficiary: Address
-    delegatee: Address
-    stakeId: string
-    tallyDelegatees: Array<TallyDelegatee>
-    tallyDelegateesError: Error | null
-  }
-) => {
-  const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    writeContract
-  } = useWriteContractWithToast()
+const useEditBeneficiaryDelegateeForm = ({
+  beneficiary: currentBeneficiary,
+  delegatee: currentDelegatee,
+  stakeId,
+  tallyDelegatees,
+  tallyDelegateesError
+}: {
+  beneficiary: Address
+  delegatee: Address
+  stakeId: string
+  tallyDelegatees: Array<TallyDelegatee>
+  tallyDelegateesError: Error | null
+}) => {
+  const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
 
   const tallyDelegatee = tallyDelegatees.find((delegatee) => isAddressEqual(delegatee.address, currentDelegatee))
 
@@ -77,9 +83,7 @@ const useEditBeneficiaryDelegateeForm = (
   }) => {
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
 
-    if (
-      values.beneficiary === undefined || delegatee === undefined
-    ) {
+    if (values.beneficiary === undefined || delegatee === undefined) {
       return
     }
 
@@ -131,7 +135,13 @@ const useEditBeneficiaryDelegateeForm = (
   }
 }
 
-function EditBeneficiaryDelegateeForm({ beneficiary, delegatee, stakeId, tallyDelegatees, tallyDelegateesError }: {
+function EditBeneficiaryDelegateeForm({
+  beneficiary,
+  delegatee,
+  stakeId,
+  tallyDelegatees,
+  tallyDelegateesError
+}: {
   beneficiary: Address
   delegatee: Address
   stakeId: string
@@ -186,22 +196,17 @@ function EditBeneficiaryDelegateeForm({ beneficiary, delegatee, stakeId, tallyDe
             )}
           />
           <DelegateeField name="delegateeOption" tallyDelegatees={tallyDelegatees} />
-          {error &&
-            (
-              <Alert variant="destructive">
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription className="break-all">
-                  {error.message}
-                </AlertDescription>
-              </Alert>
-            )}
+          {error && (
+            <Alert variant="destructive">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription className="break-all">{error.message}</AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <DialogFooter>
           <Button type="submit" className="space-x-2" disabled={isPending}>
-            {isPending
-              ? <RotateCw className="mr-2 size-4 animate-spin" />
-              : null}
+            {isPending ? <RotateCw className="mr-2 size-4 animate-spin" /> : null}
 
             <span>Confirm</span>
           </Button>

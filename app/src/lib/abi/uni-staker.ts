@@ -2,49 +2,176 @@ export const abi = [
   {
     type: "constructor",
     inputs: [
-      { name: "_rewardsToken", type: "address", internalType: "contract IERC20" },
+      {
+        name: "_rewardToken",
+        type: "address",
+        internalType: "contract IERC20"
+      },
       {
         name: "_stakeToken",
         type: "address",
         internalType: "contract IERC20Delegates"
       },
-      { name: "_admin", type: "address", internalType: "address" }
+      {
+        name: "_admin",
+        type: "address",
+        internalType: "address"
+      }
     ],
     stateMutability: "nonpayable"
   },
   {
     type: "function",
-    name: "REWARDS_TOKEN",
+    name: "ALTER_BENEFICIARY_TYPEHASH",
     inputs: [],
-    outputs: [{ name: "", type: "address", internalType: "contract IERC20" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "ALTER_DELEGATEE_TYPEHASH",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "CLAIM_REWARD_TYPEHASH",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "REWARD_DURATION",
     inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "REWARD_TOKEN",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IERC20"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "SCALE_FACTOR",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "STAKE_MORE_TYPEHASH",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "STAKE_TOKEN",
     inputs: [],
-    outputs: [{ name: "", type: "address", internalType: "contract IERC20Delegates" }],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IERC20Delegates"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "STAKE_TYPEHASH",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "WITHDRAW_TYPEHASH",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "admin",
     inputs: [],
-    outputs: [{ name: "", type: "address", internalType: "address" }],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "alterBeneficiary",
     inputs: [
-      { name: "_depositId", type: "uint256", internalType: "UniStaker.DepositIdentifier" },
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
       {
         name: "_newBeneficiary",
         type: "address",
@@ -56,9 +183,41 @@ export const abi = [
   },
   {
     type: "function",
+    name: "alterBeneficiaryOnBehalf",
+    inputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "_newBeneficiary",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_depositor",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_signature",
+        type: "bytes",
+        internalType: "bytes"
+      }
+    ],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
     name: "alterDelegatee",
     inputs: [
-      { name: "_depositId", type: "uint256", internalType: "UniStaker.DepositIdentifier" },
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
       {
         name: "_newDelegatee",
         type: "address",
@@ -68,108 +227,450 @@ export const abi = [
     outputs: [],
     stateMutability: "nonpayable"
   },
-  { type: "function", name: "claimReward", inputs: [], outputs: [], stateMutability: "nonpayable" },
   {
     type: "function",
-    name: "deposits",
-    inputs: [{ name: "depositId", type: "uint256", internalType: "UniStaker.DepositIdentifier" }],
+    name: "alterDelegateeOnBehalf",
+    inputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "_newDelegatee",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_depositor",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_signature",
+        type: "bytes",
+        internalType: "bytes"
+      }
+    ],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "beneficiaryRewardPerTokenCheckpoint",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address"
+      }
+    ],
     outputs: [
-      { name: "balance", type: "uint256", internalType: "uint256" },
-      { name: "owner", type: "address", internalType: "address" },
-      { name: "delegatee", type: "address", internalType: "address" },
-      { name: "beneficiary", type: "address", internalType: "address" }
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
     ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "earned",
-    inputs: [{ name: "_beneficiary", type: "address", internalType: "address" }],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    name: "claimReward",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "claimRewardOnBehalf",
+    inputs: [
+      {
+        name: "_beneficiary",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_signature",
+        type: "bytes",
+        internalType: "bytes"
+      }
+    ],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "depositorTotalStaked",
+    inputs: [
+      {
+        name: "depositor",
+        type: "address",
+        internalType: "address"
+      }
+    ],
+    outputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "deposits",
+    inputs: [
+      {
+        name: "depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      }
+    ],
+    outputs: [
+      {
+        name: "balance",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "owner",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "delegatee",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "beneficiary",
+        type: "address",
+        internalType: "address"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "earningPower",
-    inputs: [{ name: "beneficiary", type: "address", internalType: "address" }],
-    outputs: [{ name: "amount", type: "uint256", internalType: "uint256" }],
+    inputs: [
+      {
+        name: "beneficiary",
+        type: "address",
+        internalType: "address"
+      }
+    ],
+    outputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "finishAt",
+    name: "eip712Domain",
     inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "fields",
+        type: "bytes1",
+        internalType: "bytes1"
+      },
+      {
+        name: "name",
+        type: "string",
+        internalType: "string"
+      },
+      {
+        name: "version",
+        type: "string",
+        internalType: "string"
+      },
+      {
+        name: "chainId",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "verifyingContract",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "salt",
+        type: "bytes32",
+        internalType: "bytes32"
+      },
+      {
+        name: "extensions",
+        type: "uint256[]",
+        internalType: "uint256[]"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "isRewardsNotifier",
-    inputs: [{ name: "rewardsNotifier", type: "address", internalType: "address" }],
-    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    name: "isRewardNotifier",
+    inputs: [
+      {
+        name: "rewardNotifier",
+        type: "address",
+        internalType: "address"
+      }
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "lastTimeRewardApplicable",
+    name: "lastCheckpointTime",
     inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "lastTimeRewardDistributed",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "multicall",
-    inputs: [{ name: "data", type: "bytes[]", internalType: "bytes[]" }],
-    outputs: [{ name: "results", type: "bytes[]", internalType: "bytes[]" }],
+    inputs: [
+      {
+        name: "data",
+        type: "bytes[]",
+        internalType: "bytes[]"
+      }
+    ],
+    outputs: [
+      {
+        name: "results",
+        type: "bytes[]",
+        internalType: "bytes[]"
+      }
+    ],
     stateMutability: "nonpayable"
   },
   {
     type: "function",
-    name: "notifyRewardsAmount",
-    inputs: [{ name: "_amount", type: "uint256", internalType: "uint256" }],
+    name: "nonces",
+    inputs: [
+      {
+        name: "owner",
+        type: "address",
+        internalType: "address"
+      }
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "notifyRewardAmount",
+    inputs: [
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     outputs: [],
     stateMutability: "nonpayable"
   },
   {
     type: "function",
-    name: "rewardPerToken",
+    name: "permitAndStake",
+    inputs: [
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "_delegatee",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_beneficiary",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_deadline",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "_v",
+        type: "uint8",
+        internalType: "uint8"
+      },
+      {
+        name: "_r",
+        type: "bytes32",
+        internalType: "bytes32"
+      },
+      {
+        name: "_s",
+        type: "bytes32",
+        internalType: "bytes32"
+      }
+    ],
+    outputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      }
+    ],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "permitAndStakeMore",
+    inputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "_deadline",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "_v",
+        type: "uint8",
+        internalType: "uint8"
+      },
+      {
+        name: "_r",
+        type: "bytes32",
+        internalType: "bytes32"
+      },
+      {
+        name: "_s",
+        type: "bytes32",
+        internalType: "bytes32"
+      }
+    ],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "rewardEndTime",
     inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "rewardPerTokenStored",
+    name: "rewardPerTokenAccumulated",
     inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "rewardRate",
+    name: "rewardPerTokenAccumulatedCheckpoint",
     inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "rewards",
-    inputs: [{ name: "account", type: "address", internalType: "address" }],
-    outputs: [{ name: "amount", type: "uint256", internalType: "uint256" }],
+    name: "scaledRewardRate",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "setAdmin",
-    inputs: [{ name: "_newAdmin", type: "address", internalType: "address" }],
+    inputs: [
+      {
+        name: "_newAdmin",
+        type: "address",
+        internalType: "address"
+      }
+    ],
     outputs: [],
     stateMutability: "nonpayable"
   },
   {
     type: "function",
-    name: "setRewardsNotifier",
+    name: "setRewardNotifier",
     inputs: [
-      { name: "_rewardsNotifier", type: "address", internalType: "address" },
+      {
+        name: "_rewardNotifier",
+        type: "address",
+        internalType: "address"
+      },
       {
         name: "_isEnabled",
         type: "bool",
@@ -183,36 +684,64 @@ export const abi = [
     type: "function",
     name: "stake",
     inputs: [
-      { name: "_amount", type: "uint256", internalType: "uint256" },
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256"
+      },
       {
         name: "_delegatee",
         type: "address",
         internalType: "address"
       }
     ],
-    outputs: [{ name: "_depositId", type: "uint256", internalType: "UniStaker.DepositIdentifier" }],
+    outputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      }
+    ],
     stateMutability: "nonpayable"
   },
   {
     type: "function",
     name: "stake",
     inputs: [
-      { name: "_amount", type: "uint256", internalType: "uint256" },
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256"
+      },
       {
         name: "_delegatee",
         type: "address",
         internalType: "address"
       },
-      { name: "_beneficiary", type: "address", internalType: "address" }
+      {
+        name: "_beneficiary",
+        type: "address",
+        internalType: "address"
+      }
     ],
-    outputs: [{ name: "_depositId", type: "uint256", internalType: "UniStaker.DepositIdentifier" }],
+    outputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      }
+    ],
     stateMutability: "nonpayable"
   },
   {
     type: "function",
     name: "stakeMore",
     inputs: [
-      { name: "_depositId", type: "uint256", internalType: "UniStaker.DepositIdentifier" },
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
       {
         name: "_amount",
         type: "uint256",
@@ -224,48 +753,182 @@ export const abi = [
   },
   {
     type: "function",
+    name: "stakeMoreOnBehalf",
+    inputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "_depositor",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_signature",
+        type: "bytes",
+        internalType: "bytes"
+      }
+    ],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "stakeOnBehalf",
+    inputs: [
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "_delegatee",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_beneficiary",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_depositor",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_signature",
+        type: "bytes",
+        internalType: "bytes"
+      }
+    ],
+    outputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      }
+    ],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
     name: "surrogates",
-    inputs: [{ name: "delegatee", type: "address", internalType: "address" }],
-    outputs: [{ name: "surrogate", type: "address", internalType: "contract DelegationSurrogate" }],
+    inputs: [
+      {
+        name: "delegatee",
+        type: "address",
+        internalType: "address"
+      }
+    ],
+    outputs: [
+      {
+        name: "surrogate",
+        type: "address",
+        internalType: "contract DelegationSurrogate"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "totalDeposits",
-    inputs: [{ name: "depositor", type: "address", internalType: "address" }],
-    outputs: [{ name: "amount", type: "uint256", internalType: "uint256" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    name: "totalSupply",
+    name: "totalStaked",
     inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "updatedAt",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    name: "unclaimedReward",
+    inputs: [
+      {
+        name: "_beneficiary",
+        type: "address",
+        internalType: "address"
+      }
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
-    name: "userRewardPerTokenPaid",
-    inputs: [{ name: "account", type: "address", internalType: "address" }],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    name: "unclaimedRewardCheckpoint",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address"
+      }
+    ],
+    outputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "withdraw",
     inputs: [
-      { name: "_depositId", type: "uint256", internalType: "UniStaker.DepositIdentifier" },
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
       {
         name: "_amount",
         type: "uint256",
         internalType: "uint256"
+      }
+    ],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "withdrawOnBehalf",
+    inputs: [
+      {
+        name: "_depositId",
+        type: "uint256",
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256"
+      },
+      {
+        name: "_depositor",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "_signature",
+        type: "bytes",
+        internalType: "bytes"
       }
     ],
     outputs: [],
@@ -275,7 +938,12 @@ export const abi = [
     type: "event",
     name: "AdminSet",
     inputs: [
-      { name: "oldAdmin", type: "address", indexed: true, internalType: "address" },
+      {
+        name: "oldAdmin",
+        type: "address",
+        indexed: true,
+        internalType: "address"
+      },
       {
         name: "newAdmin",
         type: "address",
@@ -289,9 +957,24 @@ export const abi = [
     type: "event",
     name: "BeneficiaryAltered",
     inputs: [
-      { name: "depositId", type: "uint256", indexed: true, internalType: "UniStaker.DepositIdentifier" },
-      { name: "oldBeneficiary", type: "address", indexed: true, internalType: "address" },
-      { name: "newBeneficiary", type: "address", indexed: true, internalType: "address" }
+      {
+        name: "depositId",
+        type: "uint256",
+        indexed: true,
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "oldBeneficiary",
+        type: "address",
+        indexed: true,
+        internalType: "address"
+      },
+      {
+        name: "newBeneficiary",
+        type: "address",
+        indexed: true,
+        internalType: "address"
+      }
     ],
     anonymous: false
   },
@@ -299,17 +982,43 @@ export const abi = [
     type: "event",
     name: "DelegateeAltered",
     inputs: [
-      { name: "depositId", type: "uint256", indexed: true, internalType: "UniStaker.DepositIdentifier" },
-      { name: "oldDelegatee", type: "address", indexed: false, internalType: "address" },
-      { name: "newDelegatee", type: "address", indexed: false, internalType: "address" }
+      {
+        name: "depositId",
+        type: "uint256",
+        indexed: true,
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "oldDelegatee",
+        type: "address",
+        indexed: false,
+        internalType: "address"
+      },
+      {
+        name: "newDelegatee",
+        type: "address",
+        indexed: false,
+        internalType: "address"
+      }
     ],
+    anonymous: false
+  },
+  {
+    type: "event",
+    name: "EIP712DomainChanged",
+    inputs: [],
     anonymous: false
   },
   {
     type: "event",
     name: "RewardClaimed",
     inputs: [
-      { name: "beneficiary", type: "address", indexed: true, internalType: "address" },
+      {
+        name: "beneficiary",
+        type: "address",
+        indexed: true,
+        internalType: "address"
+      },
       {
         name: "amount",
         type: "uint256",
@@ -322,14 +1031,32 @@ export const abi = [
   {
     type: "event",
     name: "RewardNotified",
-    inputs: [{ name: "amount", type: "uint256", indexed: false, internalType: "uint256" }],
+    inputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256"
+      },
+      {
+        name: "notifier",
+        type: "address",
+        indexed: false,
+        internalType: "address"
+      }
+    ],
     anonymous: false
   },
   {
     type: "event",
-    name: "RewardsNotifierSet",
+    name: "RewardNotifierSet",
     inputs: [
-      { name: "account", type: "address", indexed: true, internalType: "address" },
+      {
+        name: "account",
+        type: "address",
+        indexed: true,
+        internalType: "address"
+      },
       {
         name: "isEnabled",
         type: "bool",
@@ -343,9 +1070,30 @@ export const abi = [
     type: "event",
     name: "StakeDeposited",
     inputs: [
-      { name: "depositId", type: "uint256", indexed: true, internalType: "UniStaker.DepositIdentifier" },
-      { name: "amount", type: "uint256", indexed: false, internalType: "uint256" },
-      { name: "totalDeposited", type: "uint256", indexed: false, internalType: "uint256" }
+      {
+        name: "owner",
+        type: "address",
+        indexed: false,
+        internalType: "address"
+      },
+      {
+        name: "depositId",
+        type: "uint256",
+        indexed: true,
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256"
+      },
+      {
+        name: "depositBalance",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256"
+      }
     ],
     anonymous: false
   },
@@ -353,9 +1101,24 @@ export const abi = [
     type: "event",
     name: "StakeWithdrawn",
     inputs: [
-      { name: "depositId", type: "uint256", indexed: true, internalType: "UniStaker.DepositIdentifier" },
-      { name: "amount", type: "uint256", indexed: false, internalType: "uint256" },
-      { name: "remainingAmount", type: "uint256", indexed: false, internalType: "uint256" }
+      {
+        name: "depositId",
+        type: "uint256",
+        indexed: true,
+        internalType: "UniStaker.DepositIdentifier"
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256"
+      },
+      {
+        name: "depositBalance",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256"
+      }
     ],
     anonymous: false
   },
@@ -363,7 +1126,12 @@ export const abi = [
     type: "event",
     name: "SurrogateDeployed",
     inputs: [
-      { name: "delegatee", type: "address", indexed: true, internalType: "address" },
+      {
+        name: "delegatee",
+        type: "address",
+        indexed: true,
+        internalType: "address"
+      },
       {
         name: "surrogate",
         type: "address",
@@ -376,28 +1144,102 @@ export const abi = [
   {
     type: "error",
     name: "AddressEmptyCode",
-    inputs: [{ name: "target", type: "address", internalType: "address" }]
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        internalType: "address"
+      }
+    ]
   },
   {
     type: "error",
     name: "AddressInsufficientBalance",
-    inputs: [{ name: "account", type: "address", internalType: "address" }]
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address"
+      }
+    ]
   },
-  { type: "error", name: "FailedInnerCall", inputs: [] },
-  { type: "error", name: "ReentrancyGuardReentrantCall", inputs: [] },
+  {
+    type: "error",
+    name: "FailedInnerCall",
+    inputs: []
+  },
+  {
+    type: "error",
+    name: "InvalidAccountNonce",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address"
+      },
+      {
+        name: "currentNonce",
+        type: "uint256",
+        internalType: "uint256"
+      }
+    ]
+  },
+  {
+    type: "error",
+    name: "InvalidShortString",
+    inputs: []
+  },
   {
     type: "error",
     name: "SafeERC20FailedOperation",
-    inputs: [{ name: "token", type: "address", internalType: "address" }]
+    inputs: [
+      {
+        name: "token",
+        type: "address",
+        internalType: "address"
+      }
+    ]
   },
-  { type: "error", name: "UniStaker__InsufficientRewardBalance", inputs: [] },
-  { type: "error", name: "UniStaker__InvalidAddress", inputs: [] },
-  { type: "error", name: "UniStaker__InvalidRewardRate", inputs: [] },
+  {
+    type: "error",
+    name: "StringTooLong",
+    inputs: [
+      {
+        name: "str",
+        type: "string",
+        internalType: "string"
+      }
+    ]
+  },
+  {
+    type: "error",
+    name: "UniStaker__InsufficientRewardBalance",
+    inputs: []
+  },
+  {
+    type: "error",
+    name: "UniStaker__InvalidAddress",
+    inputs: []
+  },
+  {
+    type: "error",
+    name: "UniStaker__InvalidRewardRate",
+    inputs: []
+  },
+  {
+    type: "error",
+    name: "UniStaker__InvalidSignature",
+    inputs: []
+  },
   {
     type: "error",
     name: "UniStaker__Unauthorized",
     inputs: [
-      { name: "reason", type: "bytes32", internalType: "bytes32" },
+      {
+        name: "reason",
+        type: "bytes32",
+        internalType: "bytes32"
+      },
       {
         name: "caller",
         type: "address",

@@ -7,7 +7,7 @@ import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTit
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { abi as abiIERC20 } from "@/lib/abi/IERC20"
+import { abi as abiIERC20 } from "@/lib/abi/erc-20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"

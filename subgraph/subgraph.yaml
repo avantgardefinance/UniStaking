@@ -8,7 +8,7 @@ dataSources:
     name: UniStaker
     network: mainnet
     source:
-      address: "0x3d82654b0b0415be70ef235c6e9847908b68dc6b"
+      address: "0x2BDe3FBE8644b9c9d5F89Ba6Ef8677B0e6057Fb9"
       abi: UniStaker
       startBlock: 19061305
     mapping:
@@ -47,7 +47,7 @@ dataSources:
     name: V3FactoryOwner
     network: mainnet
     source:
-      address: "0x079b7428c9d980692b6dc38dcb66bc781151130e"
+      address: "0x6760360e27bE5718786B384236DB8A3C4202f947"
       abi: V3FactoryOwner
       startBlock: 19061305
     mapping:

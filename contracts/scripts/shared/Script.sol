@@ -71,7 +71,7 @@ abstract contract Script is StdCheats, ForgeScript {
         REWARDS_TOKEN.mint(address(UNI_STAKER), _amount);
 
         vm.startBroadcast(ADMIN.privateKey);
-        UNI_STAKER.notifyRewardsAmount(_amount);
+        UNI_STAKER.notifyRewardAmount(_amount);
         vm.stopBroadcast();
     }
 }

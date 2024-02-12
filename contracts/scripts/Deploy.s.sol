@@ -33,8 +33,8 @@ contract Deploy is Script {
         vm.stopBroadcast();
 
         vm.startBroadcast(ADMIN.privateKey);
-        UNI_STAKER.setRewardsNotifier({_rewardsNotifier: ADMIN.addr, _isEnabled: true});
-        UNI_STAKER.setRewardsNotifier({_rewardsNotifier: V3_FACTORY_OWNER, _isEnabled: true});
+        UNI_STAKER.setRewardNotifier({_rewardNotifier: ADMIN.addr, _isEnabled: true});
+        UNI_STAKER.setRewardNotifier({_rewardNotifier: V3_FACTORY_OWNER, _isEnabled: true});
         vm.stopBroadcast();
     }
 }

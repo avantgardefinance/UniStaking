@@ -55,7 +55,7 @@ function useList(items: HistoryItem[]) {
   const initialLimit = 20
   const [limit, setLimit] = useState(initialLimit)
 
-  const canShowMore = initialLimit < items.length
+  const canShowMore = limit < items.length
 
   const showMoreItems = 10
   const showMore = () => {

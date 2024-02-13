@@ -30,42 +30,27 @@ export async function GET(request: Request) {
   return Response.json(history)
 }
 
-type EventType = Exclude<
-  AccountEventsQueryGenerated["accountEvents"][number]["event"]["__typename"],
-  "RewardNotified" | "SurrogateDeployed" | undefined
->
-
-type SameKeyAndValue<T extends string> = { [K in T]: K }
-
-const EventTypes: SameKeyAndValue<EventType> = {
-  BeneficiaryAltered: "BeneficiaryAltered",
-  StakeDeposited: "StakeDeposited",
-  StakeWithdrawn: "StakeWithdrawn",
-  DelegateeAltered: "DelegateeAltered",
-  RewardClaimed: "RewardClaimed"
-} as const
-
 type HistoryItem = {
   date: Date
   id: string
 } & (
-  | { type: typeof EventTypes.StakeDeposited; amount: bigint; owner: Address; stakeId: string }
-  | { type: typeof EventTypes.StakeWithdrawn; amount: bigint; owner: Address; stakeId: string }
+  | { type: "StakeDeposited"; amount: bigint; owner: Address; stakeId: string }
+  | { type: "StakeWithdrawn"; amount: bigint; owner: Address; stakeId: string }
   | {
-      type: typeof EventTypes.BeneficiaryAltered
+      type: "BeneficiaryAltered"
       oldBeneficiary: Address
       newBeneficiary: Address
       owner: Address
       stakeId: string
     }
   | {
-      type: typeof EventTypes.DelegateeAltered
+      type: "DelegateeAltered"
       oldDelegatee: Address
       newDelegatee: Address
       owner: Address
       stakeId: string
     }
-  | { type: typeof EventTypes.RewardClaimed; beneficiary: Address; amount: bigint }
+  | { type: "RewardClaimed"; beneficiary: Address; amount: bigint }
 )
 
 export type GetHistoryResponse = ReturnType<typeof getHistory>

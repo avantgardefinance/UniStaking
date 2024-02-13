@@ -78,7 +78,10 @@ export type Account = {
   /** `Account` name set on Tally */
   name: Scalars['String']['output'];
   otherLinks?: Maybe<Array<OtherLink>>;
-  /** Governances where an `Account` has a token balance or delegations along with `Account` `Participation`: votes, proposals, stats, delegations, etc. */
+  /**
+   * Governances where an `Account` has a token balance or delegations along with `Account` `Participation`: votes, proposals, stats, delegations, etc.
+   * @deprecated use root level delegation queries instead
+   */
   participations: Array<Participation>;
   /** Picture URL */
   picture?: Maybe<Scalars['String']['output']>;
@@ -134,51 +137,6 @@ export enum AccountType {
   EOA = 'EOA',
   SAFE = 'SAFE'
 }
-
-/** A Blockchain `Account` with its associated metadata, participations and activity. */
-export type AccountV2 = {
-  __typename?: 'AccountV2';
-  /** AccountActivity (votes, proposals created, etc).  Currently only supports on chain governance. */
-  activity?: Maybe<Array<ActivityItem>>;
-  /** EVM Address for this `Account` */
-  address: Scalars['Address']['output'];
-  /** List of APIKeys generated for this account.  See https://docs.tally.xyz/tally-api/welcome#request-an-api-key for how to request & use! */
-  apiKeys?: Maybe<Array<APIKey>>;
-  /** `Account` bio set on Tally */
-  bio: Scalars['String']['output'];
-  /** `Account` email set on Tally */
-  email: Scalars['String']['output'];
-  /** Ethereum Name Service Name */
-  ens?: Maybe<Scalars['String']['output']>;
-  /** Feature flags */
-  features?: Maybe<Array<FeatureState>>;
-  id: Scalars['Address']['output'];
-  isOFAC: Scalars['Boolean']['output'];
-  /** `Account` name set on Tally */
-  name: Scalars['String']['output'];
-  otherLinks?: Maybe<Array<OtherLink>>;
-  /** Picture URL */
-  picture?: Maybe<Scalars['String']['output']>;
-  safes?: Maybe<Array<Scalars['AccountID']['output']>>;
-  tokenBalance: Scalars['Uint256']['output'];
-  /** Twitter handle */
-  twitter?: Maybe<Scalars['String']['output']>;
-  type: AccountType;
-};
-
-
-/** A Blockchain `Account` with its associated metadata, participations and activity. */
-export type AccountV2activityArgs = {
-  governanceIds?: InputMaybe<Array<Scalars['AccountID']['input']>>;
-  pagination?: InputMaybe<Pagination>;
-  sort?: InputMaybe<AccountActivitySort>;
-};
-
-
-/** A Blockchain `Account` with its associated metadata, participations and activity. */
-export type AccountV2tokenBalanceArgs = {
-  input: TokenBalanceInput;
-};
 
 export type ActivityItem = Proposal | Vote;
 
@@ -489,7 +447,6 @@ export type DecodedParameter = {
 export type Delegate = {
   __typename?: 'Delegate';
   account: Account;
-  accountV2: AccountV2;
   delegatorsCount: Scalars['Int']['output'];
   id: Scalars['IntID']['output'];
   proposalsCount?: Maybe<Scalars['Int']['output']>;
@@ -658,7 +615,7 @@ export type DelegationV2 = {
   blockNumber: Scalars['Int']['output'];
   blockTimestamp: Scalars['Timestamp']['output'];
   delegate: Delegate;
-  delegator: AccountV2;
+  delegator: Account;
   token: Token;
   votes: Scalars['Uint256']['output'];
 };
@@ -2481,7 +2438,7 @@ export type Query = {
   accountByEns: Account;
   /** @deprecated Use `delegators` instead. */
   accountDelegationsIn?: Maybe<Array<Delegation>>;
-  accountV2: AccountV2;
+  accountV2: Account;
   accounts: Array<Account>;
   address: AddressInfo;
   /** Returns tokens that can be swapped from the governor's treasury via the Tally Swap proposal recipe. */
@@ -2550,6 +2507,7 @@ export type Query = {
   tallyProposalWithVersions: Array<TallyProposal>;
   tallyProposals: Array<TallyProposal>;
   tallyProposalsV2: Array<TallyProposal>;
+  tokenBalance: TokenBalance;
   tokenSyncs?: Maybe<Array<TokenSync>>;
   /** Fetches the last vote attempt from a given user on a proposal. */
   voteAttempt?: Maybe<VoteAttempt>;
@@ -2927,6 +2885,11 @@ export type QuerytallyProposalsV2Args = {
 };
 
 
+export type QuerytokenBalanceArgs = {
+  input: TokenBalanceInput;
+};
+
+
 export type QuerytokenSyncsArgs = {
   chainIds?: InputMaybe<Array<Scalars['ChainID']['input']>>;
 };
@@ -2984,6 +2947,17 @@ export enum RoundStatus {
   EXECUTED = 'EXECUTED',
   PENDING = 'PENDING'
 }
+
+export type SafeTokenBalance = {
+  __typename?: 'SafeTokenBalance';
+  address?: Maybe<Scalars['String']['output']>;
+  amount: Scalars['String']['output'];
+  decimals: Scalars['Int']['output'];
+  fiat: Scalars['String']['output'];
+  logoURI: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  symbol: Scalars['String']['output'];
+};
 
 export type SearchOrganizationFiltersInput = {
   chainId?: InputMaybe<Scalars['ChainID']['input']>;
@@ -3248,16 +3222,12 @@ export type TokeneligibilityArgs = {
 
 export type TokenBalance = {
   __typename?: 'TokenBalance';
-  address?: Maybe<Scalars['String']['output']>;
-  amount: Scalars['String']['output'];
-  decimals: Scalars['Int']['output'];
-  fiat: Scalars['String']['output'];
-  logoURI: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  symbol: Scalars['String']['output'];
+  balance: Scalars['Uint256']['output'];
+  token: Token;
 };
 
 export type TokenBalanceInput = {
+  address: Scalars['Address']['input'];
   governorID: Scalars['AccountID']['input'];
 };
 
@@ -3306,7 +3276,7 @@ export type TransactionSimulation = {
 
 export type Treasury = {
   __typename?: 'Treasury';
-  tokens: Array<TokenBalance>;
+  tokens: Array<SafeTokenBalance>;
   totalUSDValue: Scalars['String']['output'];
 };
 

@@ -66,6 +66,31 @@ export class FeesClaimed__Params {
   }
 }
 
+export class V3FactoryOwner__claimFeesResult {
+  value0: BigInt;
+  value1: BigInt;
+
+  constructor(value0: BigInt, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
+}
+
 export class V3FactoryOwner extends ethereum.SmartContract {
   static bind(address: Address): V3FactoryOwner {
     return new V3FactoryOwner("V3FactoryOwner", address);
@@ -157,6 +182,57 @@ export class V3FactoryOwner extends ethereum.SmartContract {
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
+
+  claimFees(
+    _pool: Address,
+    _recipient: Address,
+    _amount0Requested: BigInt,
+    _amount1Requested: BigInt,
+  ): V3FactoryOwner__claimFeesResult {
+    let result = super.call(
+      "claimFees",
+      "claimFees(address,address,uint128,uint128):(uint128,uint128)",
+      [
+        ethereum.Value.fromAddress(_pool),
+        ethereum.Value.fromAddress(_recipient),
+        ethereum.Value.fromUnsignedBigInt(_amount0Requested),
+        ethereum.Value.fromUnsignedBigInt(_amount1Requested),
+      ],
+    );
+
+    return new V3FactoryOwner__claimFeesResult(
+      result[0].toBigInt(),
+      result[1].toBigInt(),
+    );
+  }
+
+  try_claimFees(
+    _pool: Address,
+    _recipient: Address,
+    _amount0Requested: BigInt,
+    _amount1Requested: BigInt,
+  ): ethereum.CallResult<V3FactoryOwner__claimFeesResult> {
+    let result = super.tryCall(
+      "claimFees",
+      "claimFees(address,address,uint128,uint128):(uint128,uint128)",
+      [
+        ethereum.Value.fromAddress(_pool),
+        ethereum.Value.fromAddress(_recipient),
+        ethereum.Value.fromUnsignedBigInt(_amount0Requested),
+        ethereum.Value.fromUnsignedBigInt(_amount1Requested),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new V3FactoryOwner__claimFeesResult(
+        value[0].toBigInt(),
+        value[1].toBigInt(),
+      ),
+    );
+  }
 }
 
 export class ConstructorCall extends ethereum.Call {
@@ -244,6 +320,14 @@ export class ClaimFeesCall__Outputs {
 
   constructor(call: ClaimFeesCall) {
     this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+
+  get value1(): BigInt {
+    return this._call.outputValues[1].value.toBigInt();
   }
 }
 
@@ -345,36 +429,6 @@ export class SetFeeProtocolCall__Outputs {
   _call: SetFeeProtocolCall;
 
   constructor(call: SetFeeProtocolCall) {
-    this._call = call;
-  }
-}
-
-export class TransferFactoryOwnershipCall extends ethereum.Call {
-  get inputs(): TransferFactoryOwnershipCall__Inputs {
-    return new TransferFactoryOwnershipCall__Inputs(this);
-  }
-
-  get outputs(): TransferFactoryOwnershipCall__Outputs {
-    return new TransferFactoryOwnershipCall__Outputs(this);
-  }
-}
-
-export class TransferFactoryOwnershipCall__Inputs {
-  _call: TransferFactoryOwnershipCall;
-
-  constructor(call: TransferFactoryOwnershipCall) {
-    this._call = call;
-  }
-
-  get _newOwner(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class TransferFactoryOwnershipCall__Outputs {
-  _call: TransferFactoryOwnershipCall;
-
-  constructor(call: TransferFactoryOwnershipCall) {
     this._call = call;
   }
 }

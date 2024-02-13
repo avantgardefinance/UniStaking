@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
 
-const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: bigint; availableForUnstaking: bigint }) => {
+const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string; availableForUnstaking: bigint }) => {
   const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
 
   const form = useForm({
@@ -33,7 +33,7 @@ const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: bigint;
       address: uniStaker,
       abi: abiUniStaker,
       functionName: "withdraw",
-      args: [stakeId, parseUnits(values.amount, 18)]
+      args: [BigInt(stakeId), parseUnits(values.amount, 18)]
     })
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForUnstaking, 18))
@@ -54,7 +54,7 @@ export function UnstakeDialogContent({
   stakeId
 }: {
   availableForUnstaking: bigint
-  stakeId: bigint
+  stakeId: string
   delegatee: Address
   beneficiary: Address
 }) {
@@ -104,7 +104,7 @@ export function UnstakeDialogContent({
             <div className="space-y-2">
               <div className="flex flex-col space-y-2">
                 <span>ID</span>
-                <span>{stakeId.toString()}</span>
+                <span>{stakeId}</span>
               </div>
               <Separator />
               <div className="flex flex-col space-y-2">

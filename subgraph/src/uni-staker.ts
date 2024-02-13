@@ -119,7 +119,7 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
   entity.amount = event.params.amount
-  entity.totalDeposited = event.params.totalDeposited
+  entity.totalDeposited = event.params.depositBalance
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
@@ -147,7 +147,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   entity.depositId = event.params.depositId
   entity.deposit = deposit.id
   entity.amount = event.params.amount
-  entity.remainingAmount = event.params.remainingAmount
+  entity.remainingAmount = event.params.depositBalance
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash

@@ -10,6 +10,10 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const account = new URLSearchParams(url.search).get("account")
 
+  if (!account) {
+    return new Response(null, { status: 400 })
+  }
+
   const { deposits } = await client.request({
     document: DepositsQuery,
     variables: {

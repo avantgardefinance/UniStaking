@@ -6,7 +6,6 @@ import { Alert } from "@/components/ui/alert"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
 import { useQuery } from "@tanstack/react-query"
-import dayjs from "dayjs"
 import { ReactNode } from "react"
 import { useAccount } from "wagmi"
 
@@ -31,8 +30,8 @@ function useStakedAmounts() {
     deposits?.map((deposit: any) => {
       return {
         ...deposit,
-        createdAt: dayjs.unix(deposit.createdAt),
-        updatedAt: dayjs.unix(deposit.updatedAt)
+        createdAt: new Date(deposit.createdAt * 1000),
+        updatedAt: new Date(deposit.updatedAt * 1000)
       }
     }) ?? []
 

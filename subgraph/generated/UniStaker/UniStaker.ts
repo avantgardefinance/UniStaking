@@ -10,6 +10,28 @@ import {
   BigInt,
 } from "@graphprotocol/graph-ts";
 
+export class AdminSet extends ethereum.Event {
+  get params(): AdminSet__Params {
+    return new AdminSet__Params(this);
+  }
+}
+
+export class AdminSet__Params {
+  _event: AdminSet;
+
+  constructor(event: AdminSet) {
+    this._event = event;
+  }
+
+  get oldAdmin(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newAdmin(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
 export class BeneficiaryAltered extends ethereum.Event {
   get params(): BeneficiaryAltered__Params {
     return new BeneficiaryAltered__Params(this);
@@ -62,6 +84,20 @@ export class DelegateeAltered__Params {
   }
 }
 
+export class EIP712DomainChanged extends ethereum.Event {
+  get params(): EIP712DomainChanged__Params {
+    return new EIP712DomainChanged__Params(this);
+  }
+}
+
+export class EIP712DomainChanged__Params {
+  _event: EIP712DomainChanged;
+
+  constructor(event: EIP712DomainChanged) {
+    this._event = event;
+  }
+}
+
 export class RewardClaimed extends ethereum.Event {
   get params(): RewardClaimed__Params {
     return new RewardClaimed__Params(this);
@@ -100,6 +136,32 @@ export class RewardNotified__Params {
   get amount(): BigInt {
     return this._event.parameters[0].value.toBigInt();
   }
+
+  get notifier(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class RewardNotifierSet extends ethereum.Event {
+  get params(): RewardNotifierSet__Params {
+    return new RewardNotifierSet__Params(this);
+  }
+}
+
+export class RewardNotifierSet__Params {
+  _event: RewardNotifierSet;
+
+  constructor(event: RewardNotifierSet) {
+    this._event = event;
+  }
+
+  get account(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get isEnabled(): boolean {
+    return this._event.parameters[1].value.toBoolean();
+  }
 }
 
 export class StakeDeposited extends ethereum.Event {
@@ -115,16 +177,20 @@ export class StakeDeposited__Params {
     this._event = event;
   }
 
-  get depositId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
+  get owner(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 
-  get amount(): BigInt {
+  get depositId(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get totalDeposited(): BigInt {
+  get amount(): BigInt {
     return this._event.parameters[2].value.toBigInt();
+  }
+
+  get depositBalance(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
   }
 }
 
@@ -149,7 +215,7 @@ export class StakeWithdrawn__Params {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get remainingAmount(): BigInt {
+  get depositBalance(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 }
@@ -220,51 +286,146 @@ export class UniStaker__depositsResult {
   }
 }
 
+export class UniStaker__eip712DomainResult {
+  value0: Bytes;
+  value1: string;
+  value2: string;
+  value3: BigInt;
+  value4: Address;
+  value5: Bytes;
+  value6: Array<BigInt>;
+
+  constructor(
+    value0: Bytes,
+    value1: string,
+    value2: string,
+    value3: BigInt,
+    value4: Address,
+    value5: Bytes,
+    value6: Array<BigInt>,
+  ) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+    this.value4 = value4;
+    this.value5 = value5;
+    this.value6 = value6;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromFixedBytes(this.value0));
+    map.set("value1", ethereum.Value.fromString(this.value1));
+    map.set("value2", ethereum.Value.fromString(this.value2));
+    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
+    map.set("value4", ethereum.Value.fromAddress(this.value4));
+    map.set("value5", ethereum.Value.fromFixedBytes(this.value5));
+    map.set("value6", ethereum.Value.fromUnsignedBigIntArray(this.value6));
+    return map;
+  }
+
+  getFields(): Bytes {
+    return this.value0;
+  }
+
+  getName(): string {
+    return this.value1;
+  }
+
+  getVersion(): string {
+    return this.value2;
+  }
+
+  getChainId(): BigInt {
+    return this.value3;
+  }
+
+  getVerifyingContract(): Address {
+    return this.value4;
+  }
+
+  getSalt(): Bytes {
+    return this.value5;
+  }
+
+  getExtensions(): Array<BigInt> {
+    return this.value6;
+  }
+}
+
 export class UniStaker extends ethereum.SmartContract {
   static bind(address: Address): UniStaker {
     return new UniStaker("UniStaker", address);
   }
 
-  REWARDS_NOTIFIER(): Address {
+  ALTER_BENEFICIARY_TYPEHASH(): Bytes {
     let result = super.call(
-      "REWARDS_NOTIFIER",
-      "REWARDS_NOTIFIER():(address)",
+      "ALTER_BENEFICIARY_TYPEHASH",
+      "ALTER_BENEFICIARY_TYPEHASH():(bytes32)",
       [],
     );
 
-    return result[0].toAddress();
+    return result[0].toBytes();
   }
 
-  try_REWARDS_NOTIFIER(): ethereum.CallResult<Address> {
+  try_ALTER_BENEFICIARY_TYPEHASH(): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
-      "REWARDS_NOTIFIER",
-      "REWARDS_NOTIFIER():(address)",
+      "ALTER_BENEFICIARY_TYPEHASH",
+      "ALTER_BENEFICIARY_TYPEHASH():(bytes32)",
       [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
+    return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
-  REWARDS_TOKEN(): Address {
-    let result = super.call("REWARDS_TOKEN", "REWARDS_TOKEN():(address)", []);
+  ALTER_DELEGATEE_TYPEHASH(): Bytes {
+    let result = super.call(
+      "ALTER_DELEGATEE_TYPEHASH",
+      "ALTER_DELEGATEE_TYPEHASH():(bytes32)",
+      [],
+    );
 
-    return result[0].toAddress();
+    return result[0].toBytes();
   }
 
-  try_REWARDS_TOKEN(): ethereum.CallResult<Address> {
+  try_ALTER_DELEGATEE_TYPEHASH(): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
-      "REWARDS_TOKEN",
-      "REWARDS_TOKEN():(address)",
+      "ALTER_DELEGATEE_TYPEHASH",
+      "ALTER_DELEGATEE_TYPEHASH():(bytes32)",
       [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  CLAIM_REWARD_TYPEHASH(): Bytes {
+    let result = super.call(
+      "CLAIM_REWARD_TYPEHASH",
+      "CLAIM_REWARD_TYPEHASH():(bytes32)",
+      [],
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_CLAIM_REWARD_TYPEHASH(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "CLAIM_REWARD_TYPEHASH",
+      "CLAIM_REWARD_TYPEHASH():(bytes32)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
   REWARD_DURATION(): BigInt {
@@ -290,6 +451,59 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  REWARD_TOKEN(): Address {
+    let result = super.call("REWARD_TOKEN", "REWARD_TOKEN():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_REWARD_TOKEN(): ethereum.CallResult<Address> {
+    let result = super.tryCall("REWARD_TOKEN", "REWARD_TOKEN():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  SCALE_FACTOR(): BigInt {
+    let result = super.call("SCALE_FACTOR", "SCALE_FACTOR():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_SCALE_FACTOR(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("SCALE_FACTOR", "SCALE_FACTOR():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  STAKE_MORE_TYPEHASH(): Bytes {
+    let result = super.call(
+      "STAKE_MORE_TYPEHASH",
+      "STAKE_MORE_TYPEHASH():(bytes32)",
+      [],
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_STAKE_MORE_TYPEHASH(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "STAKE_MORE_TYPEHASH",
+      "STAKE_MORE_TYPEHASH():(bytes32)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
   STAKE_TOKEN(): Address {
     let result = super.call("STAKE_TOKEN", "STAKE_TOKEN():(address)", []);
 
@@ -303,6 +517,111 @@ export class UniStaker extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  STAKE_TYPEHASH(): Bytes {
+    let result = super.call("STAKE_TYPEHASH", "STAKE_TYPEHASH():(bytes32)", []);
+
+    return result[0].toBytes();
+  }
+
+  try_STAKE_TYPEHASH(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "STAKE_TYPEHASH",
+      "STAKE_TYPEHASH():(bytes32)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  WITHDRAW_TYPEHASH(): Bytes {
+    let result = super.call(
+      "WITHDRAW_TYPEHASH",
+      "WITHDRAW_TYPEHASH():(bytes32)",
+      [],
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_WITHDRAW_TYPEHASH(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "WITHDRAW_TYPEHASH",
+      "WITHDRAW_TYPEHASH():(bytes32)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  admin(): Address {
+    let result = super.call("admin", "admin():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_admin(): ethereum.CallResult<Address> {
+    let result = super.tryCall("admin", "admin():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  beneficiaryRewardPerTokenCheckpoint(account: Address): BigInt {
+    let result = super.call(
+      "beneficiaryRewardPerTokenCheckpoint",
+      "beneficiaryRewardPerTokenCheckpoint(address):(uint256)",
+      [ethereum.Value.fromAddress(account)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_beneficiaryRewardPerTokenCheckpoint(
+    account: Address,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "beneficiaryRewardPerTokenCheckpoint",
+      "beneficiaryRewardPerTokenCheckpoint(address):(uint256)",
+      [ethereum.Value.fromAddress(account)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  depositorTotalStaked(depositor: Address): BigInt {
+    let result = super.call(
+      "depositorTotalStaked",
+      "depositorTotalStaked(address):(uint256)",
+      [ethereum.Value.fromAddress(depositor)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_depositorTotalStaked(depositor: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "depositorTotalStaked",
+      "depositorTotalStaked(address):(uint256)",
+      [ethereum.Value.fromAddress(depositor)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   deposits(depositId: BigInt): UniStaker__depositsResult {
@@ -342,25 +661,6 @@ export class UniStaker extends ethereum.SmartContract {
     );
   }
 
-  earned(_beneficiary: Address): BigInt {
-    let result = super.call("earned", "earned(address):(uint256)", [
-      ethereum.Value.fromAddress(_beneficiary),
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_earned(_beneficiary: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("earned", "earned(address):(uint256)", [
-      ethereum.Value.fromAddress(_beneficiary),
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   earningPower(beneficiary: Address): BigInt {
     let result = super.call("earningPower", "earningPower(address):(uint256)", [
       ethereum.Value.fromAddress(beneficiary),
@@ -382,77 +682,84 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  finishAt(): BigInt {
-    let result = super.call("finishAt", "finishAt():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_finishAt(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("finishAt", "finishAt():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  lastTimeRewardApplicable(): BigInt {
+  eip712Domain(): UniStaker__eip712DomainResult {
     let result = super.call(
-      "lastTimeRewardApplicable",
-      "lastTimeRewardApplicable():(uint256)",
+      "eip712Domain",
+      "eip712Domain():(bytes1,string,string,uint256,address,bytes32,uint256[])",
       [],
     );
 
-    return result[0].toBigInt();
+    return new UniStaker__eip712DomainResult(
+      result[0].toBytes(),
+      result[1].toString(),
+      result[2].toString(),
+      result[3].toBigInt(),
+      result[4].toAddress(),
+      result[5].toBytes(),
+      result[6].toBigIntArray(),
+    );
   }
 
-  try_lastTimeRewardApplicable(): ethereum.CallResult<BigInt> {
+  try_eip712Domain(): ethereum.CallResult<UniStaker__eip712DomainResult> {
     let result = super.tryCall(
-      "lastTimeRewardApplicable",
-      "lastTimeRewardApplicable():(uint256)",
+      "eip712Domain",
+      "eip712Domain():(bytes1,string,string,uint256,address,bytes32,uint256[])",
       [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  rewardPerToken(): BigInt {
-    let result = super.call("rewardPerToken", "rewardPerToken():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_rewardPerToken(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "rewardPerToken",
-      "rewardPerToken():(uint256)",
-      [],
+    return ethereum.CallResult.fromValue(
+      new UniStaker__eip712DomainResult(
+        value[0].toBytes(),
+        value[1].toString(),
+        value[2].toString(),
+        value[3].toBigInt(),
+        value[4].toAddress(),
+        value[5].toBytes(),
+        value[6].toBigIntArray(),
+      ),
     );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  rewardPerTokenStored(): BigInt {
+  isRewardNotifier(rewardNotifier: Address): boolean {
     let result = super.call(
-      "rewardPerTokenStored",
-      "rewardPerTokenStored():(uint256)",
-      [],
+      "isRewardNotifier",
+      "isRewardNotifier(address):(bool)",
+      [ethereum.Value.fromAddress(rewardNotifier)],
     );
 
-    return result[0].toBigInt();
+    return result[0].toBoolean();
   }
 
-  try_rewardPerTokenStored(): ethereum.CallResult<BigInt> {
+  try_isRewardNotifier(rewardNotifier: Address): ethereum.CallResult<boolean> {
     let result = super.tryCall(
-      "rewardPerTokenStored",
-      "rewardPerTokenStored():(uint256)",
+      "isRewardNotifier",
+      "isRewardNotifier(address):(bool)",
+      [ethereum.Value.fromAddress(rewardNotifier)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  lastCheckpointTime(): BigInt {
+    let result = super.call(
+      "lastCheckpointTime",
+      "lastCheckpointTime():(uint256)",
+      [],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_lastCheckpointTime(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "lastCheckpointTime",
+      "lastCheckpointTime():(uint256)",
       [],
     );
     if (result.reverted) {
@@ -462,14 +769,22 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  rewardRate(): BigInt {
-    let result = super.call("rewardRate", "rewardRate():(uint256)", []);
+  lastTimeRewardDistributed(): BigInt {
+    let result = super.call(
+      "lastTimeRewardDistributed",
+      "lastTimeRewardDistributed():(uint256)",
+      [],
+    );
 
     return result[0].toBigInt();
   }
 
-  try_rewardRate(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("rewardRate", "rewardRate():(uint256)", []);
+  try_lastTimeRewardDistributed(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "lastTimeRewardDistributed",
+      "lastTimeRewardDistributed():(uint256)",
+      [],
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -477,18 +792,180 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  rewards(account: Address): BigInt {
-    let result = super.call("rewards", "rewards(address):(uint256)", [
-      ethereum.Value.fromAddress(account),
+  multicall(data: Array<Bytes>): Array<Bytes> {
+    let result = super.call("multicall", "multicall(bytes[]):(bytes[])", [
+      ethereum.Value.fromBytesArray(data),
+    ]);
+
+    return result[0].toBytesArray();
+  }
+
+  try_multicall(data: Array<Bytes>): ethereum.CallResult<Array<Bytes>> {
+    let result = super.tryCall("multicall", "multicall(bytes[]):(bytes[])", [
+      ethereum.Value.fromBytesArray(data),
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytesArray());
+  }
+
+  nonces(owner: Address): BigInt {
+    let result = super.call("nonces", "nonces(address):(uint256)", [
+      ethereum.Value.fromAddress(owner),
     ]);
 
     return result[0].toBigInt();
   }
 
-  try_rewards(account: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("rewards", "rewards(address):(uint256)", [
-      ethereum.Value.fromAddress(account),
+  try_nonces(owner: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("nonces", "nonces(address):(uint256)", [
+      ethereum.Value.fromAddress(owner),
     ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  permitAndStake(
+    _amount: BigInt,
+    _delegatee: Address,
+    _beneficiary: Address,
+    _deadline: BigInt,
+    _v: i32,
+    _r: Bytes,
+    _s: Bytes,
+  ): BigInt {
+    let result = super.call(
+      "permitAndStake",
+      "permitAndStake(uint256,address,address,uint256,uint8,bytes32,bytes32):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_amount),
+        ethereum.Value.fromAddress(_delegatee),
+        ethereum.Value.fromAddress(_beneficiary),
+        ethereum.Value.fromUnsignedBigInt(_deadline),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(_v)),
+        ethereum.Value.fromFixedBytes(_r),
+        ethereum.Value.fromFixedBytes(_s),
+      ],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_permitAndStake(
+    _amount: BigInt,
+    _delegatee: Address,
+    _beneficiary: Address,
+    _deadline: BigInt,
+    _v: i32,
+    _r: Bytes,
+    _s: Bytes,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "permitAndStake",
+      "permitAndStake(uint256,address,address,uint256,uint8,bytes32,bytes32):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_amount),
+        ethereum.Value.fromAddress(_delegatee),
+        ethereum.Value.fromAddress(_beneficiary),
+        ethereum.Value.fromUnsignedBigInt(_deadline),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(_v)),
+        ethereum.Value.fromFixedBytes(_r),
+        ethereum.Value.fromFixedBytes(_s),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  rewardEndTime(): BigInt {
+    let result = super.call("rewardEndTime", "rewardEndTime():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_rewardEndTime(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "rewardEndTime",
+      "rewardEndTime():(uint256)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  rewardPerTokenAccumulated(): BigInt {
+    let result = super.call(
+      "rewardPerTokenAccumulated",
+      "rewardPerTokenAccumulated():(uint256)",
+      [],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_rewardPerTokenAccumulated(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "rewardPerTokenAccumulated",
+      "rewardPerTokenAccumulated():(uint256)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  rewardPerTokenAccumulatedCheckpoint(): BigInt {
+    let result = super.call(
+      "rewardPerTokenAccumulatedCheckpoint",
+      "rewardPerTokenAccumulatedCheckpoint():(uint256)",
+      [],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_rewardPerTokenAccumulatedCheckpoint(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "rewardPerTokenAccumulatedCheckpoint",
+      "rewardPerTokenAccumulatedCheckpoint():(uint256)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  scaledRewardRate(): BigInt {
+    let result = super.call(
+      "scaledRewardRate",
+      "scaledRewardRate():(uint256)",
+      [],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_scaledRewardRate(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "scaledRewardRate",
+      "scaledRewardRate():(uint256)",
+      [],
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -552,6 +1029,53 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  stakeOnBehalf(
+    _amount: BigInt,
+    _delegatee: Address,
+    _beneficiary: Address,
+    _depositor: Address,
+    _signature: Bytes,
+  ): BigInt {
+    let result = super.call(
+      "stakeOnBehalf",
+      "stakeOnBehalf(uint256,address,address,address,bytes):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_amount),
+        ethereum.Value.fromAddress(_delegatee),
+        ethereum.Value.fromAddress(_beneficiary),
+        ethereum.Value.fromAddress(_depositor),
+        ethereum.Value.fromBytes(_signature),
+      ],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_stakeOnBehalf(
+    _amount: BigInt,
+    _delegatee: Address,
+    _beneficiary: Address,
+    _depositor: Address,
+    _signature: Bytes,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "stakeOnBehalf",
+      "stakeOnBehalf(uint256,address,address,address,bytes):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_amount),
+        ethereum.Value.fromAddress(_delegatee),
+        ethereum.Value.fromAddress(_beneficiary),
+        ethereum.Value.fromAddress(_depositor),
+        ethereum.Value.fromBytes(_signature),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   surrogates(delegatee: Address): Address {
     let result = super.call("surrogates", "surrogates(address):(address)", [
       ethereum.Value.fromAddress(delegatee),
@@ -571,21 +1095,36 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  totalDeposits(depositor: Address): BigInt {
+  totalStaked(): BigInt {
+    let result = super.call("totalStaked", "totalStaked():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_totalStaked(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("totalStaked", "totalStaked():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  unclaimedReward(_beneficiary: Address): BigInt {
     let result = super.call(
-      "totalDeposits",
-      "totalDeposits(address):(uint256)",
-      [ethereum.Value.fromAddress(depositor)],
+      "unclaimedReward",
+      "unclaimedReward(address):(uint256)",
+      [ethereum.Value.fromAddress(_beneficiary)],
     );
 
     return result[0].toBigInt();
   }
 
-  try_totalDeposits(depositor: Address): ethereum.CallResult<BigInt> {
+  try_unclaimedReward(_beneficiary: Address): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "totalDeposits",
-      "totalDeposits(address):(uint256)",
-      [ethereum.Value.fromAddress(depositor)],
+      "unclaimedReward",
+      "unclaimedReward(address):(uint256)",
+      [ethereum.Value.fromAddress(_beneficiary)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -594,50 +1133,20 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  totalSupply(): BigInt {
-    let result = super.call("totalSupply", "totalSupply():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_totalSupply(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("totalSupply", "totalSupply():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  updatedAt(): BigInt {
-    let result = super.call("updatedAt", "updatedAt():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_updatedAt(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("updatedAt", "updatedAt():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  userRewardPerTokenPaid(account: Address): BigInt {
+  unclaimedRewardCheckpoint(account: Address): BigInt {
     let result = super.call(
-      "userRewardPerTokenPaid",
-      "userRewardPerTokenPaid(address):(uint256)",
+      "unclaimedRewardCheckpoint",
+      "unclaimedRewardCheckpoint(address):(uint256)",
       [ethereum.Value.fromAddress(account)],
     );
 
     return result[0].toBigInt();
   }
 
-  try_userRewardPerTokenPaid(account: Address): ethereum.CallResult<BigInt> {
+  try_unclaimedRewardCheckpoint(account: Address): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "userRewardPerTokenPaid",
-      "userRewardPerTokenPaid(address):(uint256)",
+      "unclaimedRewardCheckpoint",
+      "unclaimedRewardCheckpoint(address):(uint256)",
       [ethereum.Value.fromAddress(account)],
     );
     if (result.reverted) {
@@ -665,7 +1174,7 @@ export class ConstructorCall__Inputs {
     this._call = call;
   }
 
-  get _rewardsToken(): Address {
+  get _rewardToken(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
@@ -673,7 +1182,7 @@ export class ConstructorCall__Inputs {
     return this._call.inputValues[1].value.toAddress();
   }
 
-  get _rewardsNotifier(): Address {
+  get _admin(): Address {
     return this._call.inputValues[2].value.toAddress();
   }
 }
@@ -720,6 +1229,48 @@ export class AlterBeneficiaryCall__Outputs {
   }
 }
 
+export class AlterBeneficiaryOnBehalfCall extends ethereum.Call {
+  get inputs(): AlterBeneficiaryOnBehalfCall__Inputs {
+    return new AlterBeneficiaryOnBehalfCall__Inputs(this);
+  }
+
+  get outputs(): AlterBeneficiaryOnBehalfCall__Outputs {
+    return new AlterBeneficiaryOnBehalfCall__Outputs(this);
+  }
+}
+
+export class AlterBeneficiaryOnBehalfCall__Inputs {
+  _call: AlterBeneficiaryOnBehalfCall;
+
+  constructor(call: AlterBeneficiaryOnBehalfCall) {
+    this._call = call;
+  }
+
+  get _depositId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _newBeneficiary(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _depositor(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _signature(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
+  }
+}
+
+export class AlterBeneficiaryOnBehalfCall__Outputs {
+  _call: AlterBeneficiaryOnBehalfCall;
+
+  constructor(call: AlterBeneficiaryOnBehalfCall) {
+    this._call = call;
+  }
+}
+
 export class AlterDelegateeCall extends ethereum.Call {
   get inputs(): AlterDelegateeCall__Inputs {
     return new AlterDelegateeCall__Inputs(this);
@@ -754,6 +1305,48 @@ export class AlterDelegateeCall__Outputs {
   }
 }
 
+export class AlterDelegateeOnBehalfCall extends ethereum.Call {
+  get inputs(): AlterDelegateeOnBehalfCall__Inputs {
+    return new AlterDelegateeOnBehalfCall__Inputs(this);
+  }
+
+  get outputs(): AlterDelegateeOnBehalfCall__Outputs {
+    return new AlterDelegateeOnBehalfCall__Outputs(this);
+  }
+}
+
+export class AlterDelegateeOnBehalfCall__Inputs {
+  _call: AlterDelegateeOnBehalfCall;
+
+  constructor(call: AlterDelegateeOnBehalfCall) {
+    this._call = call;
+  }
+
+  get _depositId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _newDelegatee(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _depositor(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _signature(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
+  }
+}
+
+export class AlterDelegateeOnBehalfCall__Outputs {
+  _call: AlterDelegateeOnBehalfCall;
+
+  constructor(call: AlterDelegateeOnBehalfCall) {
+    this._call = call;
+  }
+}
+
 export class ClaimRewardCall extends ethereum.Call {
   get inputs(): ClaimRewardCall__Inputs {
     return new ClaimRewardCall__Inputs(this);
@@ -780,20 +1373,88 @@ export class ClaimRewardCall__Outputs {
   }
 }
 
-export class NotifyRewardsAmountCall extends ethereum.Call {
-  get inputs(): NotifyRewardsAmountCall__Inputs {
-    return new NotifyRewardsAmountCall__Inputs(this);
+export class ClaimRewardOnBehalfCall extends ethereum.Call {
+  get inputs(): ClaimRewardOnBehalfCall__Inputs {
+    return new ClaimRewardOnBehalfCall__Inputs(this);
   }
 
-  get outputs(): NotifyRewardsAmountCall__Outputs {
-    return new NotifyRewardsAmountCall__Outputs(this);
+  get outputs(): ClaimRewardOnBehalfCall__Outputs {
+    return new ClaimRewardOnBehalfCall__Outputs(this);
   }
 }
 
-export class NotifyRewardsAmountCall__Inputs {
-  _call: NotifyRewardsAmountCall;
+export class ClaimRewardOnBehalfCall__Inputs {
+  _call: ClaimRewardOnBehalfCall;
 
-  constructor(call: NotifyRewardsAmountCall) {
+  constructor(call: ClaimRewardOnBehalfCall) {
+    this._call = call;
+  }
+
+  get _beneficiary(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _signature(): Bytes {
+    return this._call.inputValues[1].value.toBytes();
+  }
+}
+
+export class ClaimRewardOnBehalfCall__Outputs {
+  _call: ClaimRewardOnBehalfCall;
+
+  constructor(call: ClaimRewardOnBehalfCall) {
+    this._call = call;
+  }
+}
+
+export class MulticallCall extends ethereum.Call {
+  get inputs(): MulticallCall__Inputs {
+    return new MulticallCall__Inputs(this);
+  }
+
+  get outputs(): MulticallCall__Outputs {
+    return new MulticallCall__Outputs(this);
+  }
+}
+
+export class MulticallCall__Inputs {
+  _call: MulticallCall;
+
+  constructor(call: MulticallCall) {
+    this._call = call;
+  }
+
+  get data(): Array<Bytes> {
+    return this._call.inputValues[0].value.toBytesArray();
+  }
+}
+
+export class MulticallCall__Outputs {
+  _call: MulticallCall;
+
+  constructor(call: MulticallCall) {
+    this._call = call;
+  }
+
+  get results(): Array<Bytes> {
+    return this._call.outputValues[0].value.toBytesArray();
+  }
+}
+
+export class NotifyRewardAmountCall extends ethereum.Call {
+  get inputs(): NotifyRewardAmountCall__Inputs {
+    return new NotifyRewardAmountCall__Inputs(this);
+  }
+
+  get outputs(): NotifyRewardAmountCall__Outputs {
+    return new NotifyRewardAmountCall__Outputs(this);
+  }
+}
+
+export class NotifyRewardAmountCall__Inputs {
+  _call: NotifyRewardAmountCall;
+
+  constructor(call: NotifyRewardAmountCall) {
     this._call = call;
   }
 
@@ -802,10 +1463,182 @@ export class NotifyRewardsAmountCall__Inputs {
   }
 }
 
-export class NotifyRewardsAmountCall__Outputs {
-  _call: NotifyRewardsAmountCall;
+export class NotifyRewardAmountCall__Outputs {
+  _call: NotifyRewardAmountCall;
 
-  constructor(call: NotifyRewardsAmountCall) {
+  constructor(call: NotifyRewardAmountCall) {
+    this._call = call;
+  }
+}
+
+export class PermitAndStakeCall extends ethereum.Call {
+  get inputs(): PermitAndStakeCall__Inputs {
+    return new PermitAndStakeCall__Inputs(this);
+  }
+
+  get outputs(): PermitAndStakeCall__Outputs {
+    return new PermitAndStakeCall__Outputs(this);
+  }
+}
+
+export class PermitAndStakeCall__Inputs {
+  _call: PermitAndStakeCall;
+
+  constructor(call: PermitAndStakeCall) {
+    this._call = call;
+  }
+
+  get _amount(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _delegatee(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _beneficiary(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _deadline(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get _v(): i32 {
+    return this._call.inputValues[4].value.toI32();
+  }
+
+  get _r(): Bytes {
+    return this._call.inputValues[5].value.toBytes();
+  }
+
+  get _s(): Bytes {
+    return this._call.inputValues[6].value.toBytes();
+  }
+}
+
+export class PermitAndStakeCall__Outputs {
+  _call: PermitAndStakeCall;
+
+  constructor(call: PermitAndStakeCall) {
+    this._call = call;
+  }
+
+  get _depositId(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class PermitAndStakeMoreCall extends ethereum.Call {
+  get inputs(): PermitAndStakeMoreCall__Inputs {
+    return new PermitAndStakeMoreCall__Inputs(this);
+  }
+
+  get outputs(): PermitAndStakeMoreCall__Outputs {
+    return new PermitAndStakeMoreCall__Outputs(this);
+  }
+}
+
+export class PermitAndStakeMoreCall__Inputs {
+  _call: PermitAndStakeMoreCall;
+
+  constructor(call: PermitAndStakeMoreCall) {
+    this._call = call;
+  }
+
+  get _depositId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _amount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _deadline(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get _v(): i32 {
+    return this._call.inputValues[3].value.toI32();
+  }
+
+  get _r(): Bytes {
+    return this._call.inputValues[4].value.toBytes();
+  }
+
+  get _s(): Bytes {
+    return this._call.inputValues[5].value.toBytes();
+  }
+}
+
+export class PermitAndStakeMoreCall__Outputs {
+  _call: PermitAndStakeMoreCall;
+
+  constructor(call: PermitAndStakeMoreCall) {
+    this._call = call;
+  }
+}
+
+export class SetAdminCall extends ethereum.Call {
+  get inputs(): SetAdminCall__Inputs {
+    return new SetAdminCall__Inputs(this);
+  }
+
+  get outputs(): SetAdminCall__Outputs {
+    return new SetAdminCall__Outputs(this);
+  }
+}
+
+export class SetAdminCall__Inputs {
+  _call: SetAdminCall;
+
+  constructor(call: SetAdminCall) {
+    this._call = call;
+  }
+
+  get _newAdmin(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class SetAdminCall__Outputs {
+  _call: SetAdminCall;
+
+  constructor(call: SetAdminCall) {
+    this._call = call;
+  }
+}
+
+export class SetRewardNotifierCall extends ethereum.Call {
+  get inputs(): SetRewardNotifierCall__Inputs {
+    return new SetRewardNotifierCall__Inputs(this);
+  }
+
+  get outputs(): SetRewardNotifierCall__Outputs {
+    return new SetRewardNotifierCall__Outputs(this);
+  }
+}
+
+export class SetRewardNotifierCall__Inputs {
+  _call: SetRewardNotifierCall;
+
+  constructor(call: SetRewardNotifierCall) {
+    this._call = call;
+  }
+
+  get _rewardNotifier(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _isEnabled(): boolean {
+    return this._call.inputValues[1].value.toBoolean();
+  }
+}
+
+export class SetRewardNotifierCall__Outputs {
+  _call: SetRewardNotifierCall;
+
+  constructor(call: SetRewardNotifierCall) {
     this._call = call;
   }
 }
@@ -924,6 +1757,98 @@ export class StakeMoreCall__Outputs {
   }
 }
 
+export class StakeMoreOnBehalfCall extends ethereum.Call {
+  get inputs(): StakeMoreOnBehalfCall__Inputs {
+    return new StakeMoreOnBehalfCall__Inputs(this);
+  }
+
+  get outputs(): StakeMoreOnBehalfCall__Outputs {
+    return new StakeMoreOnBehalfCall__Outputs(this);
+  }
+}
+
+export class StakeMoreOnBehalfCall__Inputs {
+  _call: StakeMoreOnBehalfCall;
+
+  constructor(call: StakeMoreOnBehalfCall) {
+    this._call = call;
+  }
+
+  get _depositId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _amount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _depositor(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _signature(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
+  }
+}
+
+export class StakeMoreOnBehalfCall__Outputs {
+  _call: StakeMoreOnBehalfCall;
+
+  constructor(call: StakeMoreOnBehalfCall) {
+    this._call = call;
+  }
+}
+
+export class StakeOnBehalfCall extends ethereum.Call {
+  get inputs(): StakeOnBehalfCall__Inputs {
+    return new StakeOnBehalfCall__Inputs(this);
+  }
+
+  get outputs(): StakeOnBehalfCall__Outputs {
+    return new StakeOnBehalfCall__Outputs(this);
+  }
+}
+
+export class StakeOnBehalfCall__Inputs {
+  _call: StakeOnBehalfCall;
+
+  constructor(call: StakeOnBehalfCall) {
+    this._call = call;
+  }
+
+  get _amount(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _delegatee(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _beneficiary(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _depositor(): Address {
+    return this._call.inputValues[3].value.toAddress();
+  }
+
+  get _signature(): Bytes {
+    return this._call.inputValues[4].value.toBytes();
+  }
+}
+
+export class StakeOnBehalfCall__Outputs {
+  _call: StakeOnBehalfCall;
+
+  constructor(call: StakeOnBehalfCall) {
+    this._call = call;
+  }
+
+  get _depositId(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
 export class WithdrawCall extends ethereum.Call {
   get inputs(): WithdrawCall__Inputs {
     return new WithdrawCall__Inputs(this);
@@ -954,6 +1879,48 @@ export class WithdrawCall__Outputs {
   _call: WithdrawCall;
 
   constructor(call: WithdrawCall) {
+    this._call = call;
+  }
+}
+
+export class WithdrawOnBehalfCall extends ethereum.Call {
+  get inputs(): WithdrawOnBehalfCall__Inputs {
+    return new WithdrawOnBehalfCall__Inputs(this);
+  }
+
+  get outputs(): WithdrawOnBehalfCall__Outputs {
+    return new WithdrawOnBehalfCall__Outputs(this);
+  }
+}
+
+export class WithdrawOnBehalfCall__Inputs {
+  _call: WithdrawOnBehalfCall;
+
+  constructor(call: WithdrawOnBehalfCall) {
+    this._call = call;
+  }
+
+  get _depositId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _amount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _depositor(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _signature(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
+  }
+}
+
+export class WithdrawOnBehalfCall__Outputs {
+  _call: WithdrawOnBehalfCall;
+
+  constructor(call: WithdrawOnBehalfCall) {
     this._call = call;
   }
 }

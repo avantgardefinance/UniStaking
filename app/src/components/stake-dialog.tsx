@@ -13,13 +13,12 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
 import { useTallyDelegates } from "@/lib/hooks/use-tally-delegates"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
-import dayjs from "dayjs"
 import { Download, Info, RotateCw } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, isAddressEqual, parseAbi, parseUnits } from "viem"
-import { useAccount, useChainId } from "wagmi"
+import { useAccount } from "wagmi"
 import { getTransactionCount, readContract, signTypedData } from "wagmi/actions"
 
 const useStakeDialog = ({
@@ -28,7 +27,6 @@ const useStakeDialog = ({
   availableForStakingUni: bigint
 }) => {
   const account = useAccount()
-  const chainId = useChainId()
   const [signatureInfo, setSignatureInfo] = useState<{
     signature: Hex
     deadline: bigint
@@ -57,6 +55,7 @@ const useStakeDialog = ({
 
   const hasSignedEnoughValue = signatureInfo !== undefined && parseUnits(amount, 18) <= signatureInfo.value
 
+  // console.log({ hasSignedEnoughValue, signatureInfo })
   const onSubmit = async (values: {
     beneficiary: Address | undefined
     customDelegatee: Address | undefined
@@ -72,7 +71,8 @@ const useStakeDialog = ({
     }
 
     if (hasSignedEnoughValue) {
-      if (dayjs.unix(Number(signatureInfo.deadline)).isBefore(dayjs())) {
+      const deadlineTimestamp = Number(signatureInfo.deadline) * 1000
+      if (deadlineTimestamp < new Date().getTime()) {
         setSignatureInfo(undefined)
         setError(new Error("Singature expired"))
         return
@@ -92,21 +92,27 @@ const useStakeDialog = ({
       })
     } else {
       try {
-        const [transactionCount, name] = await Promise.all([
+        const [transactionCount, eip712Domain] = await Promise.all([
           getTransactionCount(config, {
             address: account.address
           }),
           readContract(config, {
-            abi: parseAbi(["function name() public view returns (string name_)"]),
-            address: governanceToken,
-            functionName: "name"
+            abi: abiUniStaker,
+            address: uniStaker,
+            functionName: "eip712Domain"
           })
         ])
 
-        const signedDeadline = BigInt(dayjs().add(10, "minutes").unix())
+        const [fields, name, version, chainId, verifyingContract, salt] = eip712Domain
+
+        console.log({ eip712Domain })
+
+        const timeToMakeTransaction = 10 * 60 * 60 // 10 minutes
+        const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
 
         const value = parseUnits(values.amount, 18)
 
+        console.log({ account: account.address, name })
         const permitSignature = await signTypedData(config, {
           account: account.address,
           types: {
@@ -120,9 +126,10 @@ const useStakeDialog = ({
           },
           domain: {
             name,
-            chainId,
-            verifyingContract: governanceToken,
-            version: "1" // only localhost
+            chainId: Number(chainId),
+            verifyingContract,
+            version,
+            salt
           },
           primaryType: "Permit",
           message: {
@@ -261,7 +268,9 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
             )}
             {hasSignedEnoughValue ? null : (
               <Alert>
-                <AlertDescription>You didn&apos;t</AlertDescription>
+                <AlertDescription>
+                  You didn&apos;t permit enough value to stake this amount. Please permit first.
+                </AlertDescription>
               </Alert>
             )}
           </div>

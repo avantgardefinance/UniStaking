@@ -3,10 +3,10 @@ pragma solidity ^0.8.13;
 
 import {Script as ForgeScript} from "forge-std/Script.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
-import {ERC20VotesMock} from "test/mocks/MockERC20Votes.sol";
 import {ERC20Fake} from "test/fakes/ERC20Fake.sol";
 import {UniStaker} from "src/UniStaker.sol";
 import {V3FactoryOwner} from "src/V3FactoryOwner.sol";
+import {Uni} from "../tokens/Uni.sol";
 
 abstract contract Script is StdCheats, ForgeScript {
     struct Wallet {
@@ -18,9 +18,18 @@ abstract contract Script is StdCheats, ForgeScript {
 
     Wallet public DEPLOYER = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 0)), privateKey: vm.deriveKey(MNEMONIC, 0)});
     Wallet public ADMIN = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 2)), privateKey: vm.deriveKey(MNEMONIC, 2)});
+    Wallet public GOVERNANCE_TOKEN_MINTER =
+        Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 3)), privateKey: vm.deriveKey(MNEMONIC, 3)});
 
-    ERC20VotesMock public immutable GOVERNANCE_TOKEN =
-        ERC20VotesMock(vm.computeCreate2Address(0, hashInitCode(type(ERC20VotesMock).creationCode)));
+    Uni public immutable GOVERNANCE_TOKEN = Uni(
+        vm.computeCreate2Address(
+            0,
+            hashInitCode(
+                type(Uni).creationCode,
+                abi.encode(GOVERNANCE_TOKEN_MINTER.addr, GOVERNANCE_TOKEN_MINTER.addr, block.timestamp)
+            )
+        )
+    );
     ERC20Fake public immutable REWARDS_TOKEN =
         ERC20Fake(vm.computeCreate2Address(0, hashInitCode(type(ERC20Fake).creationCode)));
     UniStaker public immutable UNI_STAKER = UniStaker(
@@ -49,7 +58,7 @@ abstract contract Script is StdCheats, ForgeScript {
     function dealToDerivedKey(uint32 who, uint256 amount) public {
         uint256 key = vm.deriveKey(MNEMONIC, who);
 
-        vm.startBroadcast(key);
+        vm.startBroadcast(GOVERNANCE_TOKEN_MINTER.privateKey);
         GOVERNANCE_TOKEN.mint(vm.addr(key), amount);
         vm.stopBroadcast();
     }
@@ -60,8 +69,11 @@ abstract contract Script is StdCheats, ForgeScript {
     {
         uint256 key = vm.deriveKey(MNEMONIC, who);
 
-        vm.startBroadcast(key);
+        vm.startBroadcast(GOVERNANCE_TOKEN_MINTER.privateKey);
         GOVERNANCE_TOKEN.mint(vm.addr(key), amount);
+        vm.stopBroadcast();
+
+        vm.startBroadcast(key);
         GOVERNANCE_TOKEN.approve(address(UNI_STAKER), amount);
         delegateId = UNI_STAKER.stake(amount, delegatee);
         vm.stopBroadcast();

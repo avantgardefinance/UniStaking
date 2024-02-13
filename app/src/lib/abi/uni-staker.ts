@@ -12,11 +12,7 @@ export const abi = [
         type: "address",
         internalType: "contract IERC20Delegates"
       },
-      {
-        name: "_admin",
-        type: "address",
-        internalType: "address"
-      }
+      { name: "_admin", type: "address", internalType: "address" }
     ],
     stateMutability: "nonpayable"
   },
@@ -24,91 +20,49 @@ export const abi = [
     type: "function",
     name: "ALTER_BENEFICIARY_TYPEHASH",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32"
-      }
-    ],
+    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "ALTER_DELEGATEE_TYPEHASH",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32"
-      }
-    ],
+    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "CLAIM_REWARD_TYPEHASH",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32"
-      }
-    ],
+    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "REWARD_DURATION",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "REWARD_TOKEN",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "contract IERC20"
-      }
-    ],
+    outputs: [{ name: "", type: "address", internalType: "contract IERC20" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "SCALE_FACTOR",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "STAKE_MORE_TYPEHASH",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32"
-      }
-    ],
+    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
     stateMutability: "view"
   },
   {
@@ -128,39 +82,21 @@ export const abi = [
     type: "function",
     name: "STAKE_TYPEHASH",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32"
-      }
-    ],
+    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "WITHDRAW_TYPEHASH",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32"
-      }
-    ],
+    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "admin",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address"
-      }
-    ],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
     stateMutability: "view"
   },
   {
@@ -195,16 +131,8 @@ export const abi = [
         type: "address",
         internalType: "address"
       },
-      {
-        name: "_depositor",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "_signature",
-        type: "bytes",
-        internalType: "bytes"
-      }
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_signature", type: "bytes", internalType: "bytes" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -241,16 +169,8 @@ export const abi = [
         type: "address",
         internalType: "address"
       },
-      {
-        name: "_depositor",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "_signature",
-        type: "bytes",
-        internalType: "bytes"
-      }
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_signature", type: "bytes", internalType: "bytes" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -258,20 +178,8 @@ export const abi = [
   {
     type: "function",
     name: "beneficiaryRewardPerTokenCheckpoint",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        internalType: "address"
-      }
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    inputs: [{ name: "account", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
@@ -290,11 +198,7 @@ export const abi = [
         type: "address",
         internalType: "address"
       },
-      {
-        name: "_signature",
-        type: "bytes",
-        internalType: "bytes"
-      }
+      { name: "_signature", type: "bytes", internalType: "bytes" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -302,20 +206,8 @@ export const abi = [
   {
     type: "function",
     name: "depositorTotalStaked",
-    inputs: [
-      {
-        name: "depositor",
-        type: "address",
-        internalType: "address"
-      }
-    ],
-    outputs: [
-      {
-        name: "amount",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    inputs: [{ name: "depositor", type: "address", internalType: "address" }],
+    outputs: [{ name: "amount", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
@@ -329,46 +221,18 @@ export const abi = [
       }
     ],
     outputs: [
-      {
-        name: "balance",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "owner",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "delegatee",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "beneficiary",
-        type: "address",
-        internalType: "address"
-      }
+      { name: "balance", type: "uint256", internalType: "uint256" },
+      { name: "owner", type: "address", internalType: "address" },
+      { name: "delegatee", type: "address", internalType: "address" },
+      { name: "beneficiary", type: "address", internalType: "address" }
     ],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "earningPower",
-    inputs: [
-      {
-        name: "beneficiary",
-        type: "address",
-        internalType: "address"
-      }
-    ],
-    outputs: [
-      {
-        name: "amount",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    inputs: [{ name: "beneficiary", type: "address", internalType: "address" }],
+    outputs: [{ name: "amount", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
@@ -376,36 +240,16 @@ export const abi = [
     name: "eip712Domain",
     inputs: [],
     outputs: [
-      {
-        name: "fields",
-        type: "bytes1",
-        internalType: "bytes1"
-      },
-      {
-        name: "name",
-        type: "string",
-        internalType: "string"
-      },
-      {
-        name: "version",
-        type: "string",
-        internalType: "string"
-      },
-      {
-        name: "chainId",
-        type: "uint256",
-        internalType: "uint256"
-      },
+      { name: "fields", type: "bytes1", internalType: "bytes1" },
+      { name: "name", type: "string", internalType: "string" },
+      { name: "version", type: "string", internalType: "string" },
+      { name: "chainId", type: "uint256", internalType: "uint256" },
       {
         name: "verifyingContract",
         type: "address",
         internalType: "address"
       },
-      {
-        name: "salt",
-        type: "bytes32",
-        internalType: "bytes32"
-      },
+      { name: "salt", type: "bytes32", internalType: "bytes32" },
       {
         name: "extensions",
         type: "uint256[]",
@@ -424,89 +268,41 @@ export const abi = [
         internalType: "address"
       }
     ],
-    outputs: [
-      {
-        name: "",
-        type: "bool",
-        internalType: "bool"
-      }
-    ],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "lastCheckpointTime",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "lastTimeRewardDistributed",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "multicall",
-    inputs: [
-      {
-        name: "data",
-        type: "bytes[]",
-        internalType: "bytes[]"
-      }
-    ],
-    outputs: [
-      {
-        name: "results",
-        type: "bytes[]",
-        internalType: "bytes[]"
-      }
-    ],
+    inputs: [{ name: "data", type: "bytes[]", internalType: "bytes[]" }],
+    outputs: [{ name: "results", type: "bytes[]", internalType: "bytes[]" }],
     stateMutability: "nonpayable"
   },
   {
     type: "function",
     name: "nonces",
-    inputs: [
-      {
-        name: "owner",
-        type: "address",
-        internalType: "address"
-      }
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    inputs: [{ name: "owner", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "notifyRewardAmount",
-    inputs: [
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    inputs: [{ name: "_amount", type: "uint256", internalType: "uint256" }],
     outputs: [],
     stateMutability: "nonpayable"
   },
@@ -514,41 +310,17 @@ export const abi = [
     type: "function",
     name: "permitAndStake",
     inputs: [
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_delegatee",
-        type: "address",
-        internalType: "address"
-      },
+      { name: "_amount", type: "uint256", internalType: "uint256" },
+      { name: "_delegatee", type: "address", internalType: "address" },
       {
         name: "_beneficiary",
         type: "address",
         internalType: "address"
       },
-      {
-        name: "_deadline",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_v",
-        type: "uint8",
-        internalType: "uint8"
-      },
-      {
-        name: "_r",
-        type: "bytes32",
-        internalType: "bytes32"
-      },
-      {
-        name: "_s",
-        type: "bytes32",
-        internalType: "bytes32"
-      }
+      { name: "_deadline", type: "uint256", internalType: "uint256" },
+      { name: "_v", type: "uint8", internalType: "uint8" },
+      { name: "_r", type: "bytes32", internalType: "bytes32" },
+      { name: "_s", type: "bytes32", internalType: "bytes32" }
     ],
     outputs: [
       {
@@ -568,31 +340,11 @@ export const abi = [
         type: "uint256",
         internalType: "UniStaker.DepositIdentifier"
       },
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_deadline",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_v",
-        type: "uint8",
-        internalType: "uint8"
-      },
-      {
-        name: "_r",
-        type: "bytes32",
-        internalType: "bytes32"
-      },
-      {
-        name: "_s",
-        type: "bytes32",
-        internalType: "bytes32"
-      }
+      { name: "_amount", type: "uint256", internalType: "uint256" },
+      { name: "_deadline", type: "uint256", internalType: "uint256" },
+      { name: "_v", type: "uint8", internalType: "uint8" },
+      { name: "_r", type: "bytes32", internalType: "bytes32" },
+      { name: "_s", type: "bytes32", internalType: "bytes32" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -601,64 +353,34 @@ export const abi = [
     type: "function",
     name: "rewardEndTime",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "rewardPerTokenAccumulated",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "rewardPerTokenAccumulatedCheckpoint",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "scaledRewardRate",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "setAdmin",
-    inputs: [
-      {
-        name: "_newAdmin",
-        type: "address",
-        internalType: "address"
-      }
-    ],
+    inputs: [{ name: "_newAdmin", type: "address", internalType: "address" }],
     outputs: [],
     stateMutability: "nonpayable"
   },
@@ -671,11 +393,7 @@ export const abi = [
         type: "address",
         internalType: "address"
       },
-      {
-        name: "_isEnabled",
-        type: "bool",
-        internalType: "bool"
-      }
+      { name: "_isEnabled", type: "bool", internalType: "bool" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -684,16 +402,8 @@ export const abi = [
     type: "function",
     name: "stake",
     inputs: [
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_delegatee",
-        type: "address",
-        internalType: "address"
-      }
+      { name: "_amount", type: "uint256", internalType: "uint256" },
+      { name: "_delegatee", type: "address", internalType: "address" }
     ],
     outputs: [
       {
@@ -708,21 +418,9 @@ export const abi = [
     type: "function",
     name: "stake",
     inputs: [
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_delegatee",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "_beneficiary",
-        type: "address",
-        internalType: "address"
-      }
+      { name: "_amount", type: "uint256", internalType: "uint256" },
+      { name: "_delegatee", type: "address", internalType: "address" },
+      { name: "_beneficiary", type: "address", internalType: "address" }
     ],
     outputs: [
       {
@@ -742,11 +440,7 @@ export const abi = [
         type: "uint256",
         internalType: "UniStaker.DepositIdentifier"
       },
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      }
+      { name: "_amount", type: "uint256", internalType: "uint256" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -760,21 +454,9 @@ export const abi = [
         type: "uint256",
         internalType: "UniStaker.DepositIdentifier"
       },
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_depositor",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "_signature",
-        type: "bytes",
-        internalType: "bytes"
-      }
+      { name: "_amount", type: "uint256", internalType: "uint256" },
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_signature", type: "bytes", internalType: "bytes" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -783,31 +465,15 @@ export const abi = [
     type: "function",
     name: "stakeOnBehalf",
     inputs: [
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_delegatee",
-        type: "address",
-        internalType: "address"
-      },
+      { name: "_amount", type: "uint256", internalType: "uint256" },
+      { name: "_delegatee", type: "address", internalType: "address" },
       {
         name: "_beneficiary",
         type: "address",
         internalType: "address"
       },
-      {
-        name: "_depositor",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "_signature",
-        type: "bytes",
-        internalType: "bytes"
-      }
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_signature", type: "bytes", internalType: "bytes" }
     ],
     outputs: [
       {
@@ -821,13 +487,7 @@ export const abi = [
   {
     type: "function",
     name: "surrogates",
-    inputs: [
-      {
-        name: "delegatee",
-        type: "address",
-        internalType: "address"
-      }
-    ],
+    inputs: [{ name: "delegatee", type: "address", internalType: "address" }],
     outputs: [
       {
         name: "surrogate",
@@ -841,51 +501,21 @@ export const abi = [
     type: "function",
     name: "totalStaked",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "unclaimedReward",
-    inputs: [
-      {
-        name: "_beneficiary",
-        type: "address",
-        internalType: "address"
-      }
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    inputs: [{ name: "_beneficiary", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
     type: "function",
     name: "unclaimedRewardCheckpoint",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        internalType: "address"
-      }
-    ],
-    outputs: [
-      {
-        name: "amount",
-        type: "uint256",
-        internalType: "uint256"
-      }
-    ],
+    inputs: [{ name: "account", type: "address", internalType: "address" }],
+    outputs: [{ name: "amount", type: "uint256", internalType: "uint256" }],
     stateMutability: "view"
   },
   {
@@ -897,11 +527,7 @@ export const abi = [
         type: "uint256",
         internalType: "UniStaker.DepositIdentifier"
       },
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      }
+      { name: "_amount", type: "uint256", internalType: "uint256" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -915,21 +541,9 @@ export const abi = [
         type: "uint256",
         internalType: "UniStaker.DepositIdentifier"
       },
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256"
-      },
-      {
-        name: "_depositor",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "_signature",
-        type: "bytes",
-        internalType: "bytes"
-      }
+      { name: "_amount", type: "uint256", internalType: "uint256" },
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_signature", type: "bytes", internalType: "bytes" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -1144,107 +758,47 @@ export const abi = [
   {
     type: "error",
     name: "AddressEmptyCode",
-    inputs: [
-      {
-        name: "target",
-        type: "address",
-        internalType: "address"
-      }
-    ]
+    inputs: [{ name: "target", type: "address", internalType: "address" }]
   },
   {
     type: "error",
     name: "AddressInsufficientBalance",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        internalType: "address"
-      }
-    ]
+    inputs: [{ name: "account", type: "address", internalType: "address" }]
   },
-  {
-    type: "error",
-    name: "FailedInnerCall",
-    inputs: []
-  },
+  { type: "error", name: "FailedInnerCall", inputs: [] },
   {
     type: "error",
     name: "InvalidAccountNonce",
     inputs: [
-      {
-        name: "account",
-        type: "address",
-        internalType: "address"
-      },
-      {
-        name: "currentNonce",
-        type: "uint256",
-        internalType: "uint256"
-      }
+      { name: "account", type: "address", internalType: "address" },
+      { name: "currentNonce", type: "uint256", internalType: "uint256" }
     ]
   },
-  {
-    type: "error",
-    name: "InvalidShortString",
-    inputs: []
-  },
+  { type: "error", name: "InvalidShortString", inputs: [] },
   {
     type: "error",
     name: "SafeERC20FailedOperation",
-    inputs: [
-      {
-        name: "token",
-        type: "address",
-        internalType: "address"
-      }
-    ]
+    inputs: [{ name: "token", type: "address", internalType: "address" }]
   },
   {
     type: "error",
     name: "StringTooLong",
-    inputs: [
-      {
-        name: "str",
-        type: "string",
-        internalType: "string"
-      }
-    ]
+    inputs: [{ name: "str", type: "string", internalType: "string" }]
   },
   {
     type: "error",
     name: "UniStaker__InsufficientRewardBalance",
     inputs: []
   },
-  {
-    type: "error",
-    name: "UniStaker__InvalidAddress",
-    inputs: []
-  },
-  {
-    type: "error",
-    name: "UniStaker__InvalidRewardRate",
-    inputs: []
-  },
-  {
-    type: "error",
-    name: "UniStaker__InvalidSignature",
-    inputs: []
-  },
+  { type: "error", name: "UniStaker__InvalidAddress", inputs: [] },
+  { type: "error", name: "UniStaker__InvalidRewardRate", inputs: [] },
+  { type: "error", name: "UniStaker__InvalidSignature", inputs: [] },
   {
     type: "error",
     name: "UniStaker__Unauthorized",
     inputs: [
-      {
-        name: "reason",
-        type: "bytes32",
-        internalType: "bytes32"
-      },
-      {
-        name: "caller",
-        type: "address",
-        internalType: "address"
-      }
+      { name: "reason", type: "bytes32", internalType: "bytes32" },
+      { name: "caller", type: "address", internalType: "address" }
     ]
   }
 ] as const

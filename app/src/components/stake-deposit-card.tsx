@@ -9,7 +9,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { UnstakeDialogContent } from "@/components/unstake-dialog"
-import type * as dayjs from "dayjs"
+import { formatDate } from "@/lib/date"
 import { Download, Info, Upload } from "lucide-react"
 import { type Address, isAddressEqual } from "viem"
 import { useAccount } from "wagmi"
@@ -24,8 +24,8 @@ function useStakeDepositCard({ owner }: { owner: Address }) {
 export type StakeDeposit = {
   stakeId: string
   stakedAmount: bigint
-  createdAt: dayjs.Dayjs
-  updatedAt: dayjs.Dayjs
+  createdAt: Date
+  updatedAt: Date
   owner: Address
   beneficiary: Address
   delegatee: Address
@@ -51,10 +51,10 @@ export function StakeDepositCard({
             </div>
           </Badge>
           <Badge className="p-2" variant="secondary">
-            Created {createdAt.format("YYYY-MM-DD HH:mm")}
+            Created {formatDate(createdAt)}
           </Badge>
           <Badge className="p-2" variant="secondary">
-            Last update {updatedAt.format("YYYY-MM-DD HH:mm")}
+            Last update {formatDate(updatedAt)}
           </Badge>
         </div>
         <div className="text-2xl font-semibold">

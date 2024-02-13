@@ -1,6 +1,9 @@
 import { never } from "@/lib/assertion"
+import type { AccountEventsQuery as AccountEventsQueryGenerated } from "@/lib/generated/subgraph/graphql"
 import { AccountEventsQuery } from "@/lib/subgraph/account-events"
+
 import { GraphQLClient } from "graphql-request"
+import { Address } from "viem"
 
 // TODO: Use the "production" subgraph url here when not in development mode.
 const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/staking", {
@@ -22,29 +25,78 @@ export async function GET(request: Request) {
     }
   })
 
-  const parsedAccountEvents = accountEvents.map((accountEvent) => {
+  const history = getHistory(accountEvents)
+
+  return Response.json(history)
+}
+
+type EventType = Exclude<
+  AccountEventsQueryGenerated["accountEvents"][number]["event"]["__typename"],
+  "RewardNotified" | "SurrogateDeployed" | undefined
+>
+
+type SameKeyAndValue<T extends string> = { [K in T]: K }
+
+const EventTypes: SameKeyAndValue<EventType> = {
+  BeneficiaryAltered: "BeneficiaryAltered",
+  StakeDeposited: "StakeDeposited",
+  StakeWithdrawn: "StakeWithdrawn",
+  DelegateeAltered: "DelegateeAltered",
+  RewardClaimed: "RewardClaimed"
+} as const
+
+type HistoryItem = {
+  date: Date
+  id: string
+} & (
+  | { type: typeof EventTypes.StakeDeposited; amount: bigint; owner: Address; stakeId: string }
+  | { type: typeof EventTypes.StakeWithdrawn; amount: bigint; owner: Address; stakeId: string }
+  | {
+      type: typeof EventTypes.BeneficiaryAltered
+      oldBeneficiary: Address
+      newBeneficiary: Address
+      owner: Address
+      stakeId: string
+    }
+  | {
+      type: typeof EventTypes.DelegateeAltered
+      oldDelegatee: Address
+      newDelegatee: Address
+      owner: Address
+      stakeId: string
+    }
+  | { type: typeof EventTypes.RewardClaimed; beneficiary: Address; amount: bigint }
+)
+
+export type GetHistoryResponse = ReturnType<typeof getHistory>
+
+function getHistory(accountEvents: AccountEventsQueryGenerated["accountEvents"]) {
+  const history: HistoryItem[] = []
+  for (const accountEvent of accountEvents) {
     const eventTypename = accountEvent.event.__typename
     switch (eventTypename) {
       case "StakeDeposited":
-        return {
+        history.push({
           stakeId: accountEvent.event.deposit.id,
           amount: accountEvent.event.amount,
           date: accountEvent.event.blockTimestamp,
           owner: accountEvent.event.deposit.owner.id,
           id: accountEvent.event.id,
           type: eventTypename
-        }
+        })
+        break
       case "StakeWithdrawn":
-        return {
+        history.push({
           stakeId: accountEvent.event.deposit.id,
           amount: accountEvent.event.amount,
           date: accountEvent.event.blockTimestamp,
           owner: accountEvent.event.deposit.owner.id,
           id: accountEvent.event.id,
           type: eventTypename
-        }
+        })
+        break
       case "BeneficiaryAltered":
-        return {
+        history.push({
           stakeId: accountEvent.event.deposit.id,
           owner: accountEvent.event.deposit.owner.id,
           date: accountEvent.event.blockTimestamp,
@@ -52,9 +104,10 @@ export async function GET(request: Request) {
           newBeneficiary: accountEvent.event.newBeneficiary,
           id: accountEvent.event.id,
           type: eventTypename
-        }
+        })
+        break
       case "DelegateeAltered":
-        return {
+        history.push({
           stakeId: accountEvent.event.deposit.id,
           owner: accountEvent.event.deposit.owner.id,
           date: accountEvent.event.blockTimestamp,
@@ -62,25 +115,26 @@ export async function GET(request: Request) {
           newDelegatee: accountEvent.event.newDelegatee,
           id: accountEvent.event.id,
           type: eventTypename
-        }
+        })
+        break
       case "RewardClaimed":
-        return {
+        history.push({
           date: accountEvent.event.blockTimestamp,
           beneficiary: accountEvent.event.beneficiary,
           amount: accountEvent.event.amount,
           id: accountEvent.event.id,
           type: eventTypename
-        }
+        })
+        break
       case "RewardNotified":
       case "SurrogateDeployed":
       case undefined:
-        return new Response(null, { status: 500 })
+        break
       default:
         never(eventTypename, `Unhandled event type for route ${eventTypename}`)
     }
-  })
-
-  return Response.json(parsedAccountEvents)
+  }
+  return history
 }
 
 export const runtime = "edge"

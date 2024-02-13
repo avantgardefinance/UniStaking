@@ -1,11 +1,10 @@
 "use client"
 
-import { HistoryCard } from "@/components/history-card"
-import type { HistoryItem } from "@/components/history-card"
+import { GetHistoryResponse } from "@/app/api/history/route"
+import { HistoryCard, HistoryItem } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { useQuery } from "@tanstack/react-query"
-import * as dayjs from "dayjs"
 import { useState } from "react"
 import { useAccount } from "wagmi"
 
@@ -22,12 +21,12 @@ function useHistoryList() {
   })
 
   // TODO improve types
-  const parsedData: Array<HistoryItem> =
+  const parsedData: GetHistoryResponse =
     data?.map((event: any) => {
       return {
         ...event,
         amount: event.amount === undefined ? undefined : BigInt(event.amount),
-        date: dayjs.unix(event.date)
+        date: new Date(event.date * 1000)
       }
     }) ?? []
 

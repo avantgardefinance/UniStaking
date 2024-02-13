@@ -20,7 +20,7 @@ function useStakeCardRewards() {
   } = useReadContract({
     address: uniStaker,
     abi: abiUniStaker,
-    functionName: "earned",
+    functionName: "unclaimedReward",
     args: account.address === undefined ? undefined : [account.address]
   })
 

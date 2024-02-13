@@ -9,19 +9,17 @@ import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTit
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { abi as abiIERC20 } from "@/lib/abi/erc-20"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
 import { useTallyDelegates } from "@/lib/hooks/use-tally-delegates"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
-import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
 import { Download, Info, RotateCw } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, isAddressEqual, parseAbi, parseUnits } from "viem"
-import { useAccount, useChainId, useReadContract } from "wagmi"
+import { useAccount, useChainId } from "wagmi"
 import { getTransactionCount, readContract, signTypedData } from "wagmi/actions"
 
 const useStakeDialog = ({
@@ -40,26 +38,8 @@ const useStakeDialog = ({
   const [error, setError] = useState<Error>()
 
   const { error: errorTallyDelegatees, isLoading: isLoadingTallyDelegatees, tallyDelegatees } = useTallyDelegates()
-  const { data: allowance, queryKey: queryKeyAllowance } = useReadContract({
-    address: governanceToken,
-    abi: abiIERC20,
-    functionName: "allowance",
-    args: account.address === undefined ? undefined : [account.address, uniStaker]
-  })
 
-  const queryClient = useQueryClient()
-  const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    writeContract
-  } = useWriteContractWithToast({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
-        setSignatureInfo(undefined)
-      }
-    }
-  })
+  const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
 
   const form = useForm({
     defaultValues: {
@@ -75,10 +55,7 @@ const useStakeDialog = ({
 
   const [amount] = watch(["amount"])
 
-  const hasEnoughAllowance = allowance !== undefined && parseUnits(amount, 18) <= allowance
-
-  const hasSignedEnoughValue =
-    allowance !== undefined && signatureInfo !== undefined && parseUnits(amount, 18) <= signatureInfo.value
+  const hasSignedEnoughValue = signatureInfo !== undefined && parseUnits(amount, 18) <= signatureInfo.value
 
   const onSubmit = async (values: {
     beneficiary: Address | undefined
@@ -91,16 +68,6 @@ const useStakeDialog = ({
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
 
     if (values.beneficiary === undefined || delegatee === undefined || account.address === undefined) {
-      return
-    }
-
-    if (hasEnoughAllowance) {
-      writeContract({
-        address: uniStaker,
-        abi: abiUniStaker,
-        functionName: "stake",
-        args: [parseUnits(values.amount, 18), delegatee, values.beneficiary]
-      })
       return
     }
 
@@ -188,8 +155,8 @@ const useStakeDialog = ({
 
   return {
     form,
+    hasSignedEnoughValue,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    hasEnoughAllowance,
     error: errorWrite || errorTallyDelegatees || error,
     isPending: isPendingWrite,
     setMaxAmount,
@@ -202,12 +169,12 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
   const {
     error,
     form,
-    hasEnoughAllowance,
     isLoadingTallyDelegatees,
     isPending,
     onSubmit,
     setMaxAmount,
-    tallyDelegatees
+    tallyDelegatees,
+    hasSignedEnoughValue
   } = useStakeDialog({
     availableForStakingUni
   })
@@ -292,11 +259,9 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
                 <AlertDescription className="break-all">{error.message}</AlertDescription>
               </Alert>
             )}
-            {hasEnoughAllowance ? null : (
+            {hasSignedEnoughValue ? null : (
               <Alert>
-                <AlertDescription>
-                  You don&apos;t have enough allowance to stake this amount. Please approve first.
-                </AlertDescription>
+                <AlertDescription>You didn&apos;t</AlertDescription>
               </Alert>
             )}
           </div>
@@ -305,11 +270,11 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
             <Button type="submit" className="space-x-2" disabled={isPending}>
               {isPending ? (
                 <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-              ) : hasEnoughAllowance ? (
+              ) : hasSignedEnoughValue ? (
                 <Download size={16} />
               ) : null}
 
-              {hasEnoughAllowance ? <span>Stake</span> : <span>Permit</span>}
+              {hasSignedEnoughValue ? <span>Stake</span> : <span>Permit</span>}
             </Button>
           </DialogFooter>
         </form>

@@ -5,7 +5,7 @@ import { HistoryCard, HistoryItem } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { useQuery } from "@tanstack/react-query"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useAccount } from "wagmi"
 
 function useHistoryList() {
@@ -51,22 +51,30 @@ export function HistoryList() {
   return <List items={data} />
 }
 
-function useList({ items }: { items: HistoryItem[] }) {
-  const initialItems = 20
-  const [historyToDisplay, setHistoryToDisplaya] = useState(items.slice(0, initialItems))
+function useList(items: HistoryItem[]) {
+  const initialLimit = 20
+  const [limit, setLimit] = useState(initialLimit)
 
-  const canLoadMore = historyToDisplay.length < items.length
+  const canShowMore = initialLimit < items.length
 
-  const loadMoreItems = 10
-  const loadMore = () => {
-    setHistoryToDisplaya(items.slice(0, historyToDisplay.length + loadMoreItems))
+  const showMoreItems = 10
+  const showMore = () => {
+    setLimit(limit + showMoreItems)
   }
 
-  return { historyToDisplay, canLoadMore, loadMore }
+  const historyToDisplay = useMemo(() => items.slice(0, limit), [items, limit])
+
+  const account = useAccount()
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    setLimit(initialLimit)
+  }, [account.address])
+
+  return { historyToDisplay, canShowMore: canShowMore, showMore }
 }
 
 function List({ items }: { items: HistoryItem[] }) {
-  const { historyToDisplay, canLoadMore, loadMore } = useList({ items })
+  const { historyToDisplay, canShowMore, showMore } = useList(items)
 
   return (
     <div className="flex items-center flex-col space-y-4">
@@ -75,7 +83,7 @@ function List({ items }: { items: HistoryItem[] }) {
           <HistoryCard key={item.id} {...item} />
         ))}
       </div>
-      {canLoadMore && <Button onClick={loadMore}>Load more</Button>}
+      {canShowMore && <Button onClick={showMore}>Load more</Button>}
     </div>
   )
 }

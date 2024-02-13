@@ -9,7 +9,7 @@ import * as dayjs from "dayjs"
 import { useState } from "react"
 import { useAccount } from "wagmi"
 
-function useHistoryListWrapper() {
+function useHistoryList() {
   const account = useAccount()
 
   const { data, error, isLoading } = useQuery({
@@ -38,8 +38,8 @@ function useHistoryListWrapper() {
   }
 }
 
-export function HistoryListWrapper() {
-  const { data, error, isLoading } = useHistoryListWrapper()
+export function HistoryList() {
+  const { data, error, isLoading } = useHistoryList()
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -49,10 +49,10 @@ export function HistoryListWrapper() {
     return <Alert variant="destructive">{error.message}</Alert>
   }
 
-  return <HistoryList items={data} />
+  return <List items={data} />
 }
 
-function useHistoryList({ items }: { items: HistoryItem[] }) {
+function useList({ items }: { items: HistoryItem[] }) {
   const initialItems = 20
   const [historyToDisplay, setHistoryToDisplaya] = useState(items.slice(0, initialItems))
 
@@ -66,8 +66,8 @@ function useHistoryList({ items }: { items: HistoryItem[] }) {
   return { historyToDisplay, canLoadMore, loadMore }
 }
 
-function HistoryList({ items }: { items: HistoryItem[] }) {
-  const { historyToDisplay, canLoadMore, loadMore } = useHistoryList({ items })
+function List({ items }: { items: HistoryItem[] }) {
+  const { historyToDisplay, canLoadMore, loadMore } = useList({ items })
 
   return (
     <div className="flex items-center flex-col space-y-4">

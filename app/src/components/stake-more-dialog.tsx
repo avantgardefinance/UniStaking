@@ -23,7 +23,7 @@ const useStakeMoreDialog = ({
   stakeId
 }: {
   availableForStakingUni: bigint
-  stakeId: bigint
+  stakeId: string
 }) => {
   const account = useAccount()
 
@@ -65,7 +65,7 @@ const useStakeMoreDialog = ({
         address: uniStaker,
         abi: abiUniStaker,
         functionName: "stakeMore",
-        args: [stakeId, parseUnits(values.amount, 18)]
+        args: [BigInt(stakeId), parseUnits(values.amount, 18)]
       })
     } else {
       writeContract({
@@ -96,7 +96,7 @@ export function StakeMoreDialogContent({
   stakeId
 }: {
   availableForStakingUni: bigint
-  stakeId: bigint
+  stakeId: string
   delegatee: Address
   beneficiary: Address
 }) {
@@ -145,7 +145,7 @@ export function StakeMoreDialogContent({
             <div className="space-y-2">
               <div className="flex flex-col space-y-2">
                 <span>ID</span>
-                <span>{stakeId.toString()}</span>
+                <span>{stakeId}</span>
               </div>
               <Separator />
               <div className="flex flex-col space-y-2">

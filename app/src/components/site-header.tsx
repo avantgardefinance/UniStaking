@@ -10,7 +10,7 @@ import Link from "next/link"
 export function SiteHeader() {
   return (
     <header className="bg-background sticky top-0 z-40 w-full">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+      <div className="flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
         <Link href="/" className="flex items-center space-x-2">
           <Logo className="size-6" />
         </Link>

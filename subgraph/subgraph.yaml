@@ -33,9 +33,9 @@ dataSources:
           handler: handleDelegateeAltered
         - event: RewardClaimed(indexed address,uint256)
           handler: handleRewardClaimed
-        - event: RewardNotified(uint256)
+        - event: RewardNotified(uint256,address)
           handler: handleRewardNotified
-        - event: StakeDeposited(indexed uint256,uint256,uint256)
+        - event: StakeDeposited(address,indexed uint256,uint256,uint256)
           handler: handleStakeDeposited
         - event: StakeWithdrawn(indexed uint256,uint256,uint256)
           handler: handleStakeWithdrawn

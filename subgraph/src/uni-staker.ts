@@ -30,6 +30,7 @@ function eventId(event: ethereum.Event): Bytes {
 export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   const deposit = getDeposit(event.params.depositId)
   deposit.beneficiary = getOrCreateAccount(event.params.newBeneficiary, event).id
+  deposit.updatedAt = event.block.timestamp.toI32()
   deposit.save()
 
   const entityId = eventId(event)
@@ -55,6 +56,7 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
 export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   const deposit = getDeposit(event.params.depositId)
   deposit.delegatee = getOrCreateAccount(event.params.newDelegatee, event).id
+  deposit.updatedAt = event.block.timestamp.toI32()
   deposit.save()
 
   const entityId = eventId(event)
@@ -111,6 +113,7 @@ export function handleRewardNotified(event: RewardNotifiedEvent): void {
 export function handleStakeDeposited(event: StakeDepositedEvent): void {
   const deposit = getOrCreateDeposit(event.params.depositId, event)
   deposit.amount = deposit.amount.plus(event.params.amount)
+  deposit.updatedAt = event.block.timestamp.toI32()
   deposit.save()
 
   const entityId = eventId(event)
@@ -139,6 +142,7 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
 export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   const deposit = getDeposit(event.params.depositId)
   deposit.amount = deposit.amount.minus(event.params.amount)
+  deposit.updatedAt = event.block.timestamp.toI32()
   deposit.save()
 
   const entityId = eventId(event)

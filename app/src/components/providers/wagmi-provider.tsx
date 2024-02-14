@@ -6,7 +6,7 @@ import { ConnectKitProvider, getDefaultConfig } from "connectkit"
 import type { ReactNode } from "react"
 import { http, WagmiProvider as WagmiProviderBase, createConfig } from "wagmi"
 
-const config = createConfig(
+export const config = createConfig(
   getDefaultConfig({
     chains: [chain],
     transports: {

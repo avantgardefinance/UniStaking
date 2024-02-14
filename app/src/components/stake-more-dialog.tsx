@@ -1,5 +1,6 @@
 "use client"
 
+import { config } from "@/components/providers/wagmi-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
@@ -7,16 +8,17 @@ import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTit
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { abi as abiIERC20 } from "@/lib/abi/erc-20"
+import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { governanceToken, uniStaker } from "@/lib/consts"
+import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
-import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
-import type { Address } from "viem"
-import { formatUnits, parseUnits } from "viem"
-import { useAccount, useReadContract } from "wagmi"
+import type { Address, Hex } from "viem"
+import { formatUnits, hexToSignature, isAddressEqual, parseUnits } from "viem"
+import { useAccount, useChainId } from "wagmi"
+import { readContract, signTypedData } from "wagmi/actions"
 
 const useStakeMoreDialog = ({
   availableForStakingUni,
@@ -26,24 +28,17 @@ const useStakeMoreDialog = ({
   stakeId: string
 }) => {
   const account = useAccount()
+  const chainId = useChainId()
 
-  const { data: allowance, queryKey: queryKeyAllowance } = useReadContract({
-    address: governanceToken,
-    abi: abiIERC20,
-    functionName: "allowance",
-    args: account.address === undefined ? undefined : [account.address, uniStaker]
-  })
+  const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
 
-  const queryClient = useQueryClient()
-  const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    writeContract
-  } = useWriteContractWithToast({
-    mutation: {
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeyAllowance })
-    }
-  })
+  const [signatureInfo, setSignatureInfo] = useState<{
+    signature: Hex
+    deadline: bigint
+    owner: Address
+    value: bigint
+  }>()
+  const [error, setError] = useState<Error>()
 
   const form = useForm({
     defaultValues: {
@@ -55,25 +50,78 @@ const useStakeMoreDialog = ({
 
   const amount = watch("amount")
 
-  const hasEnoughAllowance = allowance !== undefined && parseUnits(amount, 18) <= allowance
+  const hasSignedEnoughValue = signatureInfo !== undefined && parseUnits(amount, 18) <= signatureInfo.value
 
-  const onSubmit = (values: {
+  const onSubmit = async (values: {
     amount: string
   }) => {
-    if (hasEnoughAllowance) {
+    if (account.address === undefined) {
+      return
+    }
+
+    if (hasSignedEnoughValue) {
+      const deadlineTimestamp = Number(signatureInfo.deadline) * 1000
+      if (deadlineTimestamp < new Date().getTime()) {
+        setSignatureInfo(undefined)
+        setError(new Error("Singature expired"))
+        return
+      }
+      if (!isAddressEqual(signatureInfo.owner, account.address)) {
+        setSignatureInfo(undefined)
+        setError(new Error("Invalid signature owner"))
+        return
+      }
+
+      const { v, r, s } = hexToSignature(signatureInfo.signature)
       writeContract({
         address: uniStaker,
         abi: abiUniStaker,
-        functionName: "stakeMore",
-        args: [BigInt(stakeId), parseUnits(values.amount, 18)]
+        functionName: "permitAndStakeMore",
+        args: [BigInt(stakeId), parseUnits(values.amount, 18), signatureInfo.deadline, Number(v), r, s]
       })
     } else {
-      writeContract({
-        address: governanceToken,
-        abi: abiIERC20,
-        functionName: "approve",
-        args: [uniStaker, parseUnits(values.amount, 18)]
-      })
+      try {
+        const nonce = await readContract(config, {
+          address: governanceToken,
+          abi: uniAbi,
+          functionName: "nonces",
+          args: [account.address]
+        })
+
+        const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
+
+        const value = parseUnits(values.amount, 18)
+
+        const permitSignature = await signTypedData(config, {
+          account: account.address,
+          types: permitEIP712Options.permitTypes,
+          domain: {
+            ...permitEIP712Options.domainBase,
+            chainId: chainId
+          },
+          primaryType: permitEIP712Options.primaryType,
+          message: {
+            owner: account.address,
+            spender: uniStaker,
+            value,
+            nonce: nonce,
+            deadline: signedDeadline
+          }
+        })
+
+        setSignatureInfo({
+          signature: permitSignature,
+          deadline: signedDeadline,
+          owner: account.address,
+          value
+        })
+      } catch (e) {
+        if (e instanceof Error) {
+          setError(e)
+        } else {
+          setError(new Error("Something went wrong"))
+        }
+      }
     }
   }
 
@@ -82,8 +130,8 @@ const useStakeMoreDialog = ({
   return {
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    hasEnoughAllowance,
-    error: errorWrite,
+    hasSignedEnoughValue,
+    error: errorWrite ?? error,
     isPending: isPendingWrite,
     setMaxAmount
   }
@@ -100,7 +148,7 @@ export function StakeMoreDialogContent({
   delegatee: Address
   beneficiary: Address
 }) {
-  const { error, form, hasEnoughAllowance, isPending, onSubmit, setMaxAmount } = useStakeMoreDialog({
+  const { error, form, hasSignedEnoughValue, isPending, onSubmit, setMaxAmount } = useStakeMoreDialog({
     availableForStakingUni,
     stakeId
   })
@@ -165,10 +213,10 @@ export function StakeMoreDialogContent({
                 <AlertDescription className="break-all">{error.message}</AlertDescription>
               </Alert>
             )}
-            {hasEnoughAllowance ? null : (
+            {hasSignedEnoughValue ? null : (
               <Alert>
                 <AlertDescription>
-                  You don&apos;t have enough allowance to stake this amount. Please approve first.
+                  You didn&apos;t permit enough value to stake this amount. Please permit first.
                 </AlertDescription>
               </Alert>
             )}
@@ -178,11 +226,11 @@ export function StakeMoreDialogContent({
             <Button type="submit" className="space-x-2" disabled={isPending}>
               {isPending ? (
                 <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-              ) : hasEnoughAllowance ? (
+              ) : hasSignedEnoughValue ? (
                 <Download size={16} />
               ) : null}
 
-              {hasEnoughAllowance ? <span>Stake</span> : <span>Approve</span>}
+              {hasSignedEnoughValue ? <span>Stake</span> : <span>Permit</span>}
             </Button>
           </DialogFooter>
         </form>

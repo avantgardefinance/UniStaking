@@ -11,11 +11,11 @@ import { Plus } from "lucide-react"
 
 export function AvailableUniForStaking() {
   return (
-    <Card className="flex-1">
+    <Card className="flex-1 flex justify-between flex-col">
       <CardHeader>
         <CardDescription className="text-base font-medium">Available for staking</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-between space-x-2 text-2xl font-semibold">
+      <CardContent className="flex items-center justify-between flex-wrap gap-2">
         <NoSsr>
           <AvailableUniForStakingContent />
         </NoSsr>
@@ -41,15 +41,15 @@ function AvailableUniForStakingContent() {
 
   return (
     <>
-      <h3 className="space-x-2">
-        <span>
+      <h3 className="space-x-2 flex-grow">
+        <span className="text-2xl font-semibold">
           <BigIntDisplay value={data.value} decimals={data.decimals} precision={2} />
         </span>
-        <span>UNI</span>
+        <span className="text-xl">UNI</span>
       </h3>
       <Dialog>
         <DialogTrigger asChild>
-          <Button size="lg" className="space-x-2">
+          <Button size="lg" className="space-x-2 flex-grow">
             <Plus size={16} />
             <span>Create position</span>
           </Button>

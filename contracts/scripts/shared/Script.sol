@@ -25,8 +25,7 @@ abstract contract Script is StdCheats, ForgeScript {
         vm.computeCreate2Address(
             0,
             hashInitCode(
-                type(Uni).creationCode,
-                abi.encode(GOVERNANCE_TOKEN_MINTER.addr, GOVERNANCE_TOKEN_MINTER.addr, 0)
+                type(Uni).creationCode, abi.encode(GOVERNANCE_TOKEN_MINTER.addr, GOVERNANCE_TOKEN_MINTER.addr, 0)
             )
         )
     );

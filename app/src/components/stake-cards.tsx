@@ -13,14 +13,16 @@ export function StakeCards({
     <div className="space-y-2">
       <h2 className="text-3xl font-bold">Stake</h2>
       <div className="flex flex-row flex-wrap gap-8">
-        <Card className="flex-1">
+        <Card className="flex-1 flex justify-between flex-col">
           <CardHeader>
             <CardDescription className="text-base font-medium">Total Staked</CardDescription>
           </CardHeader>
-          <CardContent className="space-x-2 text-2xl font-semibold">
+          <CardContent>
             <h3 className="space-x-2">
-              <BigIntDisplay value={totalStakedUni} decimals={18} precision={2} />
-              <span>UNI</span>
+              <span className="text-2xl font-semibold">
+                <BigIntDisplay value={totalStakedUni} decimals={18} precision={2} />
+              </span>
+              <span className="text-xl">UNI</span>
             </h3>
           </CardContent>
         </Card>

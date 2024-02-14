@@ -1,6 +1,7 @@
 "use client"
 
 import { config } from "@/components/providers/wagmi-provider"
+import { AddressDisplay } from "@/components/ui/address-display"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
@@ -198,12 +199,12 @@ export function StakeMoreDialogContent({
               <Separator />
               <div className="flex flex-col space-y-2">
                 <span>Delegatee</span>
-                <span>{delegatee}</span>
+                <AddressDisplay value={delegatee} />
               </div>
               <Separator />
               <div className="flex flex-col space-y-2">
                 <span>Beneficiary</span>
-                <span>{beneficiary}</span>
+                <AddressDisplay value={beneficiary} />
               </div>
             </div>
 

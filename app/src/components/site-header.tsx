@@ -9,14 +9,14 @@ import Link from "next/link"
 
 export function SiteHeader() {
   return (
-    <header className="bg-background sticky top-0 z-40 w-full">
-      <div className="flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+    <header className="bg-background w-full">
+      <div className="flex items-center space-x-4 sm:justify-between sm:space-x-0 flex-wrap">
         <Link href="/" className="flex items-center space-x-2">
           <Logo className="size-6" />
         </Link>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <nav className="flex items-center space-x-1">
-            <ConnectButton />
+        <nav className="flex flex-1 items-center gap-2 flex-wrap justify-end">
+          <ConnectButton />
+          <div className="flex gap-2">
             <Link href="/">
               <div
                 className={cn(
@@ -45,8 +45,8 @@ export function SiteHeader() {
             </Link>
 
             <ThemeToggle />
-          </nav>
-        </div>
+          </div>
+        </nav>
       </div>
     </header>
   )

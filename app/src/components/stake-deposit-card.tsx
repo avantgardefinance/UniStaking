@@ -42,28 +42,31 @@ export function StakeDepositCard({
   const { isOwner } = useStakeDepositCard({ owner })
   return (
     <Card>
-      <CardHeader className="flex flex-row justify-between">
-        <div className="space-x-2">
-          <Badge className="p-2">ID #{stakeId}</Badge>
-          <Badge className="p-2">
+      <CardHeader className="flex flex-row justify-between flex-wrap">
+        <div className="flex gap-2 flex-wrap">
+          <Badge className="md:p-2">ID #{stakeId}</Badge>
+          <Badge className="md:p-2">
             <div className="flex items-center space-x-2">
               <span>Owner</span> <AddressDisplay iconSize={12} value={owner} />
             </div>
           </Badge>
-          <Badge className="p-2" variant="secondary">
+          <Badge className="md:p-2" variant="secondary">
             Created {formatDate(createdAt)}
           </Badge>
-          <Badge className="p-2" variant="secondary">
+          <Badge className="md:p-2" variant="secondary">
             Last update {formatDate(updatedAt)}
           </Badge>
         </div>
-        <div className="text-2xl font-semibold">
-          <BigIntDisplay value={stakedAmount} decimals={18} precision={2} /> <span>UNI</span>
+        <div className="space-x-2 flex items-baseline">
+          <span className="text-2xl font-semibold">
+            <BigIntDisplay value={stakedAmount} decimals={18} precision={2} />
+          </span>
+          <span className="text-xl">UNI</span>
         </div>
       </CardHeader>
       <Separator className="mb-4" />
-      <CardContent className="flex flex-row items-center justify-between">
-        <div className="flex flex-row items-end space-x-4">
+      <CardContent className="flex flex-row items-center justify-between flex-wrap gap-2">
+        <div className="flex flex-row items-end space-x-4 flex-wrap">
           <div>
             <span>Delegatee</span>
             <AddressDisplay value={delegatee} />
@@ -85,12 +88,12 @@ export function StakeDepositCard({
             </Dialog>
           )}
         </div>
-        <div className="flex flex-row items-center space-x-4">
+        <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
           {isOwner ? (
             <>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" className="space-x-2">
+                  <Button variant="ghost" className="space-x-2 w-full md:w-auto">
                     <Upload size={16} />
                     <span>Unstake</span>
                   </Button>
@@ -104,7 +107,11 @@ export function StakeDepositCard({
               </Dialog>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="secondary" disabled={governanceTokenBalanceValue === 0n} className="space-x-2">
+                  <Button
+                    variant="secondary"
+                    disabled={governanceTokenBalanceValue === 0n}
+                    className="space-x-2 w-full md:w-auto"
+                  >
                     <Download size={16} /> <span>Stake</span>
                   </Button>
                 </DialogTrigger>

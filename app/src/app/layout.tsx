@@ -31,7 +31,7 @@ export default function RootLayout({
       </head>
       <body className={cn("min-h-screen font-sans antialiased", fontSans.variable)}>
         <div className="mx-5 md:mx-20 lg:mx-40">
-          <div className="relative flex min-h-screen flex-col">
+          <div className="relative flex min-h-screen flex-col pt-2">
             <Providers>
               <SiteHeader />
               <div className="flex-1">{children}</div>

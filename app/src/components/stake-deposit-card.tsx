@@ -43,7 +43,7 @@ export function StakeDepositCard({
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between">
-        <div className="space-x-2">
+        <div className="space-x-2 space-y-2">
           <Badge className="p-2">ID #{stakeId}</Badge>
           <Badge className="p-2">
             <div className="flex items-center space-x-2">
@@ -57,12 +57,15 @@ export function StakeDepositCard({
             Last update {formatDate(updatedAt)}
           </Badge>
         </div>
-        <div className="text-2xl font-semibold">
-          <BigIntDisplay value={stakedAmount} decimals={18} precision={2} /> <span>UNI</span>
+        <div className="space-x-2 flex items-baseline">
+          <span className="text-2xl font-semibold">
+            <BigIntDisplay value={stakedAmount} decimals={18} precision={2} />
+          </span>
+          <span className="text-xl">UNI</span>
         </div>
       </CardHeader>
       <Separator className="mb-4" />
-      <CardContent className="flex flex-row items-center justify-between">
+      <CardContent className="flex flex-row items-center justify-between flex-wrap space-y-4">
         <div className="flex flex-row items-end space-x-4">
           <div>
             <span>Delegatee</span>

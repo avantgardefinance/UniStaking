@@ -17,10 +17,12 @@ export function StakeCards({
           <CardHeader>
             <CardDescription className="text-base font-medium">Total Staked</CardDescription>
           </CardHeader>
-          <CardContent className="space-x-2 text-2xl font-semibold">
+          <CardContent>
             <h3 className="space-x-2">
-              <BigIntDisplay value={totalStakedUni} decimals={18} precision={2} />
-              <span>UNI</span>
+              <span className="text-2xl font-semibold">
+                <BigIntDisplay value={totalStakedUni} decimals={18} precision={2} />
+              </span>
+              <span className="text-xl">UNI</span>
             </h3>
           </CardContent>
         </Card>

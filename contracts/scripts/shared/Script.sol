@@ -19,7 +19,7 @@ abstract contract Script is StdCheats, ForgeScript {
     Wallet public DEPLOYER = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 0)), privateKey: vm.deriveKey(MNEMONIC, 0)});
     Wallet public ADMIN = Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 2)), privateKey: vm.deriveKey(MNEMONIC, 2)});
     Wallet public GOVERNANCE_TOKEN_MINTER =
-        Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 3)), privateKey: vm.deriveKey(MNEMONIC, 3)});
+        Wallet({addr: vm.addr(vm.deriveKey(MNEMONIC, 1)), privateKey: vm.deriveKey(MNEMONIC, 1)});
 
     Uni public immutable GOVERNANCE_TOKEN = Uni(
         vm.computeCreate2Address(

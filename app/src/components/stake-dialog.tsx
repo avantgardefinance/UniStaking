@@ -9,6 +9,7 @@ import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTit
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, uniStaker } from "@/lib/consts"
 import { useTallyDelegates } from "@/lib/hooks/use-tally-delegates"
@@ -17,9 +18,9 @@ import { Download, Info, RotateCw } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
-import { formatUnits, hexToSignature, isAddressEqual, parseAbi, parseUnits } from "viem"
-import { useAccount } from "wagmi"
-import { getTransactionCount, readContract, signTypedData } from "wagmi/actions"
+import { formatUnits, hexToSignature, isAddressEqual, parseUnits } from "viem"
+import { useAccount, useChainId } from "wagmi"
+import { readContract, signTypedData } from "wagmi/actions"
 
 const useStakeDialog = ({
   availableForStakingUni
@@ -27,6 +28,8 @@ const useStakeDialog = ({
   availableForStakingUni: bigint
 }) => {
   const account = useAccount()
+  const chainId = useChainId()
+
   const [signatureInfo, setSignatureInfo] = useState<{
     signature: Hex
     deadline: bigint
@@ -92,27 +95,18 @@ const useStakeDialog = ({
       })
     } else {
       try {
-        const [transactionCount, eip712Domain] = await Promise.all([
-          getTransactionCount(config, {
-            address: account.address
-          }),
-          readContract(config, {
-            abi: abiUniStaker,
-            address: uniStaker,
-            functionName: "eip712Domain"
-          })
-        ])
-
-        const [fields, name, version, chainId, verifyingContract, salt] = eip712Domain
-
-        console.log({ eip712Domain })
+        const nonce = await readContract(config, {
+          address: governanceToken,
+          abi: uniAbi,
+          functionName: "nonces",
+          args: [account.address]
+        })
 
         const timeToMakeTransaction = 10 * 60 * 60 // 10 minutes
         const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
 
         const value = parseUnits(values.amount, 18)
 
-        console.log({ account: account.address, name })
         const permitSignature = await signTypedData(config, {
           account: account.address,
           types: {
@@ -125,18 +119,16 @@ const useStakeDialog = ({
             ]
           },
           domain: {
-            name,
-            chainId: Number(chainId),
-            verifyingContract,
-            version,
-            salt
+            name: "Uniswap",
+            chainId: chainId,
+            verifyingContract: governanceToken
           },
           primaryType: "Permit",
           message: {
             owner: account.address,
             spender: uniStaker,
             value,
-            nonce: BigInt(transactionCount),
+            nonce: nonce,
             deadline: signedDeadline
           }
         })

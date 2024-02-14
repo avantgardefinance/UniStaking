@@ -174,7 +174,7 @@ function HistoryCardTemplate({
 }) {
   return (
     <Card>
-      <CardContent className="flex flex-row justify-between p-6 flex-wrap">
+      <CardContent className="flex flex-row justify-between p-6 flex-wrap gap-4">
         <div className="flex flex-col justify-between">
           <h3 className="text-xl font-semibold">{title}</h3>
           <div className="space-x-2">
@@ -205,8 +205,8 @@ function HistoryCardTemplate({
             </Badge>
           </div>
         </div>
-        <Card className="flex">
-          <CardContent className="p-6 min-w-80 min-h-24 flex items-center">
+        <Card className="flex w-full md:w-auto">
+          <CardContent className="w-full md:w-auto p-6 min-w-80 min-h-24 flex items-center">
             <div className="w-full">{children}</div>
           </CardContent>
         </Card>

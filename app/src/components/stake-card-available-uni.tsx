@@ -11,7 +11,7 @@ import { Plus } from "lucide-react"
 
 export function AvailableUniForStaking() {
   return (
-    <Card className="flex-1">
+    <Card className="flex-1 flex justify-between flex-col">
       <CardHeader>
         <CardDescription className="text-base font-medium">Available for staking</CardDescription>
       </CardHeader>

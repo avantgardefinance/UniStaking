@@ -26,7 +26,7 @@ abstract contract Script is StdCheats, ForgeScript {
             0,
             hashInitCode(
                 type(Uni).creationCode,
-                abi.encode(GOVERNANCE_TOKEN_MINTER.addr, GOVERNANCE_TOKEN_MINTER.addr, block.timestamp)
+                abi.encode(GOVERNANCE_TOKEN_MINTER.addr, GOVERNANCE_TOKEN_MINTER.addr, 0)
             )
         )
     );

@@ -107,9 +107,7 @@ const useStakeDialog = ({
 
         const permitSignature = await signTypedData(config, {
           account: account.address,
-          types: {
-            [permitEIP712Options.primaryType]: permitEIP712Options.permitTypes
-          },
+          types: permitEIP712Options.permitTypes,
           domain: {
             ...permitEIP712Options.domainBase,
             chainId: chainId

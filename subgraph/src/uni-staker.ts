@@ -19,7 +19,8 @@ import {
   Surrogate,
   SurrogateDeployed
 } from "../generated/schema"
-import { getOrCreateAccount, trackAccountEvent } from "./account"
+import { arrayUnique } from "../utils/array"
+import { getOrCreateAccount } from "./account"
 import { getDeposit, getOrCreateDeposit } from "./deposit"
 import { trackUniStakerHistory } from "./uni-staker-history"
 
@@ -43,14 +44,13 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
-  entity.save()
-
+  const affacted = [deposit.owner, event.params.newBeneficiary]
   // Only tracking actual changes (beneficiary is initially set to address zero)
   if (event.params.oldBeneficiary.notEqual(Address.zero())) {
-    trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId.toHex())
-    trackAccountEvent(Address.fromBytes(deposit.delegatee), entityId, event.params.depositId.toHex())
-    trackAccountEvent(event.params.newBeneficiary, entityId, event.params.depositId.toHex())
+    affacted.push(event.params.oldBeneficiary)
   }
+  entity.affected = arrayUnique(affacted)
+  entity.save()
 }
 
 export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
@@ -69,14 +69,13 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
-  entity.save()
-
-  // Only tracking actual changes (delegatee is initially set to address zero)
+  const affacted = [deposit.owner, deposit.delegatee]
+  // Only tracking actual changes (beneficiary is initially set to address zero)
   if (event.params.oldDelegatee.notEqual(Address.zero())) {
-    trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId.toHex())
-    trackAccountEvent(event.params.newDelegatee, entityId, event.params.depositId.toHex())
-    trackAccountEvent(Address.fromBytes(deposit.beneficiary), entityId, event.params.depositId.toHex())
+    affacted.push(event.params.oldDelegatee)
   }
+  entity.affected = arrayUnique(affacted)
+  entity.save()
 }
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
@@ -88,13 +87,13 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  entity.affected = [event.params.beneficiary]
   entity.save()
 
   const account = getOrCreateAccount(event.params.beneficiary, event)
   account.claimedRewards = account.claimedRewards.plus(event.params.amount)
   account.save()
 
-  trackAccountEvent(event.params.beneficiary, entityId, null)
   trackUniStakerHistory(BigInt.zero(), BigInt.zero(), BigInt.zero(), event.params.amount, event)
 }
 
@@ -105,6 +104,7 @@ export function handleRewardNotified(event: RewardNotifiedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  entity.affected = []
   entity.save()
 
   trackUniStakerHistory(BigInt.zero(), BigInt.zero(), event.params.amount, BigInt.zero(), event)
@@ -126,6 +126,7 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  entity.affected = arrayUnique([event.params.owner, deposit.delegatee, deposit.beneficiary])
   entity.save()
 
   const account = getOrCreateAccount(Address.fromBytes(deposit.owner), event)
@@ -133,9 +134,6 @@ export function handleStakeDeposited(event: StakeDepositedEvent): void {
   account.currentlyStaked = account.currentlyStaked.plus(event.params.amount)
   account.save()
 
-  trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId.toHex())
-  trackAccountEvent(Address.fromBytes(deposit.delegatee), entityId, event.params.depositId.toHex())
-  trackAccountEvent(Address.fromBytes(deposit.beneficiary), entityId, event.params.depositId.toHex())
   trackUniStakerHistory(event.params.amount, BigInt.zero(), BigInt.zero(), BigInt.zero(), event)
 }
 
@@ -155,6 +153,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  entity.affected = arrayUnique([deposit.owner, deposit.delegatee, deposit.beneficiary])
   entity.save()
 
   const account = getOrCreateAccount(Address.fromBytes(deposit.owner), event)
@@ -162,9 +161,6 @@ export function handleStakeWithdrawn(event: StakeWithdrawnEvent): void {
   account.currentlyStaked = account.currentlyStaked.minus(event.params.amount)
   account.save()
 
-  trackAccountEvent(Address.fromBytes(deposit.owner), entityId, event.params.depositId.toHex())
-  trackAccountEvent(Address.fromBytes(deposit.delegatee), entityId, event.params.depositId.toHex())
-  trackAccountEvent(Address.fromBytes(deposit.beneficiary), entityId, event.params.depositId.toHex())
   trackUniStakerHistory(BigInt.zero(), event.params.amount, BigInt.zero(), BigInt.zero(), event)
 }
 
@@ -176,6 +172,7 @@ export function handleSurrogateDeployed(event: SurrogateDeployedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  entity.affected = []
   entity.save()
 
   const surrogate = new Surrogate(event.params.surrogate)

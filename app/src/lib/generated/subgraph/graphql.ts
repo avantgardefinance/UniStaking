@@ -32,7 +32,6 @@ export type Account = {
   currentlyStaked: Scalars['BigInt']['output'];
   delegateeSurrogates: Array<Surrogate>;
   delegateeships: Array<Deposit>;
-  events: Array<AccountEvent>;
   id: Scalars['Bytes']['output'];
   ownerships: Array<Deposit>;
   totalStaked: Scalars['BigInt']['output'];
@@ -67,15 +66,6 @@ export type AccountdelegateeshipsArgs = {
 };
 
 
-export type AccounteventsArgs = {
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<AccountEvent_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<AccountEvent_filter>;
-};
-
-
 export type AccountownershipsArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Deposit_orderBy>;
@@ -83,126 +73,6 @@ export type AccountownershipsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<Deposit_filter>;
 };
-
-export type AccountEvent = {
-  __typename?: 'AccountEvent';
-  account: Account;
-  deposit?: Maybe<Deposit>;
-  event: Event;
-  id: Scalars['String']['output'];
-};
-
-export type AccountEvent_filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  account?: InputMaybe<Scalars['String']['input']>;
-  account_?: InputMaybe<Account_filter>;
-  account_contains?: InputMaybe<Scalars['String']['input']>;
-  account_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  account_ends_with?: InputMaybe<Scalars['String']['input']>;
-  account_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  account_gt?: InputMaybe<Scalars['String']['input']>;
-  account_gte?: InputMaybe<Scalars['String']['input']>;
-  account_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  account_lt?: InputMaybe<Scalars['String']['input']>;
-  account_lte?: InputMaybe<Scalars['String']['input']>;
-  account_not?: InputMaybe<Scalars['String']['input']>;
-  account_not_contains?: InputMaybe<Scalars['String']['input']>;
-  account_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  account_not_ends_with?: InputMaybe<Scalars['String']['input']>;
-  account_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  account_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  account_not_starts_with?: InputMaybe<Scalars['String']['input']>;
-  account_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  account_starts_with?: InputMaybe<Scalars['String']['input']>;
-  account_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  and?: InputMaybe<Array<InputMaybe<AccountEvent_filter>>>;
-  deposit?: InputMaybe<Scalars['String']['input']>;
-  deposit_?: InputMaybe<Deposit_filter>;
-  deposit_contains?: InputMaybe<Scalars['String']['input']>;
-  deposit_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  deposit_ends_with?: InputMaybe<Scalars['String']['input']>;
-  deposit_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  deposit_gt?: InputMaybe<Scalars['String']['input']>;
-  deposit_gte?: InputMaybe<Scalars['String']['input']>;
-  deposit_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  deposit_lt?: InputMaybe<Scalars['String']['input']>;
-  deposit_lte?: InputMaybe<Scalars['String']['input']>;
-  deposit_not?: InputMaybe<Scalars['String']['input']>;
-  deposit_not_contains?: InputMaybe<Scalars['String']['input']>;
-  deposit_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  deposit_not_ends_with?: InputMaybe<Scalars['String']['input']>;
-  deposit_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  deposit_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  deposit_not_starts_with?: InputMaybe<Scalars['String']['input']>;
-  deposit_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  deposit_starts_with?: InputMaybe<Scalars['String']['input']>;
-  deposit_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  event?: InputMaybe<Scalars['String']['input']>;
-  event_?: InputMaybe<Event_filter>;
-  event_contains?: InputMaybe<Scalars['String']['input']>;
-  event_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  event_ends_with?: InputMaybe<Scalars['String']['input']>;
-  event_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  event_gt?: InputMaybe<Scalars['String']['input']>;
-  event_gte?: InputMaybe<Scalars['String']['input']>;
-  event_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  event_lt?: InputMaybe<Scalars['String']['input']>;
-  event_lte?: InputMaybe<Scalars['String']['input']>;
-  event_not?: InputMaybe<Scalars['String']['input']>;
-  event_not_contains?: InputMaybe<Scalars['String']['input']>;
-  event_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  event_not_ends_with?: InputMaybe<Scalars['String']['input']>;
-  event_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  event_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  event_not_starts_with?: InputMaybe<Scalars['String']['input']>;
-  event_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  event_starts_with?: InputMaybe<Scalars['String']['input']>;
-  event_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['String']['input']>;
-  id_contains?: InputMaybe<Scalars['String']['input']>;
-  id_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  id_ends_with?: InputMaybe<Scalars['String']['input']>;
-  id_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  id_gt?: InputMaybe<Scalars['String']['input']>;
-  id_gte?: InputMaybe<Scalars['String']['input']>;
-  id_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  id_lt?: InputMaybe<Scalars['String']['input']>;
-  id_lte?: InputMaybe<Scalars['String']['input']>;
-  id_not?: InputMaybe<Scalars['String']['input']>;
-  id_not_contains?: InputMaybe<Scalars['String']['input']>;
-  id_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  id_not_ends_with?: InputMaybe<Scalars['String']['input']>;
-  id_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  id_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  id_not_starts_with?: InputMaybe<Scalars['String']['input']>;
-  id_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  id_starts_with?: InputMaybe<Scalars['String']['input']>;
-  id_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  or?: InputMaybe<Array<InputMaybe<AccountEvent_filter>>>;
-};
-
-export enum AccountEvent_orderBy {
-  account = 'account',
-  account__claimedRewards = 'account__claimedRewards',
-  account__createdAt = 'account__createdAt',
-  account__currentlyStaked = 'account__currentlyStaked',
-  account__id = 'account__id',
-  account__totalStaked = 'account__totalStaked',
-  account__totalWithdrawn = 'account__totalWithdrawn',
-  deposit = 'deposit',
-  deposit__amount = 'deposit__amount',
-  deposit__createdAt = 'deposit__createdAt',
-  deposit__id = 'deposit__id',
-  deposit__updatedAt = 'deposit__updatedAt',
-  event = 'event',
-  event__blockNumber = 'event__blockNumber',
-  event__blockTimestamp = 'event__blockTimestamp',
-  event__id = 'event__id',
-  event__transactionHash = 'event__transactionHash',
-  event__type = 'event__type',
-  id = 'id'
-}
 
 export type Account_filter = {
   /** Filter for the block changed event. */
@@ -235,7 +105,6 @@ export type Account_filter = {
   currentlyStaked_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   delegateeSurrogates_?: InputMaybe<Surrogate_filter>;
   delegateeships_?: InputMaybe<Deposit_filter>;
-  events_?: InputMaybe<AccountEvent_filter>;
   id?: InputMaybe<Scalars['Bytes']['input']>;
   id_contains?: InputMaybe<Scalars['Bytes']['input']>;
   id_gt?: InputMaybe<Scalars['Bytes']['input']>;
@@ -273,7 +142,6 @@ export enum Account_orderBy {
   currentlyStaked = 'currentlyStaked',
   delegateeSurrogates = 'delegateeSurrogates',
   delegateeships = 'delegateeships',
-  events = 'events',
   id = 'id',
   ownerships = 'ownerships',
   totalStaked = 'totalStaked',
@@ -364,6 +232,7 @@ export enum AdminSet_orderBy {
 
 export type BeneficiaryAltered = DepositEvent & Event & {
   __typename?: 'BeneficiaryAltered';
+  affected: Array<Scalars['Bytes']['output']>;
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
   deposit: Deposit;
@@ -378,6 +247,12 @@ export type BeneficiaryAltered = DepositEvent & Event & {
 export type BeneficiaryAltered_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   and?: InputMaybe<Array<InputMaybe<BeneficiaryAltered_filter>>>;
   blockNumber?: InputMaybe<Scalars['BigInt']['input']>;
   blockNumber_gt?: InputMaybe<Scalars['BigInt']['input']>;
@@ -472,6 +347,7 @@ export type BeneficiaryAltered_filter = {
 };
 
 export enum BeneficiaryAltered_orderBy {
+  affected = 'affected',
   blockNumber = 'blockNumber',
   blockTimestamp = 'blockTimestamp',
   deposit = 'deposit',
@@ -499,6 +375,7 @@ export type Block_height = {
 
 export type DelegateeAltered = DepositEvent & Event & {
   __typename?: 'DelegateeAltered';
+  affected: Array<Scalars['Bytes']['output']>;
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
   deposit: Deposit;
@@ -513,6 +390,12 @@ export type DelegateeAltered = DepositEvent & Event & {
 export type DelegateeAltered_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   and?: InputMaybe<Array<InputMaybe<DelegateeAltered_filter>>>;
   blockNumber?: InputMaybe<Scalars['BigInt']['input']>;
   blockNumber_gt?: InputMaybe<Scalars['BigInt']['input']>;
@@ -607,6 +490,7 @@ export type DelegateeAltered_filter = {
 };
 
 export enum DelegateeAltered_orderBy {
+  affected = 'affected',
   blockNumber = 'blockNumber',
   blockTimestamp = 'blockTimestamp',
   deposit = 'deposit',
@@ -644,6 +528,7 @@ export type DepositeventsArgs = {
 };
 
 export type DepositEvent = {
+  affected: Array<Scalars['Bytes']['output']>;
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
   deposit: Deposit;
@@ -656,6 +541,12 @@ export type DepositEvent = {
 export type DepositEvent_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   and?: InputMaybe<Array<InputMaybe<DepositEvent_filter>>>;
   blockNumber?: InputMaybe<Scalars['BigInt']['input']>;
   blockNumber_gt?: InputMaybe<Scalars['BigInt']['input']>;
@@ -730,6 +621,7 @@ export type DepositEvent_filter = {
 };
 
 export enum DepositEvent_orderBy {
+  affected = 'affected',
   blockNumber = 'blockNumber',
   blockTimestamp = 'blockTimestamp',
   deposit = 'deposit',
@@ -888,6 +780,7 @@ export enum Deposit_orderBy {
 }
 
 export type Event = {
+  affected: Array<Scalars['Bytes']['output']>;
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
   id: Scalars['Bytes']['output'];
@@ -908,6 +801,12 @@ export enum EventType {
 export type Event_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   and?: InputMaybe<Array<InputMaybe<Event_filter>>>;
   blockNumber?: InputMaybe<Scalars['BigInt']['input']>;
   blockNumber_gt?: InputMaybe<Scalars['BigInt']['input']>;
@@ -953,6 +852,7 @@ export type Event_filter = {
 };
 
 export enum Event_orderBy {
+  affected = 'affected',
   blockNumber = 'blockNumber',
   blockTimestamp = 'blockTimestamp',
   id = 'id',
@@ -1085,8 +985,6 @@ export type Query = {
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
   account?: Maybe<Account>;
-  accountEvent?: Maybe<AccountEvent>;
-  accountEvents: Array<AccountEvent>;
   accounts: Array<Account>;
   adminSet?: Maybe<AdminSet>;
   adminSets: Array<AdminSet>;
@@ -1104,8 +1002,6 @@ export type Query = {
   feesClaimeds: Array<FeesClaimed>;
   rewardClaimed?: Maybe<RewardClaimed>;
   rewardClaimeds: Array<RewardClaimed>;
-  rewardEvent?: Maybe<RewardEvent>;
-  rewardEvents: Array<RewardEvent>;
   rewardNotified?: Maybe<RewardNotified>;
   rewardNotifieds: Array<RewardNotified>;
   stakeDeposited?: Maybe<StakeDeposited>;
@@ -1130,24 +1026,6 @@ export type QueryaccountArgs = {
   block?: InputMaybe<Block_height>;
   id: Scalars['ID']['input'];
   subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type QueryaccountEventArgs = {
-  block?: InputMaybe<Block_height>;
-  id: Scalars['ID']['input'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type QueryaccountEventsArgs = {
-  block?: InputMaybe<Block_height>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<AccountEvent_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<AccountEvent_filter>;
 };
 
 
@@ -1306,24 +1184,6 @@ export type QueryrewardClaimedsArgs = {
 };
 
 
-export type QueryrewardEventArgs = {
-  block?: InputMaybe<Block_height>;
-  id: Scalars['ID']['input'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type QueryrewardEventsArgs = {
-  block?: InputMaybe<Block_height>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<RewardEvent_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<RewardEvent_filter>;
-};
-
-
 export type QueryrewardNotifiedArgs = {
   block?: InputMaybe<Block_height>;
   id: Scalars['ID']['input'];
@@ -1431,8 +1291,9 @@ export type QueryuniStakerHistoryArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
-export type RewardClaimed = Event & RewardEvent & {
+export type RewardClaimed = Event & {
   __typename?: 'RewardClaimed';
+  affected: Array<Scalars['Bytes']['output']>;
   amount: Scalars['BigInt']['output'];
   beneficiary: Scalars['Bytes']['output'];
   blockNumber: Scalars['BigInt']['output'];
@@ -1445,6 +1306,12 @@ export type RewardClaimed = Event & RewardEvent & {
 export type RewardClaimed_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   amount?: InputMaybe<Scalars['BigInt']['input']>;
   amount_gt?: InputMaybe<Scalars['BigInt']['input']>;
   amount_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -1508,6 +1375,7 @@ export type RewardClaimed_filter = {
 };
 
 export enum RewardClaimed_orderBy {
+  affected = 'affected',
   amount = 'amount',
   beneficiary = 'beneficiary',
   blockNumber = 'blockNumber',
@@ -1517,71 +1385,9 @@ export enum RewardClaimed_orderBy {
   type = 'type'
 }
 
-export type RewardEvent = {
-  blockNumber: Scalars['BigInt']['output'];
-  blockTimestamp: Scalars['BigInt']['output'];
-  id: Scalars['Bytes']['output'];
-  transactionHash: Scalars['Bytes']['output'];
-  type: EventType;
-};
-
-export type RewardEvent_filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  and?: InputMaybe<Array<InputMaybe<RewardEvent_filter>>>;
-  blockNumber?: InputMaybe<Scalars['BigInt']['input']>;
-  blockNumber_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  blockNumber_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  blockNumber_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  blockNumber_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  blockNumber_not?: InputMaybe<Scalars['BigInt']['input']>;
-  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  blockTimestamp?: InputMaybe<Scalars['BigInt']['input']>;
-  blockTimestamp_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  blockTimestamp_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  blockTimestamp_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  blockTimestamp_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  blockTimestamp_not?: InputMaybe<Scalars['BigInt']['input']>;
-  blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  id?: InputMaybe<Scalars['Bytes']['input']>;
-  id_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  id_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  id_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  id_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  id_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  id_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  id_not?: InputMaybe<Scalars['Bytes']['input']>;
-  id_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  id_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  or?: InputMaybe<Array<InputMaybe<RewardEvent_filter>>>;
-  transactionHash?: InputMaybe<Scalars['Bytes']['input']>;
-  transactionHash_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  transactionHash_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  transactionHash_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  transactionHash_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  transactionHash_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  transactionHash_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  transactionHash_not?: InputMaybe<Scalars['Bytes']['input']>;
-  transactionHash_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  transactionHash_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  type?: InputMaybe<EventType>;
-  type_in?: InputMaybe<Array<EventType>>;
-  type_not?: InputMaybe<EventType>;
-  type_not_in?: InputMaybe<Array<EventType>>;
-};
-
-export enum RewardEvent_orderBy {
-  blockNumber = 'blockNumber',
-  blockTimestamp = 'blockTimestamp',
-  id = 'id',
-  transactionHash = 'transactionHash',
-  type = 'type'
-}
-
-export type RewardNotified = Event & RewardEvent & {
+export type RewardNotified = Event & {
   __typename?: 'RewardNotified';
+  affected: Array<Scalars['Bytes']['output']>;
   amount: Scalars['BigInt']['output'];
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
@@ -1593,6 +1399,12 @@ export type RewardNotified = Event & RewardEvent & {
 export type RewardNotified_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   amount?: InputMaybe<Scalars['BigInt']['input']>;
   amount_gt?: InputMaybe<Scalars['BigInt']['input']>;
   amount_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -1646,6 +1458,7 @@ export type RewardNotified_filter = {
 };
 
 export enum RewardNotified_orderBy {
+  affected = 'affected',
   amount = 'amount',
   blockNumber = 'blockNumber',
   blockTimestamp = 'blockTimestamp',
@@ -1656,6 +1469,7 @@ export enum RewardNotified_orderBy {
 
 export type StakeDeposited = DepositEvent & Event & {
   __typename?: 'StakeDeposited';
+  affected: Array<Scalars['Bytes']['output']>;
   amount: Scalars['BigInt']['output'];
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
@@ -1670,6 +1484,12 @@ export type StakeDeposited = DepositEvent & Event & {
 export type StakeDeposited_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   amount?: InputMaybe<Scalars['BigInt']['input']>;
   amount_gt?: InputMaybe<Scalars['BigInt']['input']>;
   amount_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -1760,6 +1580,7 @@ export type StakeDeposited_filter = {
 };
 
 export enum StakeDeposited_orderBy {
+  affected = 'affected',
   amount = 'amount',
   blockNumber = 'blockNumber',
   blockTimestamp = 'blockTimestamp',
@@ -1777,6 +1598,7 @@ export enum StakeDeposited_orderBy {
 
 export type StakeWithdrawn = DepositEvent & Event & {
   __typename?: 'StakeWithdrawn';
+  affected: Array<Scalars['Bytes']['output']>;
   amount: Scalars['BigInt']['output'];
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
@@ -1791,6 +1613,12 @@ export type StakeWithdrawn = DepositEvent & Event & {
 export type StakeWithdrawn_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   amount?: InputMaybe<Scalars['BigInt']['input']>;
   amount_gt?: InputMaybe<Scalars['BigInt']['input']>;
   amount_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -1881,6 +1709,7 @@ export type StakeWithdrawn_filter = {
 };
 
 export enum StakeWithdrawn_orderBy {
+  affected = 'affected',
   amount = 'amount',
   blockNumber = 'blockNumber',
   blockTimestamp = 'blockTimestamp',
@@ -1901,8 +1730,6 @@ export type Subscription = {
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
   account?: Maybe<Account>;
-  accountEvent?: Maybe<AccountEvent>;
-  accountEvents: Array<AccountEvent>;
   accounts: Array<Account>;
   adminSet?: Maybe<AdminSet>;
   adminSets: Array<AdminSet>;
@@ -1920,8 +1747,6 @@ export type Subscription = {
   feesClaimeds: Array<FeesClaimed>;
   rewardClaimed?: Maybe<RewardClaimed>;
   rewardClaimeds: Array<RewardClaimed>;
-  rewardEvent?: Maybe<RewardEvent>;
-  rewardEvents: Array<RewardEvent>;
   rewardNotified?: Maybe<RewardNotified>;
   rewardNotifieds: Array<RewardNotified>;
   stakeDeposited?: Maybe<StakeDeposited>;
@@ -1946,24 +1771,6 @@ export type SubscriptionaccountArgs = {
   block?: InputMaybe<Block_height>;
   id: Scalars['ID']['input'];
   subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type SubscriptionaccountEventArgs = {
-  block?: InputMaybe<Block_height>;
-  id: Scalars['ID']['input'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type SubscriptionaccountEventsArgs = {
-  block?: InputMaybe<Block_height>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<AccountEvent_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<AccountEvent_filter>;
 };
 
 
@@ -2122,24 +1929,6 @@ export type SubscriptionrewardClaimedsArgs = {
 };
 
 
-export type SubscriptionrewardEventArgs = {
-  block?: InputMaybe<Block_height>;
-  id: Scalars['ID']['input'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type SubscriptionrewardEventsArgs = {
-  block?: InputMaybe<Block_height>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<RewardEvent_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<RewardEvent_filter>;
-};
-
-
 export type SubscriptionrewardNotifiedArgs = {
   block?: InputMaybe<Block_height>;
   id: Scalars['ID']['input'];
@@ -2256,6 +2045,7 @@ export type Surrogate = {
 
 export type SurrogateDeployed = Event & {
   __typename?: 'SurrogateDeployed';
+  affected: Array<Scalars['Bytes']['output']>;
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
   delegatee: Scalars['Bytes']['output'];
@@ -2268,6 +2058,12 @@ export type SurrogateDeployed = Event & {
 export type SurrogateDeployed_filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
+  affected?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  affected_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']['input']>>;
   and?: InputMaybe<Array<InputMaybe<SurrogateDeployed_filter>>>;
   blockNumber?: InputMaybe<Scalars['BigInt']['input']>;
   blockNumber_gt?: InputMaybe<Scalars['BigInt']['input']>;
@@ -2333,6 +2129,7 @@ export type SurrogateDeployed_filter = {
 };
 
 export enum SurrogateDeployed_orderBy {
+  affected = 'affected',
   blockNumber = 'blockNumber',
   blockTimestamp = 'blockTimestamp',
   delegatee = 'delegatee',
@@ -2530,13 +2327,6 @@ export enum _SubgraphErrorPolicy_ {
   deny = 'deny'
 }
 
-export type AccountEventsQueryVariables = Exact<{
-  account: Scalars['String']['input'];
-}>;
-
-
-export type AccountEventsQuery = { __typename?: 'Query', accountEvents: Array<{ __typename?: 'AccountEvent', event: { __typename: 'BeneficiaryAltered', oldBeneficiary: any, newBeneficiary: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'DelegateeAltered', newDelegatee: any, oldDelegatee: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'RewardClaimed', beneficiary: any, amount: any, id: any, blockTimestamp: any } | { __typename: 'RewardNotified', id: any, blockTimestamp: any } | { __typename: 'StakeDeposited', amount: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'StakeWithdrawn', amount: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'SurrogateDeployed', id: any, blockTimestamp: any } }> };
-
 export type DepositsQueryVariables = Exact<{
   account: Scalars['String']['input'];
 }>;
@@ -2544,6 +2334,13 @@ export type DepositsQueryVariables = Exact<{
 
 export type DepositsQuery = { __typename?: 'Query', deposits: Array<{ __typename?: 'Deposit', id: string, amount: any, createdAt: number, updatedAt: number, beneficiary: { __typename?: 'Account', id: any }, delegatee: { __typename?: 'Account', id: any }, owner: { __typename?: 'Account', id: any } }> };
 
+export type EventsQueryVariables = Exact<{
+  account: Scalars['Bytes']['input'];
+}>;
 
-export const AccountEventsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AccountEvents"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accountEvents"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1000"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"event"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"blockTimestamp"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BeneficiaryAltered"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deposit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"oldBeneficiary"}},{"kind":"Field","name":{"kind":"Name","value":"newBeneficiary"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"DelegateeAltered"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"newDelegatee"}},{"kind":"Field","name":{"kind":"Name","value":"oldDelegatee"}},{"kind":"Field","name":{"kind":"Name","value":"deposit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"StakeDeposited"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"deposit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"RewardClaimed"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"beneficiary"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"StakeWithdrawn"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"deposit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<AccountEventsQuery, AccountEventsQueryVariables>;
+
+export type EventsQuery = { __typename?: 'Query', events: Array<{ __typename: 'BeneficiaryAltered', oldBeneficiary: any, newBeneficiary: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'DelegateeAltered', newDelegatee: any, oldDelegatee: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'RewardClaimed', beneficiary: any, amount: any, id: any, blockTimestamp: any } | { __typename: 'RewardNotified', id: any, blockTimestamp: any } | { __typename: 'StakeDeposited', amount: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'StakeWithdrawn', amount: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'SurrogateDeployed', id: any, blockTimestamp: any }> };
+
+
 export const DepositsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Deposits"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deposits"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"amount_gt"},"value":{"kind":"IntValue","value":"0"}},{"kind":"ObjectField","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"delegatee"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"beneficiary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"beneficiary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"delegatee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<DepositsQuery, DepositsQueryVariables>;
+export const EventsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Events"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Bytes"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"events"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"affected_contains"},"value":{"kind":"ListValue","values":[{"kind":"Variable","name":{"kind":"Name","value":"account"}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"blockTimestamp"}},{"kind":"Argument","name":{"kind":"Name","value":"orderDirection"},"value":{"kind":"EnumValue","value":"desc"}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1000"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"blockTimestamp"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BeneficiaryAltered"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deposit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"oldBeneficiary"}},{"kind":"Field","name":{"kind":"Name","value":"newBeneficiary"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"DelegateeAltered"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"newDelegatee"}},{"kind":"Field","name":{"kind":"Name","value":"oldDelegatee"}},{"kind":"Field","name":{"kind":"Name","value":"deposit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"StakeDeposited"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"deposit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"RewardClaimed"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"beneficiary"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"StakeWithdrawn"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"deposit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<EventsQuery, EventsQueryVariables>;

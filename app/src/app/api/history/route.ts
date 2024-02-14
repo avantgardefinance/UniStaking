@@ -1,6 +1,6 @@
 import { never } from "@/lib/assertion"
-import type { AccountEventsQuery as AccountEventsQueryGenerated } from "@/lib/generated/subgraph/graphql"
-import { AccountEventsQuery } from "@/lib/subgraph/account-events"
+import type { EventsQuery as EventsQueryGenerated } from "@/lib/generated/subgraph/graphql"
+import { EventsQuery } from "@/lib/subgraph/events"
 
 import { GraphQLClient } from "graphql-request"
 import { Address } from "viem"
@@ -18,14 +18,14 @@ export async function GET(request: Request) {
     return new Response(null, { status: 400 })
   }
 
-  const { accountEvents } = await client.request({
-    document: AccountEventsQuery,
+  const { events } = await client.request({
+    document: EventsQuery,
     variables: {
       account
     }
   })
 
-  const history = getHistory(accountEvents)
+  const history = getHistory(events)
 
   return Response.json(history)
 }
@@ -55,59 +55,59 @@ type HistoryItem = {
 
 export type GetHistoryResponse = ReturnType<typeof getHistory>
 
-function getHistory(accountEvents: AccountEventsQueryGenerated["accountEvents"]) {
+function getHistory(events: EventsQueryGenerated["events"]) {
   const history: HistoryItem[] = []
-  for (const accountEvent of accountEvents) {
-    const eventTypename = accountEvent.event.__typename
+  for (const event of events) {
+    const eventTypename = event.__typename
     switch (eventTypename) {
       case "StakeDeposited":
         history.push({
-          stakeId: accountEvent.event.deposit.id,
-          amount: accountEvent.event.amount,
-          date: accountEvent.event.blockTimestamp,
-          owner: accountEvent.event.deposit.owner.id,
-          id: accountEvent.event.id,
+          stakeId: event.deposit.id,
+          amount: event.amount,
+          date: event.blockTimestamp,
+          owner: event.deposit.owner.id,
+          id: event.id,
           type: eventTypename
         })
         break
       case "StakeWithdrawn":
         history.push({
-          stakeId: accountEvent.event.deposit.id,
-          amount: accountEvent.event.amount,
-          date: accountEvent.event.blockTimestamp,
-          owner: accountEvent.event.deposit.owner.id,
-          id: accountEvent.event.id,
+          stakeId: event.deposit.id,
+          amount: event.amount,
+          date: event.blockTimestamp,
+          owner: event.deposit.owner.id,
+          id: event.id,
           type: eventTypename
         })
         break
       case "BeneficiaryAltered":
         history.push({
-          stakeId: accountEvent.event.deposit.id,
-          owner: accountEvent.event.deposit.owner.id,
-          date: accountEvent.event.blockTimestamp,
-          oldBeneficiary: accountEvent.event.oldBeneficiary,
-          newBeneficiary: accountEvent.event.newBeneficiary,
-          id: accountEvent.event.id,
+          stakeId: event.deposit.id,
+          owner: event.deposit.owner.id,
+          date: event.blockTimestamp,
+          oldBeneficiary: event.oldBeneficiary,
+          newBeneficiary: event.newBeneficiary,
+          id: event.id,
           type: eventTypename
         })
         break
       case "DelegateeAltered":
         history.push({
-          stakeId: accountEvent.event.deposit.id,
-          owner: accountEvent.event.deposit.owner.id,
-          date: accountEvent.event.blockTimestamp,
-          oldDelegatee: accountEvent.event.oldDelegatee,
-          newDelegatee: accountEvent.event.newDelegatee,
-          id: accountEvent.event.id,
+          stakeId: event.deposit.id,
+          owner: event.deposit.owner.id,
+          date: event.blockTimestamp,
+          oldDelegatee: event.oldDelegatee,
+          newDelegatee: event.newDelegatee,
+          id: event.id,
           type: eventTypename
         })
         break
       case "RewardClaimed":
         history.push({
-          date: accountEvent.event.blockTimestamp,
-          beneficiary: accountEvent.event.beneficiary,
-          amount: accountEvent.event.amount,
-          id: accountEvent.event.id,
+          date: event.blockTimestamp,
+          beneficiary: event.beneficiary,
+          amount: event.amount,
+          id: event.id,
           type: eventTypename
         })
         break

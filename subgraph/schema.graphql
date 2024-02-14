@@ -31,7 +31,8 @@ interface DepositEvent implements Event {
   deposit: Deposit!
 }
 
-type BeneficiaryAltered implements DepositEvent @entity(immutable: true) {
+type BeneficiaryAltered implements DepositEvent & Event
+  @entity(immutable: true) {
   id: Bytes!
   type: EventType!
   blockNumber: BigInt!
@@ -46,7 +47,7 @@ type BeneficiaryAltered implements DepositEvent @entity(immutable: true) {
   newBeneficiary: Bytes!
 }
 
-type DelegateeAltered implements DepositEvent @entity(immutable: true) {
+type DelegateeAltered implements DepositEvent & Event @entity(immutable: true) {
   id: Bytes!
   type: EventType!
   blockNumber: BigInt!
@@ -84,7 +85,7 @@ type RewardNotified implements Event @entity(immutable: true) {
   amount: BigInt!
 }
 
-type StakeDeposited implements DepositEvent @entity(immutable: true) {
+type StakeDeposited implements DepositEvent & Event @entity(immutable: true) {
   id: Bytes!
   type: EventType!
   blockNumber: BigInt!
@@ -99,7 +100,7 @@ type StakeDeposited implements DepositEvent @entity(immutable: true) {
   totalDeposited: BigInt!
 }
 
-type StakeWithdrawn implements DepositEvent @entity(immutable: true) {
+type StakeWithdrawn implements DepositEvent & Event @entity(immutable: true) {
   id: Bytes!
   type: EventType!
   blockNumber: BigInt!

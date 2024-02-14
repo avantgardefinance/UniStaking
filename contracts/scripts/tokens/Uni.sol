@@ -1,9 +1,8 @@
+// SPDX-License-Identifier: Unlicense
 /**
  * Submitted for verification at Etherscan.io on 2020-09-15
  */
 pragma solidity 0.8.23;
-
-import "forge-std/console2.sol";
 
 // From https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/Math.sol
 // Subject to the MIT license.
@@ -190,6 +189,11 @@ library SafeMath {
     }
 }
 
+/**
+ * @dev This contract is a fork of Uni governance token https://etherscan.io/address/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984
+ * It has been updated to the latest solidity version
+ * Also restrictions on minting have been commented out, as they are not relevant for the purpose of this app, and only make the development process more difficult
+ */
 contract Uni {
     /// @notice EIP-20 token name for this token
     string public constant name = "Uniswap";
@@ -273,7 +277,7 @@ contract Uni {
      * @param mintingAllowedAfter_ The timestamp after which minting may occur
      */
     constructor(address account, address minter_, uint256 mintingAllowedAfter_) {
-        // require(mintingAllowedAfter_ >= block.timestamp, "Uni::constructor: minting can only begin after deployment");
+        // require(mintingAllowedAfter_ >= block.timestamp, "Uni::constructor: minting can only begin after deployment"); // Commented out code from original contract
 
         balances[account] = uint96(totalSupply);
         emit Transfer(address(0), account, totalSupply);
@@ -299,7 +303,7 @@ contract Uni {
      */
     function mint(address dst, uint256 rawAmount) external {
         require(msg.sender == minter, "Uni::mint: only the minter can mint");
-        // require(block.timestamp >= mintingAllowedAfter, "Uni::mint: minting not allowed yet");
+        // require(block.timestamp >= mintingAllowedAfter, "Uni::mint: minting not allowed yet"); // Commented out code from original contract
         require(dst != address(0), "Uni::mint: cannot transfer to the zero address");
 
         // record the mint

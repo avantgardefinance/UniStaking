@@ -20,7 +20,7 @@ contract Deploy is Script {
 
         console2.log("Deploying Governance Token Contract: %s", address(GOVERNANCE_TOKEN));
         address governanceToken =
-            address(new Uni{salt: 0}(GOVERNANCE_TOKEN_MINTER.addr, GOVERNANCE_TOKEN_MINTER.addr, block.timestamp));
+            address(new Uni{salt: 0}(GOVERNANCE_TOKEN_MINTER.addr, GOVERNANCE_TOKEN_MINTER.addr, 0));
         assert(governanceToken == address(GOVERNANCE_TOKEN));
 
         console2.log("Deploying Uniswap Staking Contract: %s", address(UNI_STAKER));

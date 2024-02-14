@@ -15,7 +15,7 @@ export function AvailableUniForStaking() {
       <CardHeader>
         <CardDescription className="text-base font-medium">Available for staking</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-between space-x-2">
+      <CardContent className="flex items-center justify-between flex-wrap gap-2">
         <NoSsr>
           <AvailableUniForStakingContent />
         </NoSsr>
@@ -41,7 +41,7 @@ function AvailableUniForStakingContent() {
 
   return (
     <>
-      <h3 className="space-x-2">
+      <h3 className="space-x-2 flex-grow">
         <span className="text-2xl font-semibold">
           <BigIntDisplay value={data.value} decimals={data.decimals} precision={2} />
         </span>
@@ -49,7 +49,7 @@ function AvailableUniForStakingContent() {
       </h3>
       <Dialog>
         <DialogTrigger asChild>
-          <Button size="lg" className="space-x-2">
+          <Button size="lg" className="space-x-2 flex-grow">
             <Plus size={16} />
             <span>Create position</span>
           </Button>

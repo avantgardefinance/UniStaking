@@ -49,7 +49,7 @@ export function StakeCardRewards() {
       <CardHeader>
         <CardDescription className="text-base font-medium">Rewards</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-between space-x-2">
+      <CardContent className="flex items-center justify-between flex-wrap gap-2">
         <StakeCardRewardsContent />
       </CardContent>
     </Card>
@@ -73,14 +73,20 @@ function StakeCardRewardsContent() {
 
   return (
     <>
-      <h3 className="space-x-2">
+      <h3 className="space-x-2 flex-grow">
         <span className="font-semibold text-2xl">
           <BigIntDisplay value={rewards} decimals={18} precision={4} />
         </span>
         <span className="text-xl">WETH</span>
       </h3>
 
-      <Button size="lg" disabled={!isAbleToClaim} variant="outline" onClick={() => writeClaim()} className="space-x-2">
+      <Button
+        size="lg"
+        disabled={!isAbleToClaim}
+        variant="outline"
+        onClick={() => writeClaim()}
+        className="space-x-2 flex-grow"
+      >
         <Trophy size={16} />
         <span>Claim</span>
       </Button>

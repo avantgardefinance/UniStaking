@@ -174,7 +174,7 @@ function HistoryCardTemplate({
 }) {
   return (
     <Card>
-      <CardContent className="flex flex-row justify-between p-6">
+      <CardContent className="flex flex-row justify-between p-6 flex-wrap">
         <div className="flex flex-col justify-between">
           <h3 className="text-xl font-semibold">{title}</h3>
           <div className="space-x-2">

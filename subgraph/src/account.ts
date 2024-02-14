@@ -1,6 +1,6 @@
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
-import { Account, AccountEvent } from "../generated/schema"
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
+import { Account } from "../generated/schema"
 
 export function getOrCreateAccount(address: Address, event: ethereum.Event): Account {
   let account = Account.load(address)
@@ -18,13 +18,4 @@ export function getOrCreateAccount(address: Address, event: ethereum.Event): Acc
   account.save()
 
   return account
-}
-
-export function trackAccountEvent(account: Address, eventId: Bytes, depositId: string | null): void {
-  const accountEventId = `${account.toHex()}/${eventId.toHex()}`
-  const accountEvent = new AccountEvent(accountEventId)
-  accountEvent.account = account
-  accountEvent.event = eventId
-  accountEvent.deposit = depositId
-  accountEvent.save()
 }

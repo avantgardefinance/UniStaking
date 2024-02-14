@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { governanceToken, timeToMakeTransaction, uniStaker } from "@/lib/consts"
+import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { Download, RotateCw } from "lucide-react"
 import { useState } from "react"
@@ -95,20 +95,13 @@ const useStakeMoreDialog = ({
         const permitSignature = await signTypedData(config, {
           account: account.address,
           types: {
-            Permit: [
-              { name: "owner", type: "address" },
-              { name: "spender", type: "address" },
-              { name: "value", type: "uint256" },
-              { name: "nonce", type: "uint256" },
-              { name: "deadline", type: "uint256" }
-            ]
+            [permitEIP712Options.primaryType]: permitEIP712Options.permitTypes
           },
           domain: {
-            name: "Uniswap",
-            chainId: chainId,
-            verifyingContract: governanceToken
+            ...permitEIP712Options.domainBase,
+            chainId: chainId
           },
-          primaryType: "Permit",
+          primaryType: permitEIP712Options.primaryType,
           message: {
             owner: account.address,
             spender: uniStaker,

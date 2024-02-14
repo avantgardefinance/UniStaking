@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { governanceToken, uniStaker } from "@/lib/consts"
+import { governanceToken, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useTallyDelegates } from "@/lib/hooks/use-tally-delegates"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { Download, Info, RotateCw } from "lucide-react"
@@ -58,7 +58,6 @@ const useStakeDialog = ({
 
   const hasSignedEnoughValue = signatureInfo !== undefined && parseUnits(amount, 18) <= signatureInfo.value
 
-  // console.log({ hasSignedEnoughValue, signatureInfo })
   const onSubmit = async (values: {
     beneficiary: Address | undefined
     customDelegatee: Address | undefined
@@ -102,7 +101,6 @@ const useStakeDialog = ({
           args: [account.address]
         })
 
-        const timeToMakeTransaction = 10 * 60 * 60 // 10 minutes
         const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
 
         const value = parseUnits(values.amount, 18)
@@ -139,7 +137,6 @@ const useStakeDialog = ({
           owner: account.address,
           value
         })
-        console.log(permitSignature)
       } catch (e) {
         if (e instanceof Error) {
           setError(e)

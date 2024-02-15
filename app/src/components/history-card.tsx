@@ -177,7 +177,7 @@ function HistoryCardTemplate({
       <CardContent className="flex flex-row justify-between p-6 flex-wrap gap-4">
         <div className="flex flex-col justify-between">
           <h3 className="text-xl font-semibold">{title}</h3>
-          <div className="space-x-2">
+          <div className="flex gap-2 flex-wrap">
             {stakeId === undefined ? null : <Badge className="p-2">ID #{stakeId}</Badge>}
             {owner === undefined ? null : (
               <Badge className="p-2">
@@ -206,7 +206,7 @@ function HistoryCardTemplate({
           </div>
         </div>
         <Card className="flex w-full md:w-auto">
-          <CardContent className="w-full md:w-auto p-6 min-w-80 min-h-24 flex items-center">
+          <CardContent className="w-full md:w-auto p-6 min-w-60 sm:min-w-80 min-h-24 flex items-center">
             <div className="w-full">{children}</div>
           </CardContent>
         </Card>

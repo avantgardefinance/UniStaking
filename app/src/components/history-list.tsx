@@ -5,7 +5,7 @@ import { HistoryCard, HistoryItem } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { useQuery } from "@tanstack/react-query"
-import { useEffect, useMemo, useState } from "react"
+import { useState } from "react"
 import { useAccount } from "wagmi"
 
 function useHistoryList() {
@@ -38,6 +38,7 @@ function useHistoryList() {
 }
 
 export function HistoryList() {
+  const account = useAccount()
   const { data, error, isLoading } = useHistoryList()
 
   if (isLoading) {
@@ -48,29 +49,17 @@ export function HistoryList() {
     return <Alert variant="destructive">{error.message}</Alert>
   }
 
-  return <List items={data} />
+  return <List key={account.address} items={data} />
 }
 
 function useList(items: HistoryItem[]) {
-  const initialLimit = 20
-  const [limit, setLimit] = useState(initialLimit)
+  const [limit, setLimit] = useState(20)
 
-  const canShowMore = limit < items.length
-
-  const showMoreItems = 10
-  const showMore = () => {
-    setLimit(limit + showMoreItems)
+  return {
+    historyToDisplay: items.slice(0, limit),
+    canShowMore: limit < items.length,
+    showMore: () => setLimit(limit + 10)
   }
-
-  const historyToDisplay = useMemo(() => items.slice(0, limit), [items, limit])
-
-  const account = useAccount()
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    setLimit(initialLimit)
-  }, [account.address])
-
-  return { historyToDisplay, canShowMore: canShowMore, showMore }
 }
 
 function List({ items }: { items: HistoryItem[] }) {

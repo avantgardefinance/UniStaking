@@ -12,14 +12,6 @@ import { UnstakeDialogContent } from "@/components/unstake-dialog"
 import { formatDate } from "@/lib/date"
 import { Download, Info, Upload } from "lucide-react"
 import { type Address, isAddressEqual } from "viem"
-import { useAccount } from "wagmi"
-
-function useStakeDepositCard({ owner }: { owner: Address }) {
-  const account = useAccount()
-  return {
-    isOwner: account.address ? isAddressEqual(account.address, owner) : false
-  }
-}
 
 export type StakeDeposit = {
   stakeId: string
@@ -33,13 +25,15 @@ export type StakeDeposit = {
 export type StakeDepositCardProps = {
   deposit: StakeDeposit
   governanceTokenBalanceValue: bigint
+  account: Address
 }
 
 export function StakeDepositCard({
   deposit: { beneficiary, createdAt, delegatee, owner, stakeId, stakedAmount, updatedAt },
-  governanceTokenBalanceValue
+  governanceTokenBalanceValue,
+  account
 }: StakeDepositCardProps) {
-  const { isOwner } = useStakeDepositCard({ owner })
+  const isOwner = isAddressEqual(account, owner)
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between flex-wrap">
@@ -116,6 +110,7 @@ export function StakeDepositCard({
                   </Button>
                 </DialogTrigger>
                 <StakeMoreDialogContent
+                  account={account}
                   availableForStakingUni={governanceTokenBalanceValue}
                   stakeId={stakeId}
                   delegatee={delegatee}

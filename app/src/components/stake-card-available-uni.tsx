@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
+import { Address } from "viem"
 
 interface Props {
   availableForStakingUni?: bigint
   isLoading: boolean
   error?: Error
+  account: Address
 }
 
 export function AvailableUniForStaking(props: Props) {
@@ -24,7 +26,7 @@ export function AvailableUniForStaking(props: Props) {
   )
 }
 
-function AvailableUniForStakingContent({ availableForStakingUni, isLoading, error }: Props) {
+function AvailableUniForStakingContent({ availableForStakingUni, isLoading, error, account }: Props) {
   if (isLoading) {
     return "Loading..."
   }
@@ -52,7 +54,7 @@ function AvailableUniForStakingContent({ availableForStakingUni, isLoading, erro
             <span>Create position</span>
           </Button>
         </DialogTrigger>
-        <StakeDialogContent availableForStakingUni={availableForStakingUni} />
+        <StakeDialogContent account={account} availableForStakingUni={availableForStakingUni} />
       </Dialog>
     </>
   )

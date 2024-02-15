@@ -6,6 +6,7 @@ import { Alert } from "@/components/ui/alert"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ReactNode } from "react"
+import { Address } from "viem"
 
 interface Props {
   deposits: StakeDeposit[]
@@ -13,6 +14,7 @@ interface Props {
   governanceTokenBalance: { value: bigint } | undefined
   isEmpty: boolean
   isLoading: boolean
+  account: Address
 }
 
 export function StakedAmounts(props: Props) {
@@ -36,7 +38,7 @@ function CardWithTitle({ children }: { children: ReactNode }) {
   )
 }
 
-function StakedAmountsContent({ deposits, error, governanceTokenBalance, isEmpty, isLoading }: Props) {
+function StakedAmountsContent({ deposits, error, governanceTokenBalance, isEmpty, isLoading, account }: Props) {
   if (isLoading) {
     return (
       <>
@@ -91,7 +93,11 @@ function StakedAmountsContent({ deposits, error, governanceTokenBalance, isEmpty
       {/*TODO improve types*/}
       {deposits.map((deposit: any) => (
         <div key={deposit.stakeId} className="w-full">
-          <StakeDepositCard deposit={deposit} governanceTokenBalanceValue={governanceTokenBalance.value} />
+          <StakeDepositCard
+            account={account}
+            deposit={deposit}
+            governanceTokenBalanceValue={governanceTokenBalance.value}
+          />
         </div>
       ))}
     </>

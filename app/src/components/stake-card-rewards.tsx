@@ -8,11 +8,10 @@ import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { Trophy } from "lucide-react"
-import { useAccount, useReadContract } from "wagmi"
+import { Address } from "viem"
+import { useReadContract } from "wagmi"
 
-function useStakeCardRewards() {
-  const account = useAccount()
-
+function useStakeCardRewards(account: Address) {
   const {
     data: rewards,
     queryKey,
@@ -21,7 +20,7 @@ function useStakeCardRewards() {
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "unclaimedReward",
-    args: account.address === undefined ? undefined : [account.address]
+    args: [account]
   })
 
   const queryClient = useQueryClient()
@@ -43,21 +42,21 @@ function useStakeCardRewards() {
   return { rewards, writeClaim, isAbleToClaim, status }
 }
 
-export function StakeCardRewards() {
+export function StakeCardRewards({ account }: { account: Address }) {
   return (
     <Card className="flex-1 flex justify-between flex-col">
       <CardHeader>
         <CardDescription className="text-base font-medium">Rewards</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-between flex-wrap gap-2">
-        <StakeCardRewardsContent />
+        <StakeCardRewardsContent account={account} />
       </CardContent>
     </Card>
   )
 }
 
-function StakeCardRewardsContent() {
-  const { isAbleToClaim, rewards, status, writeClaim } = useStakeCardRewards()
+function StakeCardRewardsContent({ account }: { account: Address }) {
+  const { isAbleToClaim, rewards, status, writeClaim } = useStakeCardRewards(account)
 
   if (status === "error") {
     return "Error"

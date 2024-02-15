@@ -36,7 +36,7 @@ export default function RootLayout({
           <div className="relative flex flex-col pt-2">
             <Providers>
               <SiteHeader />
-              <div className="flex-1">{children}</div>
+              <div className="flex-1 pt-4">{children}</div>
             </Providers>
           </div>
         </div>

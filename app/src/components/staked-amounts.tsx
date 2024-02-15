@@ -64,7 +64,7 @@ function StakedAmountsContent({ deposits, error, governanceTokenBalance, isEmpty
     )
   }
 
-  if (error !== null) {
+  if (error) {
     return (
       <CardWithTitle>
         <Alert variant="destructive">Error</Alert>

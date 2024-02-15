@@ -1,41 +1,39 @@
-"use client"
-
 import { StakeDialogContent } from "@/components/stake-dialog"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { NoSsr } from "@/components/ui/no-ssr"
-import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
 import { Plus } from "lucide-react"
 
-export function AvailableUniForStaking() {
+interface Props {
+  availableForStakingUni?: bigint
+  isLoading: boolean
+  error: Error | null
+}
+
+export function AvailableUniForStaking(props: Props) {
   return (
     <Card className="flex-1 flex justify-between flex-col">
       <CardHeader>
         <CardDescription className="text-base font-medium">Available for staking</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-between flex-wrap gap-2">
-        <NoSsr>
-          <AvailableUniForStakingContent />
-        </NoSsr>
+        <AvailableUniForStakingContent {...props} />
       </CardContent>
     </Card>
   )
 }
 
-function AvailableUniForStakingContent() {
-  const { data, status } = useGovernanceTokenBalance()
-
-  if (status === "error") {
-    return "Error"
-  }
-
-  if (status === "pending") {
+function AvailableUniForStakingContent({ availableForStakingUni, isLoading, error }: Props) {
+  if (isLoading) {
     return "Loading..."
   }
 
-  if (data === undefined) {
+  if (error) {
+    return "Error"
+  }
+
+  if (availableForStakingUni === undefined) {
     return "Not available"
   }
 
@@ -43,7 +41,7 @@ function AvailableUniForStakingContent() {
     <>
       <h3 className="space-x-2 flex-grow">
         <span className="text-2xl font-semibold">
-          <BigIntDisplay value={data.value} decimals={data.decimals} precision={2} />
+          <BigIntDisplay value={availableForStakingUni} decimals={18} precision={2} />
         </span>
         <span className="text-xl">UNI</span>
       </h3>
@@ -54,7 +52,7 @@ function AvailableUniForStakingContent() {
             <span>Create position</span>
           </Button>
         </DialogTrigger>
-        <StakeDialogContent availableForStakingUni={data.value} />
+        <StakeDialogContent availableForStakingUni={availableForStakingUni} />
       </Dialog>
     </>
   )

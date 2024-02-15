@@ -1,7 +1,10 @@
 import { graphql } from "@/lib/generated/subgraph/gql"
 
 export const DepositsQuery = graphql(`
-  query Deposits($account: String!) {
+  query Deposits($account: String!, $accountId: ID!) {
+    account(id: $accountId) {
+      currentlyStaked
+    }
     deposits(where: { amount_gt: 0, owner: $account, delegatee: $account, beneficiary: $account}) {
       beneficiary {
         id

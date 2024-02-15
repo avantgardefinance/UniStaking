@@ -4,59 +4,23 @@ import { StakeDepositCard } from "@/components/stake-deposit-card"
 import type { StakeDeposit } from "@/components/stake-deposit-card"
 import { Alert } from "@/components/ui/alert"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
-import { useQuery } from "@tanstack/react-query"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ReactNode } from "react"
-import { useAccount } from "wagmi"
 
-function useStakedAmounts() {
-  const account = useAccount()
-
-  const {
-    data: deposits,
-    error: errorDeposits,
-    isLoading: isLoadingDeposits
-  } = useQuery({
-    queryKey: ["deposits", account.address],
-    queryFn: async () => {
-      const response = await fetch(`/api/deposits?account=${account.address}`)
-      return response.json()
-    },
-    enabled: account.address !== undefined
-  })
-
-  // TODO improve types
-  const parsedDeposits: Array<StakeDeposit> =
-    deposits?.map((deposit: any) => {
-      return {
-        ...deposit,
-        createdAt: new Date(deposit.createdAt * 1000),
-        updatedAt: new Date(deposit.updatedAt * 1000)
-      }
-    }) ?? []
-
-  const {
-    data: governanceTokenBalance,
-    error: errorGovernanceTokenBalance,
-    isLoading: isLoadingGovernanceTokenBalance
-  } = useGovernanceTokenBalance()
-
-  const isEmpty = parsedDeposits.length === 0
-  return {
-    deposits: parsedDeposits,
-    isEmpty,
-    governanceTokenBalance,
-    error: errorGovernanceTokenBalance ?? errorDeposits,
-    isLoading: isLoadingGovernanceTokenBalance ?? isLoadingDeposits
-  }
+interface Props {
+  deposits: StakeDeposit[]
+  error: Error | null
+  governanceTokenBalance: { value: bigint } | undefined
+  isEmpty: boolean
+  isLoading: boolean
 }
 
-export function StakedAmounts() {
+export function StakedAmounts(props: Props) {
   return (
     <div className="space-y-2">
       <h2 className="text-3xl font-bold">Staked Amounts</h2>
       <div className="flex flex-row flex-wrap gap-8">
-        <StakedAmountsContent />
+        <StakedAmountsContent {...props} />
       </div>
     </div>
   )
@@ -72,17 +36,38 @@ function CardWithTitle({ children }: { children: ReactNode }) {
   )
 }
 
-function StakedAmountsContent() {
-  const { deposits, error, governanceTokenBalance, isEmpty, isLoading } = useStakedAmounts()
-
+function StakedAmountsContent({ deposits, error, governanceTokenBalance, isEmpty, isLoading }: Props) {
   if (isLoading) {
-    return <CardWithTitle>Loading...</CardWithTitle>
+    return (
+      <>
+        <CardWithTitle>
+          <div className="flex flex-row">
+            <Skeleton className="w-20 h-20 rounded-full" />
+            <div className="space-y-2 flex-grow">
+              <Skeleton className="w-full h-[20px] rounded-full" />
+              <Skeleton className="w-3/4 h-[20px] rounded-full" />
+              <Skeleton className="w-3/4 h-[20px] rounded-full" />
+            </div>
+          </div>
+        </CardWithTitle>
+        <CardWithTitle>
+          <div className="flex flex-row">
+            <Skeleton className="w-20 h-20 rounded-full" />
+            <div className="space-y-2 flex-grow">
+              <Skeleton className="w-full h-[20px] rounded-full" />
+              <Skeleton className="w-3/4 h-[20px] rounded-full" />
+              <Skeleton className="w-3/4 h-[20px] rounded-full" />
+            </div>
+          </div>
+        </CardWithTitle>
+      </>
+    )
   }
 
   if (error !== null) {
     return (
       <CardWithTitle>
-        <Alert variant="destructive">{error.message}</Alert>
+        <Alert variant="destructive">Error</Alert>
       </CardWithTitle>
     )
   }

@@ -8,18 +8,23 @@ const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/s
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
-  const account = new URLSearchParams(url.search).get("account")
+  const accountParam = new URLSearchParams(url.search).get("account")
 
-  if (!account) {
+  if (!accountParam) {
     return new Response(null, { status: 400 })
   }
 
-  const { deposits } = await client.request({
+  const { deposits, account } = await client.request({
     document: DepositsQuery,
     variables: {
-      account
+      account: accountParam,
+      accountId: accountParam
     }
   })
+
+  if (!account) {
+    return new Response(null, { status: 404 })
+  }
 
   const parsedDeposits = deposits.map((deposit) => {
     return {
@@ -33,7 +38,7 @@ export async function GET(request: Request) {
     }
   })
 
-  return Response.json(parsedDeposits)
+  return Response.json({ deposits: parsedDeposits, currentlyStaked: account.currentlyStaked })
 }
 
 export const runtime = "edge"

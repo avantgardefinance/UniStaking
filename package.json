@@ -3,7 +3,7 @@
   "packageManager": "pnpm@8.15.1",
   "scripts": {
     "lint": "biome check .",
-    "format": "biome check --apply-unsafe .",
+    "format": "biome check --apply-unsafe",
     "dev": "pnpm --filter app run dev"
   },
   "devDependencies": {
@@ -12,7 +12,7 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "@graphprotocol/graph-cli@0.67.3": "patches/@graphprotocol__graph-cli@0.67.3.patch"
+      "@graphprotocol/graph-cli@0.68.0": "patches/@graphprotocol__graph-cli@0.68.0.patch"
     }
   }
 }

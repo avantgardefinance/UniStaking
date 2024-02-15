@@ -4,20 +4,21 @@ import { GetHistoryResponse } from "@/app/api/history/route"
 import { HistoryCard, HistoryItem } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
-import { useAccount } from "wagmi"
+import { Address } from "viem"
 
-function useHistoryList() {
-  const account = useAccount()
-
+function useHistoryList({ account }: { account: Address }) {
   const { data, error, isLoading } = useQuery({
-    queryKey: ["history", account.address],
+    queryKey: ["history", account],
     queryFn: async () => {
-      const response = await fetch(`/api/history?account=${account.address}`)
+      const response = await fetch(`/api/history?account=${account}`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch history")
+      }
       return response.json()
-    },
-    enabled: account.address !== undefined
+    }
   })
 
   // TODO improve types
@@ -37,9 +38,8 @@ function useHistoryList() {
   }
 }
 
-export function HistoryList() {
-  const account = useAccount()
-  const { data, error, isLoading } = useHistoryList()
+export function HistoryList({ account }: { account: Address }) {
+  const { data, error, isLoading } = useHistoryList({ account })
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -49,7 +49,17 @@ export function HistoryList() {
     return <Alert variant="destructive">{error.message}</Alert>
   }
 
-  return <List key={account.address} items={data} />
+  if (data.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>No history</CardTitle>
+        </CardHeader>
+      </Card>
+    )
+  }
+
+  return <List key={account} items={data} />
 }
 
 function useList(items: HistoryItem[]) {

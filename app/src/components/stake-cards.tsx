@@ -1,6 +1,7 @@
 import { AvailableUniForStaking } from "@/components/stake-card-available-uni"
 import { StakeCardRewards } from "@/components/stake-card-rewards"
 import { StakeCardTotalStaked } from "@/components/stake-card-total-staked"
+import { Address } from "viem"
 
 export function StakeCards(props: {
   currentlyStaked?: bigint
@@ -9,6 +10,7 @@ export function StakeCards(props: {
   availableForStakingUni?: bigint
   isLoadingAvailableForStaking: boolean
   errorAvailableForStaking?: Error
+  account: Address
 }) {
   return (
     <div className="space-y-2">
@@ -19,8 +21,9 @@ export function StakeCards(props: {
           isLoading={props.isLoadingTotalStaked}
           error={props.errorTotalStaked}
         />
-        <StakeCardRewards />
+        <StakeCardRewards account={props.account} />
         <AvailableUniForStaking
+          account={props.account}
           isLoading={props.isLoadingAvailableForStaking}
           error={props.errorAvailableForStaking}
           availableForStakingUni={props.availableForStakingUni}

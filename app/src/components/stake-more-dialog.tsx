@@ -18,17 +18,18 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, isAddressEqual, parseUnits } from "viem"
-import { useAccount, useChainId } from "wagmi"
+import { useChainId } from "wagmi"
 import { readContract, signTypedData } from "wagmi/actions"
 
 const useStakeMoreDialog = ({
   availableForStakingUni,
-  stakeId
+  stakeId,
+  account
 }: {
   availableForStakingUni: bigint
   stakeId: string
+  account: Address
 }) => {
-  const account = useAccount()
   const chainId = useChainId()
 
   const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
@@ -56,10 +57,6 @@ const useStakeMoreDialog = ({
   const onSubmit = async (values: {
     amount: string
   }) => {
-    if (account.address === undefined) {
-      return
-    }
-
     if (hasSignedEnoughValue) {
       const deadlineTimestamp = Number(signatureInfo.deadline) * 1000
       if (deadlineTimestamp < new Date().getTime()) {
@@ -67,7 +64,7 @@ const useStakeMoreDialog = ({
         setError(new Error("Singature expired"))
         return
       }
-      if (!isAddressEqual(signatureInfo.owner, account.address)) {
+      if (!isAddressEqual(signatureInfo.owner, account)) {
         setSignatureInfo(undefined)
         setError(new Error("Invalid signature owner"))
         return
@@ -86,7 +83,7 @@ const useStakeMoreDialog = ({
           address: governanceToken,
           abi: uniAbi,
           functionName: "nonces",
-          args: [account.address]
+          args: [account]
         })
 
         const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
@@ -94,7 +91,7 @@ const useStakeMoreDialog = ({
         const value = parseUnits(values.amount, 18)
 
         const permitSignature = await signTypedData(config, {
-          account: account.address,
+          account,
           types: permitEIP712Options.permitTypes,
           domain: {
             ...permitEIP712Options.domainBase,
@@ -102,7 +99,7 @@ const useStakeMoreDialog = ({
           },
           primaryType: permitEIP712Options.primaryType,
           message: {
-            owner: account.address,
+            owner: account,
             spender: uniStaker,
             value,
             nonce: nonce,
@@ -113,7 +110,7 @@ const useStakeMoreDialog = ({
         setSignatureInfo({
           signature: permitSignature,
           deadline: signedDeadline,
-          owner: account.address,
+          owner: account,
           value
         })
       } catch (e) {
@@ -142,16 +139,19 @@ export function StakeMoreDialogContent({
   availableForStakingUni,
   beneficiary,
   delegatee,
-  stakeId
+  stakeId,
+  account
 }: {
   availableForStakingUni: bigint
   stakeId: string
   delegatee: Address
   beneficiary: Address
+  account: Address
 }) {
   const { error, form, hasSignedEnoughValue, isPending, onSubmit, setMaxAmount } = useStakeMoreDialog({
     availableForStakingUni,
-    stakeId
+    stakeId,
+    account
   })
 
   return (

@@ -3,29 +3,28 @@
 import { StakeCards } from "@/components/stake-cards"
 import { StakeDeposit } from "@/components/stake-deposit-card"
 import { StakedAmounts } from "@/components/staked-amounts"
-import { useGovernanceTokenBalance } from "@/lib/hooks/use-governance-token-balance"
+import { governanceToken } from "@/lib/consts"
+import { withAccount } from "@/lib/hocs/withAccount"
 import { useQuery } from "@tanstack/react-query"
-import { useAccount } from "wagmi"
+import { Address } from "viem"
+import { useBalance } from "wagmi"
 
-function useStakePanel() {
-  const account = useAccount() // TODO: move this on top of the app
-
+function useStakePanel(account: Address) {
   const {
     data: depositsData,
     error: errorDeposits,
     isLoading: isLoadingDeposits
   } = useQuery({
-    queryKey: ["deposits", account.address],
+    queryKey: ["deposits", account],
     queryFn: async () => {
-      const response = await fetch(`/api/deposits?account=${account.address}`)
+      const response = await fetch(`/api/deposits?account=${account}`)
 
       if (!response.ok) {
         throw new Error("Failed to fetch deposits")
       }
 
       return response.json()
-    },
-    enabled: account.address !== undefined
+    }
   })
 
   // TODO improve types
@@ -45,7 +44,10 @@ function useStakePanel() {
     data: governanceTokenBalance,
     error: errorGovernanceTokenBalance,
     isLoading: isLoadingGovernanceTokenBalance
-  } = useGovernanceTokenBalance()
+  } = useBalance({
+    address: account,
+    token: governanceToken
+  })
 
   const isEmpty = parsedDeposits.length === 0
   return {
@@ -60,7 +62,7 @@ function useStakePanel() {
   }
 }
 
-export function StakePanel() {
+function Panel({ account }: { account: Address }) {
   const {
     currentlyStaked,
     deposits,
@@ -70,7 +72,7 @@ export function StakePanel() {
     errorGovernanceTokenBalance,
     isLoadingDeposits,
     isLoadingGovernanceTokenBalance
-  } = useStakePanel()
+  } = useStakePanel(account)
 
   return (
     <>
@@ -82,10 +84,12 @@ export function StakePanel() {
           errorAvailableForStaking={errorGovernanceTokenBalance ?? undefined}
           isLoadingTotalStaked={isLoadingDeposits}
           errorTotalStaked={errorDeposits}
+          account={account}
         />
       </section>
       <section>
         <StakedAmounts
+          account={account}
           deposits={deposits}
           error={errorGovernanceTokenBalance ?? errorDeposits}
           governanceTokenBalance={governanceTokenBalance}
@@ -96,3 +100,5 @@ export function StakePanel() {
     </>
   )
 }
+
+export const StakePanel = withAccount(Panel)

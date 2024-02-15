@@ -19,15 +19,16 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, isAddressEqual, parseUnits } from "viem"
-import { useAccount, useChainId } from "wagmi"
+import { useChainId } from "wagmi"
 import { readContract, signTypedData } from "wagmi/actions"
 
 const useStakeDialog = ({
-  availableForStakingUni
+  availableForStakingUni,
+  account
 }: {
   availableForStakingUni: bigint
+  account: Address
 }) => {
-  const account = useAccount()
   const chainId = useChainId()
 
   const [signatureInfo, setSignatureInfo] = useState<{
@@ -44,8 +45,8 @@ const useStakeDialog = ({
 
   const form = useForm({
     defaultValues: {
-      beneficiary: account.address,
-      customDelegatee: account.address,
+      beneficiary: account,
+      customDelegatee: account,
       tallyDelegatee: undefined,
       amount: formatUnits(availableForStakingUni, 18),
       delegateeOption: "custom"
@@ -68,7 +69,7 @@ const useStakeDialog = ({
     setError(undefined)
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
 
-    if (values.beneficiary === undefined || delegatee === undefined || account.address === undefined) {
+    if (values.beneficiary === undefined || delegatee === undefined) {
       return
     }
 
@@ -79,7 +80,7 @@ const useStakeDialog = ({
         setError(new Error("Singature expired"))
         return
       }
-      if (!isAddressEqual(signatureInfo.owner, account.address)) {
+      if (!isAddressEqual(signatureInfo.owner, account)) {
         setSignatureInfo(undefined)
         setError(new Error("Invalid signature owner"))
         return
@@ -98,7 +99,7 @@ const useStakeDialog = ({
           address: governanceToken,
           abi: uniAbi,
           functionName: "nonces",
-          args: [account.address]
+          args: [account]
         })
 
         const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
@@ -106,7 +107,7 @@ const useStakeDialog = ({
         const value = parseUnits(values.amount, 18)
 
         const permitSignature = await signTypedData(config, {
-          account: account.address,
+          account,
           types: permitEIP712Options.permitTypes,
           domain: {
             ...permitEIP712Options.domainBase,
@@ -114,7 +115,7 @@ const useStakeDialog = ({
           },
           primaryType: permitEIP712Options.primaryType,
           message: {
-            owner: account.address,
+            owner: account,
             spender: uniStaker,
             value,
             nonce: nonce,
@@ -125,7 +126,7 @@ const useStakeDialog = ({
         setSignatureInfo({
           signature: permitSignature,
           deadline: signedDeadline,
-          owner: account.address,
+          owner: account,
           value
         })
       } catch (e) {
@@ -152,7 +153,10 @@ const useStakeDialog = ({
   }
 }
 
-export function StakeDialogContent({ availableForStakingUni }: { availableForStakingUni: bigint }) {
+export function StakeDialogContent({
+  availableForStakingUni,
+  account
+}: { availableForStakingUni: bigint; account: Address }) {
   const {
     error,
     form,
@@ -163,7 +167,8 @@ export function StakeDialogContent({ availableForStakingUni }: { availableForSta
     tallyDelegatees,
     hasSignedEnoughValue
   } = useStakeDialog({
-    availableForStakingUni
+    availableForStakingUni,
+    account
   })
 
   return (

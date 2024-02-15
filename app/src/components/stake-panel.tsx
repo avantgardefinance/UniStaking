@@ -18,6 +18,11 @@ function useStakePanel() {
     queryKey: ["deposits", account.address],
     queryFn: async () => {
       const response = await fetch(`/api/deposits?account=${account.address}`)
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch deposits")
+      }
+
       return response.json()
     },
     enabled: account.address !== undefined
@@ -48,8 +53,8 @@ function useStakePanel() {
     isEmpty,
     currentlyStaked,
     governanceTokenBalance,
-    errorGovernanceTokenBalance,
-    errorDeposits,
+    errorGovernanceTokenBalance: errorGovernanceTokenBalance ?? undefined,
+    errorDeposits: errorDeposits ?? undefined,
     isLoadingGovernanceTokenBalance,
     isLoadingDeposits
   }
@@ -74,7 +79,7 @@ export function StakePanel() {
           currentlyStaked={currentlyStaked}
           availableForStakingUni={governanceTokenBalance?.value}
           isLoadingAvailableForStaking={isLoadingGovernanceTokenBalance}
-          errorAvailableForStaking={errorGovernanceTokenBalance}
+          errorAvailableForStaking={errorGovernanceTokenBalance ?? undefined}
           isLoadingTotalStaked={isLoadingDeposits}
           errorTotalStaked={errorDeposits}
         />
@@ -82,7 +87,7 @@ export function StakePanel() {
       <section>
         <StakedAmounts
           deposits={deposits}
-          error={errorDeposits ?? errorGovernanceTokenBalance}
+          error={errorGovernanceTokenBalance ?? errorDeposits}
           governanceTokenBalance={governanceTokenBalance}
           isEmpty={isEmpty}
           isLoading={isLoadingDeposits ?? isLoadingGovernanceTokenBalance}

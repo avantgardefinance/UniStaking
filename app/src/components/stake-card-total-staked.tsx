@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/
 interface Props {
   currentlyStaked?: bigint
   isLoading: boolean
-  error: Error | null
+  error?: Error
 }
 
 export function StakeCardTotalStaked(props: Props) {

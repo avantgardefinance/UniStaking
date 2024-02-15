@@ -8,7 +8,7 @@ import { Plus } from "lucide-react"
 interface Props {
   availableForStakingUni?: bigint
   isLoading: boolean
-  error: Error | null
+  error?: Error
 }
 
 export function AvailableUniForStaking(props: Props) {

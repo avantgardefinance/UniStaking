@@ -5,10 +5,10 @@ import { StakeCardTotalStaked } from "@/components/stake-card-total-staked"
 export function StakeCards(props: {
   currentlyStaked?: bigint
   isLoadingTotalStaked: boolean
-  errorTotalStaked: Error | null
+  errorTotalStaked?: Error
   availableForStakingUni?: bigint
   isLoadingAvailableForStaking: boolean
-  errorAvailableForStaking: Error | null
+  errorAvailableForStaking?: Error
 }) {
   return (
     <div className="space-y-2">

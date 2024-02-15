@@ -1,16 +1,17 @@
 import { DepositsQuery } from "@/lib/subgraph/deposits"
 import { GraphQLClient } from "graphql-request"
+import { NextApiRequest } from "next"
+import { isAddress } from "viem"
 
 // TODO: Use the "production" subgraph url here when not in development mode.
 const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/staking", {
   fetch
 })
 
-export async function GET(request: Request) {
-  const url = new URL(request.url)
-  const accountParam = new URLSearchParams(url.search).get("account")
+export async function GET(request: NextApiRequest) {
+  const accountParam = request.query.account
 
-  if (!accountParam) {
+  if (typeof accountParam !== "string" || !isAddress(accountParam)) {
     return new Response(null, { status: 400 })
   }
 
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
   })
 
   if (!account) {
-    return new Response(null, { status: 404 })
+    return Response.json({ deposits: [], currentlyStaked: 0 })
   }
 
   const parsedDeposits = deposits.map((deposit) => {

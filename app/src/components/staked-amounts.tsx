@@ -9,7 +9,7 @@ import { ReactNode } from "react"
 
 interface Props {
   deposits: StakeDeposit[]
-  error: Error | null
+  error?: Error
   governanceTokenBalance: { value: bigint } | undefined
   isEmpty: boolean
   isLoading: boolean

@@ -1,5 +1,6 @@
 import { DepositsQuery } from "@/lib/subgraph/deposits"
 import { GraphQLClient } from "graphql-request"
+import { NextRequest } from "next/server"
 import { isAddress } from "viem"
 
 // TODO: Use the "production" subgraph url here when not in development mode.
@@ -7,9 +8,8 @@ const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/s
   fetch
 })
 
-export async function GET(request: Request) {
-  const url = new URL(request.url)
-  const accountParam = new URLSearchParams(url.search).get("account")
+export async function GET(request: NextRequest) {
+  const accountParam = request.nextUrl.searchParams.get("account")
 
   if (typeof accountParam !== "string" || !isAddress(accountParam)) {
     return new Response(null, { status: 400 })

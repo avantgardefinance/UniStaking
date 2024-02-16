@@ -79,7 +79,15 @@ function UnstakeCard({
   )
 }
 
-function ClaimRewardsCard({ amount, beneficiary, date }: { date: Date; amount: bigint; beneficiary: Address }) {
+function ClaimRewardsCard({
+  amount,
+  beneficiary,
+  date
+}: {
+  date: Date
+  amount: bigint
+  beneficiary: Address
+}) {
   return (
     <HistoryCardTemplate date={date} beneficiary={beneficiary} title="Claim Rewards">
       <div className="flex flex-row justify-between items-center w-full">

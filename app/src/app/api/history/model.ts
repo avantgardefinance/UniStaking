@@ -62,3 +62,6 @@ export const HistoryEntrySchema = Schema.union(
   DelegateeAlteredSchema,
   RewardClaimedSchema
 )
+
+export type History = Schema.Schema.To<typeof HistorySchema>
+export const HistorySchema = Schema.array(HistoryEntrySchema)

@@ -1,4 +1,4 @@
-import { TallyDelegateeSchema } from "@/app/api/delegatees/model"
+import { TallyDelegateesSchema } from "@/app/api/delegatees/model"
 import { invariant } from "@/lib/assertion"
 import { DelegatesSortBy } from "@/lib/generated/tally/graphql"
 import { DelegatesQuery } from "@/lib/tally/delegates"
@@ -30,7 +30,7 @@ function query(limit: number, after?: string) {
   })
 }
 
-const encode = Schema.encodeSync(Schema.array(TallyDelegateeSchema))
+const encode = Schema.encodeSync(TallyDelegateesSchema)
 
 export async function GET() {
   const first = await query(20)

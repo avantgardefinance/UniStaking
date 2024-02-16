@@ -11,13 +11,23 @@ import { Separator } from "@/components/ui/separator"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { useQueryClient } from "@tanstack/react-query"
 import { RotateCw, Upload } from "lucide-react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, parseUnits } from "viem"
 
 const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string; availableForUnstaking: bigint }) => {
-  const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
+  const client = useQueryClient()
+  const {
+    error: errorWrite,
+    isPending: isPendingWrite,
+    writeContract
+  } = useWriteContractWithToast({
+    mutation: {
+      onSettled: () => client.invalidateQueries()
+    }
+  })
 
   const form = useForm({
     defaultValues: {

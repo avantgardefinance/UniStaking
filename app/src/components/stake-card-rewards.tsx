@@ -12,11 +12,7 @@ import { Address } from "viem"
 import { useReadContract } from "wagmi"
 
 function useStakeCardRewards(account: Address) {
-  const {
-    data: rewards,
-    queryKey,
-    status
-  } = useReadContract({
+  const { data: rewards, status } = useReadContract({
     address: uniStaker,
     abi: abiUniStaker,
     functionName: "unclaimedReward",
@@ -26,7 +22,7 @@ function useStakeCardRewards(account: Address) {
   const queryClient = useQueryClient()
   const { writeContract } = useWriteContractWithToast({
     mutation: {
-      onSuccess: () => queryClient.invalidateQueries({ queryKey })
+      onSettled: () => queryClient.invalidateQueries()
     }
   })
 

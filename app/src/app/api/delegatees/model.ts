@@ -9,3 +9,6 @@ export const TallyDelegateeSchema = Schema.struct({
   label: Schema.string,
   votes: Schema.bigint
 })
+
+export type TallyDelegatees = Schema.Schema.To<typeof TallyDelegateesSchema>
+export const TallyDelegateesSchema = Schema.array(TallyDelegateeSchema)

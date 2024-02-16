@@ -1,13 +1,17 @@
 "use client"
 
+import { AccountDepositsSchema } from "@/app/api/deposits/model"
 import { StakeCards } from "@/components/stake-cards"
 import { StakeDeposit } from "@/components/stake-deposit-card"
 import { StakedAmounts } from "@/components/staked-amounts"
 import { governanceToken } from "@/lib/consts"
 import { withAccount } from "@/lib/hocs/withAccount"
+import { Schema } from "@effect/schema"
 import { useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
 import { useBalance } from "wagmi"
+
+const decode = Schema.decodeSync(AccountDepositsSchema)
 
 function useStakePanel(account: Address) {
   const {
@@ -18,27 +22,13 @@ function useStakePanel(account: Address) {
     queryKey: ["deposits", account],
     queryFn: async () => {
       const response = await fetch(`/api/deposits?account=${account}`)
-
       if (!response.ok) {
         throw new Error("Failed to fetch deposits")
       }
 
-      return response.json()
+      return decode(await response.json())
     }
   })
-
-  // TODO improve types
-  const parsedDeposits: Array<StakeDeposit> =
-    depositsData?.deposits.map((deposit: any) => {
-      return {
-        ...deposit,
-        createdAt: new Date(deposit.createdAt * 1000),
-        updatedAt: new Date(deposit.updatedAt * 1000)
-      }
-    }) ?? []
-
-  const currentlyStaked: bigint | undefined =
-    depositsData === undefined ? undefined : BigInt(depositsData.currentlyStaked)
 
   const {
     data: governanceTokenBalance,
@@ -49,11 +39,11 @@ function useStakePanel(account: Address) {
     token: governanceToken
   })
 
-  const isEmpty = parsedDeposits.length === 0
+  const isEmpty = depositsData?.deposits.length === 0
   return {
-    deposits: parsedDeposits,
+    deposits: depositsData?.deposits ?? [],
     isEmpty,
-    currentlyStaked,
+    currentlyStaked: depositsData?.total ?? BigInt(0),
     governanceTokenBalance,
     errorGovernanceTokenBalance: errorGovernanceTokenBalance ?? undefined,
     errorDeposits: errorDeposits ?? undefined,

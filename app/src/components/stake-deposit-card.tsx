@@ -1,3 +1,4 @@
+import { Deposit } from "@/app/api/deposits/model"
 import { EditBeneficiaryDelegateeDialogContent } from "@/components/edit-beneficiary-delegatee-dialog"
 import { StakeMoreDialogContent } from "@/components/stake-more-dialog"
 import { AddressDisplay } from "@/components/ui/address-display"
@@ -13,17 +14,8 @@ import { formatDate } from "@/lib/date"
 import { Download, Info, Upload } from "lucide-react"
 import { type Address, isAddressEqual } from "viem"
 
-export type StakeDeposit = {
-  stakeId: string
-  stakedAmount: bigint
-  createdAt: Date
-  updatedAt: Date
-  owner: Address
-  beneficiary: Address
-  delegatee: Address
-}
 export type StakeDepositCardProps = {
-  deposit: StakeDeposit
+  deposit: Deposit
   governanceTokenBalanceValue: bigint
   account: Address
 }

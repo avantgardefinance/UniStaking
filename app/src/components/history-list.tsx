@@ -1,6 +1,6 @@
 "use client"
 
-import { HistoryEntry, HistoryEntrySchema } from "@/app/api/history/model"
+import { History, HistoryEntry, HistorySchema } from "@/app/api/history/model"
 import { HistoryCard } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 import { Address } from "viem"
 
-const decode = Schema.decodeSync(Schema.array(HistoryEntrySchema))
+const decode = Schema.decodeSync(HistorySchema)
 
 function useHistoryList({ account }: { account: Address }) {
   return useQuery({
@@ -52,7 +52,7 @@ export function HistoryList({ account }: { account: Address }) {
   return null
 }
 
-function useList(items: ReadonlyArray<HistoryEntry>) {
+function useList(items: History) {
   const [limit, setLimit] = useState(20)
 
   return {
@@ -62,7 +62,7 @@ function useList(items: ReadonlyArray<HistoryEntry>) {
   }
 }
 
-function List({ items }: { items: ReadonlyArray<HistoryEntry> }) {
+function List({ items }: { items: History }) {
   const { historyToDisplay, canShowMore, showMore } = useList(items)
 
   return (

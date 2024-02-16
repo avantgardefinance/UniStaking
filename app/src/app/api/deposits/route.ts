@@ -1,7 +1,11 @@
+import { AccountDepositsSchema } from "@/app/api/deposits/model"
 import { DepositsQuery } from "@/lib/subgraph/deposits"
+import { Schema } from "@effect/schema"
 import { GraphQLClient } from "graphql-request"
 import { NextRequest } from "next/server"
 import { isAddress } from "viem"
+
+const encode = Schema.encodeSync(AccountDepositsSchema)
 
 // TODO: Use the "production" subgraph url here when not in development mode.
 const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/staking", {
@@ -9,37 +13,35 @@ const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/s
 })
 
 export async function GET(request: NextRequest) {
-  const accountParam = request.nextUrl.searchParams.get("account")
-
-  if (typeof accountParam !== "string" || !isAddress(accountParam)) {
+  const account = request.nextUrl.searchParams.get("account") || ""
+  if (!isAddress(account)) {
     return new Response(null, { status: 400 })
   }
 
-  const { deposits, account } = await client.request({
+  const response = await client.request({
     document: DepositsQuery,
     variables: {
-      account: accountParam,
-      accountId: accountParam
+      account,
+      accountId: account
     }
   })
 
-  if (!account) {
-    return Response.json({ deposits: [], currentlyStaked: 0 })
-  }
+  const deposits = (response.deposits ?? []).map((deposit) => ({
+    stakeId: deposit.id,
+    stakedAmount: BigInt(deposit.amount),
+    createdAt: new Date(deposit.createdAt * 1000),
+    updatedAt: new Date(deposit.updatedAt * 1000),
+    owner: deposit.owner.id,
+    delegatee: deposit.delegatee.id,
+    beneficiary: deposit.beneficiary.id
+  }))
 
-  const parsedDeposits = deposits.map((deposit) => {
-    return {
-      stakeId: deposit.id,
-      stakedAmount: deposit.amount,
-      createdAt: deposit.createdAt,
-      updatedAt: deposit.updatedAt,
-      owner: deposit.owner.id,
-      delegatee: deposit.delegatee.id,
-      beneficiary: deposit.beneficiary.id
-    }
-  })
-
-  return Response.json({ deposits: parsedDeposits, currentlyStaked: account.currentlyStaked })
+  return Response.json(
+    encode({
+      deposits,
+      total: BigInt(response.account?.currentlyStaked ?? 0)
+    })
+  )
 }
 
 export const runtime = "edge"

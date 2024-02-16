@@ -13,6 +13,7 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { useQueryClient } from "@tanstack/react-query"
 import { Info, RotateCw } from "lucide-react"
 import { FormProvider, useForm } from "react-hook-form"
 import type { Address } from "viem"
@@ -62,7 +63,16 @@ const useEditBeneficiaryDelegateeForm = ({
   tallyDelegatees: ReadonlyArray<TallyDelegatee>
   tallyDelegateesError: Error | null
 }) => {
-  const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
+  const client = useQueryClient()
+  const {
+    error: errorWrite,
+    isPending: isPendingWrite,
+    writeContract
+  } = useWriteContractWithToast({
+    mutation: {
+      onSettled: () => client.invalidateQueries()
+    }
+  })
 
   const tallyDelegatee = tallyDelegatees.find((delegatee) => isAddressEqual(delegatee.address, currentDelegatee))
 

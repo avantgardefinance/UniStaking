@@ -13,6 +13,7 @@ import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -30,9 +31,18 @@ const useStakeMoreDialog = ({
   stakeId: string
   account: Address
 }) => {
+  const client = useQueryClient()
   const chainId = useChainId()
 
-  const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
+  const {
+    error: errorWrite,
+    isPending: isPendingWrite,
+    writeContract
+  } = useWriteContractWithToast({
+    mutation: {
+      onSettled: () => client.invalidateQueries()
+    }
+  })
 
   const [error, setError] = useState<Error>()
 

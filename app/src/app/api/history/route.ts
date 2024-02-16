@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
         history.push({
           stakeId: event.deposit.id,
           amount: BigInt(event.amount),
-          date: new Date(event.blockTimestamp),
+          date: new Date(Number(event.blockTimestamp) * 1000),
           owner: event.deposit.owner.id,
           id: event.id,
           type
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         history.push({
           stakeId: event.deposit.id,
           amount: BigInt(event.amount),
-          date: new Date(event.blockTimestamp),
+          date: new Date(Number(event.blockTimestamp) * 1000),
           owner: event.deposit.owner.id,
           id: event.id,
           type
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
         history.push({
           stakeId: event.deposit.id,
           owner: event.deposit.owner.id,
-          date: new Date(event.blockTimestamp),
+          date: new Date(Number(event.blockTimestamp) * 1000),
           oldBeneficiary: event.oldBeneficiary,
           newBeneficiary: event.newBeneficiary,
           id: event.id,
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
         history.push({
           stakeId: event.deposit.id,
           owner: event.deposit.owner.id,
-          date: new Date(event.blockTimestamp),
+          date: new Date(Number(event.blockTimestamp) * 1000),
           oldDelegatee: event.oldDelegatee,
           newDelegatee: event.newDelegatee,
           id: event.id,
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
 
       case "RewardClaimed":
         history.push({
-          date: new Date(event.blockTimestamp),
+          date: new Date(Number(event.blockTimestamp) * 1000),
           beneficiary: event.beneficiary,
           amount: BigInt(event.amount),
           id: event.id,

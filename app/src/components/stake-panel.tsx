@@ -2,7 +2,6 @@
 
 import { AccountDepositsSchema } from "@/app/api/deposits/model"
 import { StakeCards } from "@/components/stake-cards"
-import { StakeDeposit } from "@/components/stake-deposit-card"
 import { StakedAmounts } from "@/components/staked-amounts"
 import { governanceToken } from "@/lib/consts"
 import { withAccount } from "@/lib/hocs/withAccount"

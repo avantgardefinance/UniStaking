@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+import { Address, Hex } from "viem"
+import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -17,13 +18,13 @@ export type Scalars = {
   /** AccountID is a CAIP-10 compliant account id. */
   AccountID: { input: any; output: any; }
   /** Address is a 20 byte Ethereum address, represented as 0x-prefixed hexadecimal. */
-  Address: { input: any; output: any; }
+  Address: { input: Address; output: Address; }
   /** AssetID is a CAIP-19 compliant asset id. */
   AssetID: { input: any; output: any; }
   /** BlockID is a ChainID scoped identifier for identifying blocks across chains.  Ex: eip155:1:15672. */
   BlockID: { input: any; output: any; }
   /** Bytes is an arbitrary length binary string, represented as 0x-prefixed hexadecimal. */
-  Bytes: { input: any; output: any; }
+  Bytes: { input: Hex; output: Hex; }
   /** Bytes32 is a 32 byte binary string, represented as 0x-prefixed hexadecimal. */
   Bytes32: { input: any; output: any; }
   /** ChainID is a CAIP-2 compliant chain id. */
@@ -44,7 +45,7 @@ export type Scalars = {
 
 /** Key for use with this API.  See https://docs.tally.xyz/tally-api/welcome#request-an-api-key for how to request & use! */
 export type APIKey = {
-  __typename?: 'APIKey';
+  __typename: 'APIKey';
   /** Last four characters of original generated key */
   lastFour: Scalars['String']['output'];
   /** User generated name to differentiate keys */
@@ -53,7 +54,7 @@ export type APIKey = {
 
 /** A Blockchain `Account` with its associated metadata, participations and activity. */
 export type Account = {
-  __typename?: 'Account';
+  __typename: 'Account';
   /** AccountActivity (votes, proposals created, etc).  Currently only supports on chain governance. */
   activity?: Maybe<Array<ActivityItem>>;
   /** EVM Address for this `Account` */
@@ -85,6 +86,7 @@ export type Account = {
   participations: Array<Participation>;
   /** Picture URL */
   picture?: Maybe<Scalars['String']['output']>;
+  proposalsCreatedCount: Scalars['Int']['output'];
   safes?: Maybe<Array<Scalars['AccountID']['output']>>;
   /** Twitter handle */
   twitter?: Maybe<Scalars['String']['output']>;
@@ -110,6 +112,12 @@ export type AccountparticipationsArgs = {
 
 
 /** A Blockchain `Account` with its associated metadata, participations and activity. */
+export type AccountproposalsCreatedCountArgs = {
+  input: ProposalsCreatedCountInput;
+};
+
+
+/** A Blockchain `Account` with its associated metadata, participations and activity. */
 export type AccountvotesArgs = {
   governorId: Scalars['AccountID']['input'];
 };
@@ -124,7 +132,7 @@ export enum AccountActivitySortField {
 }
 
 export type AccountElectionMeta = {
-  __typename?: 'AccountElectionMeta';
+  __typename: 'AccountElectionMeta';
   hasRegistered: Scalars['Boolean']['output'];
   isContender: Scalars['Boolean']['output'];
   /** The contender's statement, set during register as candidate flow. */
@@ -138,6 +146,26 @@ export enum AccountType {
   SAFE = 'SAFE'
 }
 
+/** Source of data: Hexagate. All the events/threats for an executable call, along with a result describing whether the simulation was successful i.e. was Hexagate able to successfully run this action */
+export type ActionThreatData = {
+  __typename: 'ActionThreatData';
+  events?: Maybe<Array<EventDataPoint>>;
+  result: Scalars['String']['output'];
+};
+
+/** Security check for a bundle of actions (proposal-level) */
+export type ActionsSecurityCheck = {
+  __typename: 'ActionsSecurityCheck';
+  metadata: ActionsSecurityCheckMetadata;
+  simulations: Array<TransactionSimulationV2>;
+};
+
+/** Metadata for a bundle (proposal-level) security check */
+export type ActionsSecurityCheckMetadata = {
+  __typename: 'ActionsSecurityCheckMetadata';
+  threatAnalysis?: Maybe<ThreatAnalysis>;
+};
+
 export type ActivityItem = Proposal | Vote;
 
 export type AddAdminInput = {
@@ -146,7 +174,7 @@ export type AddAdminInput = {
 };
 
 export type AddressInfo = {
-  __typename?: 'AddressInfo';
+  __typename: 'AddressInfo';
   accounts: Array<Account>;
   /** Returns a list of `AddressInfo` Activity for a given address across all chains supported by Tally.  Currently only supports on chain governances. */
   activity?: Maybe<Array<ActivityItem>>;
@@ -169,14 +197,22 @@ export type AddressInfoparticipationsArgs = {
   pagination?: InputMaybe<Pagination>;
 };
 
+/** Source of data: Hexagate. Action-level (executable call) analysis data point, the name is a label (e.g. SMARTCONTRACT_IMPLEMENTS_ANTI_SIMULATION_TECHNIQUES) and the result gives an indication whether or not it passed the check */
 export type AnalysisDataPoint = {
-  __typename?: 'AnalysisDataPoint';
+  __typename: 'AnalysisDataPoint';
+  name: Scalars['String']['output'];
+  result: Scalars['Boolean']['output'];
+};
+
+/** Source of data: Hexagate. Action-level (executable call) analysis data point, the name is a label (e.g. SMARTCONTRACT_IMPLEMENTS_ANTI_SIMULATION_TECHNIQUES) and the result gives an indication whether or not it passed the check */
+export type AnalysisDataPointV2 = {
+  __typename: 'AnalysisDataPointV2';
   name: Scalars['String']['output'];
   result: Scalars['Boolean']['output'];
 };
 
 export type BalanceItem = {
-  __typename?: 'BalanceItem';
+  __typename: 'BalanceItem';
   address: Scalars['String']['output'];
   balance: Scalars['String']['output'];
   balance24H: Scalars['String']['output'];
@@ -193,7 +229,7 @@ export type BalanceItem = {
 };
 
 export type Block = {
-  __typename?: 'Block';
+  __typename: 'Block';
   id: Scalars['BlockID']['output'];
   number: Scalars['Int']['output'];
   timestamp: Scalars['Timestamp']['output'];
@@ -203,6 +239,13 @@ export type Block = {
 export type BlockIDInput = {
   blockNumber: Scalars['Int']['input'];
   chain: Scalars['ChainID']['input'];
+};
+
+export type BlockOrTimestamp = Block | BlocklessTimestamp;
+
+export type BlocklessTimestamp = {
+  __typename: 'BlocklessTimestamp';
+  timestamp: Scalars['Timestamp']['output'];
 };
 
 export type Candidate = {
@@ -218,7 +261,7 @@ export type CandidatevotesArgs = {
 };
 
 export type CandidateExport = {
-  __typename?: 'CandidateExport';
+  __typename: 'CandidateExport';
   address: Scalars['String']['output'];
   email?: Maybe<Scalars['String']['output']>;
 };
@@ -229,13 +272,13 @@ export enum CandidateSort {
 }
 
 export type CandidateVote = {
-  __typename?: 'CandidateVote';
+  __typename: 'CandidateVote';
   voter: Account;
   weight: Scalars['Uint256']['output'];
 };
 
 export type CastVoteActionMetadata = {
-  __typename?: 'CastVoteActionMetadata';
+  __typename: 'CastVoteActionMetadata';
   /** Address of the user casting the vote */
   address: Scalars['Address']['output'];
   /** The amount of gas paid for the given meta transaction */
@@ -254,7 +297,7 @@ export type CastVoteActionMetadata = {
 
 /** Chain data in the models are only loaded on server startup. If changed please restart the api servers. */
 export type Chain = {
-  __typename?: 'Chain';
+  __typename: 'Chain';
   /** API url of the block explorer */
   blockExplorerAPI: Scalars['String']['output'];
   /** Url of the block explorer */
@@ -301,7 +344,7 @@ export type Chain = {
 
 /** The `ClaimAndDelegateAttempt` type represents the stored attempt of a user that tried to call claimAndDelegate. */
 export type ClaimAndDelegateAttempt = {
-  __typename?: 'ClaimAndDelegateAttempt';
+  __typename: 'ClaimAndDelegateAttempt';
   createdAt: Scalars['Timestamp']['output'];
   delegateeId: Scalars['AccountID']['output'];
   delegatorId: Scalars['AccountID']['output'];
@@ -315,7 +358,7 @@ export type ClaimAndDelegateAttempt = {
 };
 
 export type Collectible = {
-  __typename?: 'Collectible';
+  __typename: 'Collectible';
   ID: Scalars['ID']['output'];
   address: Scalars['String']['output'];
   description?: Maybe<Scalars['String']['output']>;
@@ -329,7 +372,7 @@ export type Collectible = {
 };
 
 export type Confirmation = {
-  __typename?: 'Confirmation';
+  __typename: 'Confirmation';
   owner: Account;
   signature: Scalars['Bytes']['output'];
   signatureType: Scalars['String']['output'];
@@ -337,7 +380,7 @@ export type Confirmation = {
 };
 
 export type Contact = {
-  __typename?: 'Contact';
+  __typename: 'Contact';
   discord: Scalars['String']['output'];
   email: Scalars['String']['output'];
   name: Scalars['String']['output'];
@@ -352,7 +395,7 @@ export type ContactInput = {
 };
 
 export type Contender = Candidate & {
-  __typename?: 'Contender';
+  __typename: 'Contender';
   account: Account;
   accountElectionMeta: AccountElectionMeta;
   id: Scalars['ID']['output'];
@@ -375,18 +418,23 @@ export enum ContenderFilter {
 }
 
 export type ContractVerification = {
-  __typename?: 'ContractVerification';
+  __typename: 'ContractVerification';
+  isVerified: Scalars['Boolean']['output'];
+};
+
+export type ContractVerificationV2 = {
+  __typename: 'ContractVerificationV2';
   isVerified: Scalars['Boolean']['output'];
 };
 
 export type Contracts = {
-  __typename?: 'Contracts';
+  __typename: 'Contracts';
   governor: GovernorContract;
   tokens: Array<TokenContract>;
 };
 
 export type Council = {
-  __typename?: 'Council';
+  __typename: 'Council';
   cohortSize: Scalars['Int']['output'];
   description: Scalars['String']['output'];
   elections: Array<Election>;
@@ -402,13 +450,13 @@ export type CouncilelectionsArgs = {
 };
 
 export type CouncilMembers = {
-  __typename?: 'CouncilMembers';
+  __typename: 'CouncilMembers';
   firstCohort: Array<Account>;
   secondCohort: Array<Account>;
 };
 
 export type CovalentData = {
-  __typename?: 'CovalentData';
+  __typename: 'CovalentData';
   decimals: Scalars['Int']['output'];
   logo: Scalars['String']['output'];
   name: Scalars['String']['output'];
@@ -436,7 +484,7 @@ export type CreateSafeInput = {
 
 /** A single parameter used in a method. */
 export type DecodedParameter = {
-  __typename?: 'DecodedParameter';
+  __typename: 'DecodedParameter';
   /** Decoded calls in the case of a `transactions` parameter on multisend contract or similar. */
   calls?: Maybe<Array<ExecutableCall>>;
   name: Scalars['String']['output'];
@@ -445,7 +493,7 @@ export type DecodedParameter = {
 };
 
 export type Delegate = {
-  __typename?: 'Delegate';
+  __typename: 'Delegate';
   account: Account;
   delegatorsCount: Scalars['Int']['output'];
   id: Scalars['IntID']['output'];
@@ -463,7 +511,7 @@ export type DelegatestatementArgs = {
 };
 
 export type DelegateActionMetadata = {
-  __typename?: 'DelegateActionMetadata';
+  __typename: 'DelegateActionMetadata';
   /** Address of the user receiving the delegation */
   delegatee: Scalars['Address']['output'];
   /** Address of the user delegating using a meta transaction action */
@@ -511,7 +559,7 @@ export enum DelegateSortField {
 }
 
 export type DelegateStatement = {
-  __typename?: 'DelegateStatement';
+  __typename: 'DelegateStatement';
   address: Scalars['Address']['output'];
   dataSource: DelegateStatementSource;
   dataSourceURL?: Maybe<Scalars['String']['output']>;
@@ -578,7 +626,7 @@ export type DelegatesSortInput = {
 };
 
 export type Delegation = {
-  __typename?: 'Delegation';
+  __typename: 'Delegation';
   /** The `Block` when the `Delegation` took place */
   block: Block;
   /** Actor who is delegating their voting power */
@@ -597,7 +645,7 @@ export type Delegation = {
 
 /** The `DelegationAttempt` type represents the stored attempt of a user that tried to delegate. */
 export type DelegationAttempt = {
-  __typename?: 'DelegationAttempt';
+  __typename: 'DelegationAttempt';
   createdAt: Scalars['Timestamp']['output'];
   delegateeId: Scalars['AccountID']['output'];
   delegatorId: Scalars['AccountID']['output'];
@@ -611,7 +659,7 @@ export type DelegationInput = {
 };
 
 export type DelegationV2 = {
-  __typename?: 'DelegationV2';
+  __typename: 'DelegationV2';
   blockNumber: Scalars['Int']['output'];
   blockTimestamp: Scalars['Timestamp']['output'];
   delegate: Delegate;
@@ -621,7 +669,7 @@ export type DelegationV2 = {
 };
 
 export type DelegationWeightChange = {
-  __typename?: 'DelegationWeightChange';
+  __typename: 'DelegationWeightChange';
   block?: Maybe<Block>;
   delegate: Account;
   hash?: Maybe<Scalars['Bytes32']['output']>;
@@ -645,7 +693,7 @@ export enum DelegationWeightChangeSortField {
 }
 
 export type DelegationWeightStats = {
-  __typename?: 'DelegationWeightStats';
+  __typename: 'DelegationWeightStats';
   in: Scalars['Uint256']['output'];
   out: Scalars['Uint256']['output'];
 };
@@ -674,7 +722,7 @@ export type DelegationsSortInput = {
 };
 
 export type Election = {
-  __typename?: 'Election';
+  __typename: 'Election';
   accountElectionMeta: AccountElectionMeta;
   councilId: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
@@ -700,7 +748,7 @@ export enum ElectionStatus {
 }
 
 export type Eligibility = {
-  __typename?: 'Eligibility';
+  __typename: 'Eligibility';
   /** Amount the account can claim from this token */
   amount?: Maybe<Scalars['Uint256']['output']>;
   proof?: Maybe<Array<Scalars['String']['output']>>;
@@ -715,9 +763,17 @@ export enum EligibilityStatus {
   NOTELIGIBLE = 'NOTELIGIBLE'
 }
 
+/** Source of data: Hexagate. Proposal-level analysis data point (it is per executable call, but run with Hexagate Governance analysis), the name is a label (e.g. SMARTCONTRACT_IMPLEMENTS_ANTI_SIMULATION_TECHNIQUES) and the result gives an indication whether or not it passed the check */
+export type EventDataPoint = {
+  __typename: 'EventDataPoint';
+  description: Scalars['String']['output'];
+  eventType: Scalars['String']['output'];
+  severity: Scalars['String']['output'];
+};
+
 /** Executable payload of a proposal.  This is contains four arrays each of which contain an element for each action included. */
 export type Executable = {
-  __typename?: 'Executable';
+  __typename: 'Executable';
   /** Call data sent */
   callDatas: Array<Scalars['Bytes']['output']>;
   /** Method signatures for the target.  Only set in Alpha and Bravo style Governors. */
@@ -730,7 +786,7 @@ export type Executable = {
 
 /** Describes what happens if a given `Proposal` or `GnosisSafeTransaction` is executed. A call can have an unlimited amount of nested parameters which can have their own calls in the case of a common initial call to a multisend contract. */
 export type ExecutableCall = {
-  __typename?: 'ExecutableCall';
+  __typename: 'ExecutableCall';
   /** Input data that will be sent to the target method.  Individual parameters derived from this data are available on the parameters field if decoding succeeds. */
   data?: Maybe<Scalars['Bytes']['output']>;
   /** Media context i.e. invoice file */
@@ -756,7 +812,7 @@ export type ExecutableCall = {
 export type ExecutableCallMeta = RewardsMeta | SwapRecipeMeta;
 
 export type FeatureState = {
-  __typename?: 'FeatureState';
+  __typename: 'FeatureState';
   account?: Maybe<Account>;
   enabled: Scalars['Boolean']['output'];
   governance?: Maybe<Governance>;
@@ -766,7 +822,7 @@ export type FeatureState = {
 
 /** The `File` type, represents the response of uploading a file. */
 export type File = {
-  __typename?: 'File';
+  __typename: 'File';
   contentType: Scalars['String']['output'];
   id: Scalars['String']['output'];
   metadata: Image;
@@ -775,7 +831,7 @@ export type File = {
 };
 
 export type GnosisSafe = {
-  __typename?: 'GnosisSafe';
+  __typename: 'GnosisSafe';
   /** Values of all Tokens in this Gnosis Safe */
   balance?: Maybe<Treasury>;
   collectibles?: Maybe<Array<Maybe<Collectible>>>;
@@ -795,7 +851,7 @@ export type GnosisSafe = {
 
 /** A transaction can be `SUBMITTED` or `EXECUTED`. An `EXECUTED` transaction will include a block and an on chain txHashID. */
 export type GnosisSafeTransaction = {
-  __typename?: 'GnosisSafeTransaction';
+  __typename: 'GnosisSafeTransaction';
   /** `Block` at which this safe transaction was executed. */
   block?: Maybe<Block>;
   /** Describes what happens if it is executed.  This includes a `target` smart contract address as well as the method and input data being used to make the call.  A call can have an unlimited amount of nested `parameters` which can have their own calls in the case of a common initial call to a multisend contract.  Each call includes a `recipe` placeholder if the call was created on Tally. */
@@ -823,7 +879,7 @@ export type GnosisSafesInput = {
 };
 
 export type GnosisStatusChange = {
-  __typename?: 'GnosisStatusChange';
+  __typename: 'GnosisStatusChange';
   timestamp: Scalars['Timestamp']['output'];
   type: GnosisStatusChangeType;
 };
@@ -834,7 +890,7 @@ export enum GnosisStatusChangeType {
 }
 
 export type Governance = {
-  __typename?: 'Governance';
+  __typename: 'Governance';
   active: Scalars['Boolean']['output'];
   balance: Scalars['Uint256']['output'];
   chainId: Scalars['ChainID']['output'];
@@ -895,13 +951,13 @@ export type GovernancetallyProposalsArgs = {
 };
 
 export type GovernanceStats = {
-  __typename?: 'GovernanceStats';
+  __typename: 'GovernanceStats';
   proposals: ProposalStats;
   tokens: GovernanceTokenStats;
 };
 
 export type GovernanceSync = {
-  __typename?: 'GovernanceSync';
+  __typename: 'GovernanceSync';
   id: Scalars['AccountID']['output'];
   start: Scalars['Int']['output'];
   tokenId: Scalars['AssetID']['output'];
@@ -909,7 +965,7 @@ export type GovernanceSync = {
 };
 
 export type GovernanceTokenStats = {
-  __typename?: 'GovernanceTokenStats';
+  __typename: 'GovernanceTokenStats';
   delegatedVotingPower: Scalars['Uint256']['output'];
   delegates: TokenDelegateStats;
   owners: Scalars['Int']['output'];
@@ -927,14 +983,14 @@ export enum GovernanceType {
 }
 
 export type GovernanceTypeData = {
-  __typename?: 'GovernanceTypeData';
+  __typename: 'GovernanceTypeData';
   name: Scalars['String']['output'];
   type: GovernanceType;
 };
 
 /** Core type that describes an onchain Governor contract */
 export type Governor = {
-  __typename?: 'Governor';
+  __typename: 'Governor';
   /** Current tokens owned by a particular address */
   balance: Scalars['Uint256']['output'];
   contracts: Contracts;
@@ -1006,7 +1062,7 @@ export type GovernorproposalsArgs = {
 };
 
 export type GovernorAaveParameters = {
-  __typename?: 'GovernorAaveParameters';
+  __typename: 'GovernorAaveParameters';
   /** Amount of votes needed to create a proposal */
   proposalThreshold: Scalars['Uint256']['output'];
   /** If the governor supports fractional quorum the denominatior of the quorum fraction */
@@ -1022,7 +1078,7 @@ export type GovernorAaveParameters = {
 };
 
 export type GovernorAlphaParameters = {
-  __typename?: 'GovernorAlphaParameters';
+  __typename: 'GovernorAlphaParameters';
   /** Amount of votes needed to create a proposal */
   proposalThreshold: Scalars['Uint256']['output'];
   /** If the governor supports fractional quorum the denominatior of the quorum fraction */
@@ -1038,7 +1094,7 @@ export type GovernorAlphaParameters = {
 };
 
 export type GovernorBravoParameters = {
-  __typename?: 'GovernorBravoParameters';
+  __typename: 'GovernorBravoParameters';
   /** Amount of votes needed to create a proposal */
   proposalThreshold: Scalars['Uint256']['output'];
   /** If the governor supports fractional quorum the denominatior of the quorum fraction */
@@ -1054,7 +1110,7 @@ export type GovernorBravoParameters = {
 };
 
 export type GovernorContract = {
-  __typename?: 'GovernorContract';
+  __typename: 'GovernorContract';
   address: Scalars['Address']['output'];
   lastBlock: Scalars['Int']['output'];
   type: GovernanceType;
@@ -1098,7 +1154,7 @@ export enum GovernorSortField {
 
 /** Current token stats */
 export type GovernorTokenStats = {
-  __typename?: 'GovernorTokenStats';
+  __typename: 'GovernorTokenStats';
   /** Total delegated voting power from `DelegateVotesChanged` events */
   delegatedVotingPower: Scalars['Uint256']['output'];
   /** Number of addresses with non-zero balances of this token derived from `Transfer` events */
@@ -1119,8 +1175,9 @@ export enum GovernorType {
 }
 
 export type GovernorV2 = {
-  __typename?: 'GovernorV2';
+  __typename: 'GovernorV2';
   id: Scalars['AccountID']['output'];
+  name: Scalars['String']['output'];
   parameters: GovernorV2Parameters;
   timelockId?: Maybe<Scalars['AccountID']['output']>;
   tokenId: Scalars['AssetID']['output'];
@@ -1128,7 +1185,7 @@ export type GovernorV2 = {
 };
 
 export type GovernorV2Parameters = {
-  __typename?: 'GovernorV2Parameters';
+  __typename: 'GovernorV2Parameters';
   clockMode?: Maybe<Scalars['String']['output']>;
   fullWeightDuration?: Maybe<Scalars['Uint256']['output']>;
   gracePeriod?: Maybe<Scalars['Uint256']['output']>;
@@ -1163,7 +1220,7 @@ export type GovernorsSortInput = {
 
 /** Identity Providers associated with an `Account`. */
 export type Identities = {
-  __typename?: 'Identities';
+  __typename: 'Identities';
   /** Ethereum Name Service */
   ens?: Maybe<Scalars['String']['output']>;
   twitter?: Maybe<Scalars['String']['output']>;
@@ -1174,13 +1231,13 @@ export type IdentitiesInput = {
 };
 
 export type Image = {
-  __typename?: 'Image';
+  __typename: 'Image';
   thumbnail?: Maybe<Scalars['String']['output']>;
   url?: Maybe<Scalars['String']['output']>;
 };
 
 export type Issue = {
-  __typename?: 'Issue';
+  __typename: 'Issue';
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['IntID']['output'];
   name?: Maybe<Scalars['String']['output']>;
@@ -1208,7 +1265,7 @@ export type JoinOrganizationInput = {
 };
 
 export type Member = {
-  __typename?: 'Member';
+  __typename: 'Member';
   account: Account;
   id: Scalars['ID']['output'];
   organization: Organization;
@@ -1218,7 +1275,7 @@ export type Member = {
 };
 
 export type MemberRound = Round & {
-  __typename?: 'MemberRound';
+  __typename: 'MemberRound';
   availableVotes: Scalars['Uint256']['output'];
   end: Block;
   fullWeightDuration: Scalars['Uint256']['output'];
@@ -1246,7 +1303,7 @@ export type MemberRoundvotesToWeightArgs = {
 };
 
 export type MetaTransaction = {
-  __typename?: 'MetaTransaction';
+  __typename: 'MetaTransaction';
   action: MetaTransactionAction;
   address: Scalars['Address']['output'];
   createdAt: Scalars['Timestamp']['output'];
@@ -1278,7 +1335,7 @@ export enum MultiGovernanceSupport {
 }
 
 export type Mutation = {
-  __typename?: 'Mutation';
+  __typename: 'Mutation';
   addWhitelabelDomain: Scalars['Boolean']['output'];
   analyticsBackfill: Scalars['Boolean']['output'];
   /** Archives a `TallyProposal`. */
@@ -1797,7 +1854,7 @@ export type MutationvoteArgs = {
 };
 
 export type NativeCurrency = {
-  __typename?: 'NativeCurrency';
+  __typename: 'NativeCurrency';
   /** Decimals of the Currency. e.g.: 18 */
   decimals: Scalars['Int']['output'];
   /** Name of the Currency. e.g.: Ether */
@@ -1810,7 +1867,7 @@ export type NativeCurrency = {
 export type Node = Delegate | DelegationV2 | GovernorV2 | Member | Organization;
 
 export type NominationRound = Round & {
-  __typename?: 'NominationRound';
+  __typename: 'NominationRound';
   availableVotes: Scalars['Uint256']['output'];
   contenders: Array<Contender>;
   end: Block;
@@ -1834,7 +1891,7 @@ export type NominationRoundcontendersArgs = {
 };
 
 export type Nominee = Candidate & {
-  __typename?: 'Nominee';
+  __typename: 'Nominee';
   account: Account;
   accountElectionMeta: AccountElectionMeta;
   id: Scalars['ID']['output'];
@@ -1849,7 +1906,7 @@ export type NomineevotesArgs = {
 };
 
 export type NounsForkGovernorParameters = {
-  __typename?: 'NounsForkGovernorParameters';
+  __typename: 'NounsForkGovernorParameters';
   /** Amount of votes needed to create a proposal */
   proposalThreshold: Scalars['Uint256']['output'];
   /** Amount of votes needed for a proposal to qualify for passing */
@@ -1861,7 +1918,7 @@ export type NounsForkGovernorParameters = {
 };
 
 export type OpenZeppelinGovernorParameters = {
-  __typename?: 'OpenZeppelinGovernorParameters';
+  __typename: 'OpenZeppelinGovernorParameters';
   /** The clock mode of the governor */
   clockMode?: Maybe<Scalars['String']['output']>;
   /** Amount of votes needed to create a proposal */
@@ -1884,7 +1941,7 @@ export enum OrgUxVersion {
 }
 
 export type Organization = {
-  __typename?: 'Organization';
+  __typename: 'Organization';
   activeProposalsCount: Scalars['Int']['output'];
   /** Can only be accessed by a TallyAdmin or Organization Admin */
   adminData?: Maybe<OrganizationAdminData>;
@@ -1918,7 +1975,7 @@ export type OrganizationgovernancesArgs = {
 };
 
 export type OrganizationAdminData = {
-  __typename?: 'OrganizationAdminData';
+  __typename: 'OrganizationAdminData';
   contact?: Maybe<Contact>;
   password?: Maybe<Scalars['String']['output']>;
 };
@@ -1942,7 +1999,7 @@ export type OrganizationInput = {
 };
 
 export type OrganizationIssue = {
-  __typename?: 'OrganizationIssue';
+  __typename: 'OrganizationIssue';
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
@@ -1980,7 +2037,7 @@ export type OrganizationMembersSortInput = {
 };
 
 export type OrganizationMetadata = {
-  __typename?: 'OrganizationMetadata';
+  __typename: 'OrganizationMetadata';
   color?: Maybe<Scalars['String']['output']>;
   contact?: Maybe<Contact>;
   description?: Maybe<Scalars['String']['output']>;
@@ -2046,7 +2103,7 @@ export type OrganizationsSortInput = {
 };
 
 export type OtherLink = {
-  __typename?: 'OtherLink';
+  __typename: 'OtherLink';
   label: Scalars['String']['output'];
   value: Scalars['String']['output'];
 };
@@ -2058,7 +2115,7 @@ export type OtherLinkInput = {
 
 /** Page metadata including pagination cursors and total count */
 export type PageInfo = {
-  __typename?: 'PageInfo';
+  __typename: 'PageInfo';
   /**
    * Total number of items across all pages.
    * FYI, this is not yet implemented so the value will always be 0
@@ -2089,7 +2146,7 @@ export type PageInput = {
 
 /** Wraps a list of nodes and the pagination info */
 export type PaginatedOutput = {
-  __typename?: 'PaginatedOutput';
+  __typename: 'PaginatedOutput';
   /** List of nodes for the page */
   nodes: Array<Node>;
   /** Pagination information */
@@ -2102,7 +2159,7 @@ export type Pagination = {
 };
 
 export type Participation = {
-  __typename?: 'Participation';
+  __typename: 'Participation';
   account: Account;
   /** Delegation of voting power of this `account` to another `account`.  An `account` can delegate to itself and often that is required in order for voting power to be counted. */
   delegationOut?: Maybe<Delegation>;
@@ -2157,20 +2214,20 @@ export type ParticipationweightChangesArgs = {
 };
 
 export type ParticipationDelegationStats = {
-  __typename?: 'ParticipationDelegationStats';
+  __typename: 'ParticipationDelegationStats';
   /** Total count of delegations to this `Account` including self-delegation if present */
   total: Scalars['Int']['output'];
 };
 
 export type ParticipationProposalStats = {
-  __typename?: 'ParticipationProposalStats';
+  __typename: 'ParticipationProposalStats';
   /** Number of proposals created by this `Account */
   total: Scalars['Int']['output'];
 };
 
 /** Number of votes on the last 10 proposals if there are at least ten made on this contract.  If there are not 10 proposals the amount of proposals is provided as `recentProposalCount`. */
 export type ParticipationRate = {
-  __typename?: 'ParticipationRate';
+  __typename: 'ParticipationRate';
   /** 10 or the number of proposals on this `Governor` if less than 10 */
   recentProposalCount: Scalars['Int']['output'];
   /** Number of votes on the last 10 proposals on this `Governor` */
@@ -2179,7 +2236,7 @@ export type ParticipationRate = {
 
 /** Statistics about an `Account`'s participation in a `Governor` */
 export type ParticipationStats = {
-  __typename?: 'ParticipationStats';
+  __typename: 'ParticipationStats';
   /** Current overall number of delegations that delegate non-zero voting power */
   activeDelegationCount: Scalars['Int']['output'];
   /** Number of proposals created by this `Account */
@@ -2213,13 +2270,13 @@ export type ParticipationStatsdelegationsArgs = {
 };
 
 export type ParticipationVoteStats = {
-  __typename?: 'ParticipationVoteStats';
+  __typename: 'ParticipationVoteStats';
   /** Number of votes made by this `Account` */
   total: Scalars['Int']['output'];
 };
 
 export type ParticipationVotingPowerStats = {
-  __typename?: 'ParticipationVotingPowerStats';
+  __typename: 'ParticipationVotingPowerStats';
   /** Total current voting power delegated to this `Account` including self-delegation if present */
   in: Scalars['Uint256']['output'];
   /** Total current voting power for this `Account` */
@@ -2229,7 +2286,7 @@ export type ParticipationVotingPowerStats = {
 };
 
 export type ParticipationWeightStats = {
-  __typename?: 'ParticipationWeightStats';
+  __typename: 'ParticipationWeightStats';
   /** Total current voting power delegated in/out of this `Account` */
   delegations: DelegationWeightStats;
   /** Current number of tokens owned by this `Account` */
@@ -2239,7 +2296,7 @@ export type ParticipationWeightStats = {
 };
 
 export type Poll = {
-  __typename?: 'Poll';
+  __typename: 'Poll';
   author: Account;
   createdAt: Scalars['Timestamp']['output'];
   end: Scalars['Uint256']['output'];
@@ -2269,7 +2326,7 @@ export enum PollStatus {
 }
 
 export type PollVote = {
-  __typename?: 'PollVote';
+  __typename: 'PollVote';
   createdAt: Scalars['Timestamp']['output'];
   id: Scalars['ID']['output'];
   reason?: Maybe<Scalars['String']['output']>;
@@ -2279,7 +2336,7 @@ export type PollVote = {
 };
 
 export type PollVoteStat = {
-  __typename?: 'PollVoteStat';
+  __typename: 'PollVoteStat';
   percent: Scalars['Float']['output'];
   support: Scalars['String']['output'];
   votes: Scalars['Uint256']['output'];
@@ -2287,7 +2344,7 @@ export type PollVoteStat = {
 };
 
 export type PriceChecker = {
-  __typename?: 'PriceChecker';
+  __typename: 'PriceChecker';
   feePath: Array<Scalars['Uint256']['output']>;
   slippage: Scalars['Uint256']['output'];
   tokenPath: Array<Scalars['String']['output']>;
@@ -2297,7 +2354,7 @@ export type PriceChecker = {
 
 /** Core type that describes a proposal created by an onchain Governor contract */
 export type Proposal = {
-  __typename?: 'Proposal';
+  __typename: 'Proposal';
   /**
    * `Block` at proposal creation
    * @deprecated selector `createdTransaction` contains the creation block
@@ -2308,7 +2365,7 @@ export type Proposal = {
   /** Proposal description onchain */
   description: Scalars['String']['output'];
   /** Last block when you can cast a vote */
-  end: Block;
+  end: BlockOrTimestamp;
   /** Time at which a proposal can be executed */
   eta?: Maybe<Scalars['Uint256']['output']>;
   /** Payload that can be executed after the proposal passes */
@@ -2332,10 +2389,11 @@ export type Proposal = {
   hash: Scalars['String']['output'];
   /** Chain Scoped onchain Proposal ID */
   id: Scalars['ID']['output'];
+  participationType: ProposalParticipationType;
   /** `Account` that created this proposal */
   proposer: Account;
   /** First block when you can cast a vote, also the time when quorum is established */
-  start: Block;
+  start: BlockOrTimestamp;
   /** List of state transitions for this proposal.  The last `StatusChange` is the current state. */
   statusChanges?: Maybe<Array<StatusChange>>;
   /** Tally draft if exists */
@@ -2348,6 +2406,12 @@ export type Proposal = {
   votes?: Maybe<Array<Vote>>;
   /** Voting power of a given address on this proposal */
   votingPower: Scalars['Uint256']['output'];
+};
+
+
+/** Core type that describes a proposal created by an onchain Governor contract */
+export type ProposalparticipationTypeArgs = {
+  address: Scalars['Address']['input'];
 };
 
 
@@ -2366,7 +2430,7 @@ export type ProposalvotingPowerArgs = {
 
 /** The `ProposalActionAttempt` type represents the stored attempt of a user attempting an action on a `Proposal`. */
 export type ProposalActionAttempt = {
-  __typename?: 'ProposalActionAttempt';
+  __typename: 'ProposalActionAttempt';
   actionType: ProposalActionType;
   actionUser: Account;
   createdAt: Scalars['Timestamp']['output'];
@@ -2387,6 +2451,31 @@ export enum ProposalActionType {
   QUEUE = 'QUEUE'
 }
 
+export enum ProposalParticipationType {
+  notdelegate = 'notdelegate',
+  notvoted = 'notvoted',
+  unknown = 'unknown',
+  votedabstain = 'votedabstain',
+  votedagainst = 'votedagainst',
+  votedfor = 'votedfor'
+}
+
+/** Type that describes a security check related to a saved proposal */
+export type ProposalSecurityCheck = {
+  __typename: 'ProposalSecurityCheck';
+  createdAt: Scalars['Timestamp']['output'];
+  /** JSON metadata of the security check */
+  metadata: ActionsSecurityCheck;
+};
+
+/** Whole proposal */
+export type ProposalSecurityCheckInput = {
+  executableCalls: Array<GovernorExecutableCallInput>;
+  governorId: Scalars['AccountID']['input'];
+  proposer: Scalars['AccountID']['input'];
+  value?: InputMaybe<Scalars['Uint256']['input']>;
+};
+
 export type ProposalSort = {
   field?: InputMaybe<ProposalSortField>;
   order?: InputMaybe<SortOrder>;
@@ -2400,7 +2489,7 @@ export enum ProposalSortField {
 }
 
 export type ProposalStats = {
-  __typename?: 'ProposalStats';
+  __typename: 'ProposalStats';
   /** Total count of active proposals */
   active: Scalars['Int']['output'];
   /** Total count of failed proposals including quorum not reached */
@@ -2430,8 +2519,13 @@ export enum ProposalStatusType {
   SUCCEEDED = 'SUCCEEDED'
 }
 
+export type ProposalsCreatedCountInput = {
+  governorId?: InputMaybe<Scalars['AccountID']['input']>;
+  organizationId?: InputMaybe<Scalars['IntID']['input']>;
+};
+
 export type Query = {
-  __typename?: 'Query';
+  __typename: 'Query';
   /** Returns `Account` given a chain scoped `AccountID`. */
   account: Account;
   /** Returns `Account` by given an ENS name. */
@@ -2440,6 +2534,8 @@ export type Query = {
   accountDelegationsIn?: Maybe<Array<Delegation>>;
   accountV2: Account;
   accounts: Array<Account>;
+  actionSecurityCheck: SingleActionSecurityCheck;
+  actionsSecurityCheck: ActionsSecurityCheck;
   address: AddressInfo;
   /** Returns tokens that can be swapped from the governor's treasury via the Tally Swap proposal recipe. */
   availableSwaps: SwapAssets;
@@ -2498,6 +2594,7 @@ export type Query = {
   pollsV2: Array<Poll>;
   proposal: Proposal;
   proposalActionAttempt: ProposalActionAttempt;
+  proposalSecurityCheck: ProposalSecurityCheck;
   proposals: Array<Proposal>;
   /** Returns a quote for a swap. */
   quoteSwap: SwapQuote;
@@ -2540,6 +2637,16 @@ export type QueryaccountV2Args = {
 export type QueryaccountsArgs = {
   addresses?: InputMaybe<Array<Scalars['Address']['input']>>;
   ids?: InputMaybe<Array<Scalars['AccountID']['input']>>;
+};
+
+
+export type QueryactionSecurityCheckArgs = {
+  input: SingleActionSecurityCheckInput;
+};
+
+
+export type QueryactionsSecurityCheckArgs = {
+  input: ProposalSecurityCheckInput;
 };
 
 
@@ -2820,6 +2927,11 @@ export type QueryproposalActionAttemptArgs = {
 };
 
 
+export type QueryproposalSecurityCheckArgs = {
+  proposalId: Scalars['ID']['input'];
+};
+
+
 export type QueryproposalsArgs = {
   chainId: Scalars['ChainID']['input'];
   governanceIds?: InputMaybe<Array<Scalars['AccountID']['input']>>;
@@ -2917,7 +3029,7 @@ export enum Recipe {
 }
 
 export type RewardsMeta = {
-  __typename?: 'RewardsMeta';
+  __typename: 'RewardsMeta';
   contributorFee: Scalars['Int']['output'];
   recipients: Array<Scalars['String']['output']>;
   tallyFee: Scalars['Int']['output'];
@@ -2949,7 +3061,7 @@ export enum RoundStatus {
 }
 
 export type SafeTokenBalance = {
-  __typename?: 'SafeTokenBalance';
+  __typename: 'SafeTokenBalance';
   address?: Maybe<Scalars['String']['output']>;
   amount: Scalars['String']['output'];
   decimals: Scalars['Int']['output'];
@@ -2969,13 +3081,18 @@ export type SearchOrganizationInput = {
 };
 
 export type SecurityAnalysis = {
-  __typename?: 'SecurityAnalysis';
+  __typename: 'SecurityAnalysis';
   dataPoints: Array<AnalysisDataPoint>;
+};
+
+export type SecurityAnalysisV2 = {
+  __typename: 'SecurityAnalysisV2';
+  dataPoints: Array<AnalysisDataPointV2>;
 };
 
 /** Type that describes a security check related to a proposal */
 export type SecurityCheck = {
-  __typename?: 'SecurityCheck';
+  __typename: 'SecurityCheck';
   createdAt: Scalars['Timestamp']['output'];
   /** JSON metadata of the security check */
   metadata: SecurityCheckMetadata;
@@ -2994,7 +3111,7 @@ export type SetArbitrumProposalExecutedInput = {
 };
 
 export type Simulation = {
-  __typename?: 'Simulation';
+  __typename: 'Simulation';
   executionValue: Scalars['Uint256']['output'];
   id: Scalars['ID']['output'];
   raw: Scalars['String']['output'];
@@ -3006,8 +3123,30 @@ export enum SimulationStatus {
   success = 'success'
 }
 
+/** Security check for a single action */
+export type SingleActionSecurityCheck = {
+  __typename: 'SingleActionSecurityCheck';
+  metadata: SingleActionSecurityCheckMetadata;
+  simulation: TransactionSimulationV2;
+};
+
+/** Single action */
+export type SingleActionSecurityCheckInput = {
+  executableCall: GovernorExecutableCallInput;
+  governorId: Scalars['AccountID']['input'];
+  proposer?: InputMaybe<Scalars['AccountID']['input']>;
+  value?: InputMaybe<Scalars['Uint256']['input']>;
+};
+
+/** Metadata for a single action security check */
+export type SingleActionSecurityCheckMetadata = {
+  __typename: 'SingleActionSecurityCheckMetadata';
+  contractVerification?: Maybe<ContractVerificationV2>;
+  securityAnalysis?: Maybe<SecurityAnalysisV2>;
+};
+
 export type Socials = {
-  __typename?: 'Socials';
+  __typename: 'Socials';
   discord?: Maybe<Scalars['String']['output']>;
   others?: Maybe<Array<Maybe<OtherLink>>>;
   telegram?: Maybe<Scalars['String']['output']>;
@@ -3039,7 +3178,7 @@ export type SpectaQLOption = {
 };
 
 export type StatusChange = {
-  __typename?: 'StatusChange';
+  __typename: 'StatusChange';
   /** Transaction hash of this state transition if applicable.  Computed states do not have an associated transaction. */
   block: Block;
   /**
@@ -3066,7 +3205,7 @@ export enum SupportType {
 }
 
 export type SwapAssets = {
-  __typename?: 'SwapAssets';
+  __typename: 'SwapAssets';
   /** List of tokens that can be bought via the Tally Swap proposal recipe. */
   buy: Array<SwapToken>;
   /** List of tokens that can be sold via the Tally Swap proposal recipe. */
@@ -3074,7 +3213,7 @@ export type SwapAssets = {
 };
 
 export type SwapMetaInput = {
-  __typename?: 'SwapMetaInput';
+  __typename: 'SwapMetaInput';
   /** Tally fee */
   fee?: Maybe<Scalars['Uint256']['output']>;
   /** List of Uniswap pool ids, describing price checker path. */
@@ -3082,7 +3221,7 @@ export type SwapMetaInput = {
 };
 
 export type SwapOrder = {
-  __typename?: 'SwapOrder';
+  __typename: 'SwapOrder';
   /** Address of the order smart contract. */
   address?: Maybe<Scalars['String']['output']>;
   /** Buy amount if status is fulfilled. */
@@ -3101,7 +3240,7 @@ export enum SwapOrderStatus {
 }
 
 export type SwapQuote = {
-  __typename?: 'SwapQuote';
+  __typename: 'SwapQuote';
   buyAmount: Scalars['Uint256']['output'];
   buyTokenQuoteRate?: Maybe<Scalars['Float']['output']>;
   feeAmount: Scalars['Uint256']['output'];
@@ -3110,7 +3249,7 @@ export type SwapQuote = {
 };
 
 export type SwapRecipeMeta = {
-  __typename?: 'SwapRecipeMeta';
+  __typename: 'SwapRecipeMeta';
   /** Sell amount for the swap. */
   amountIn: Scalars['Uint256']['output'];
   buyToken: TokenData;
@@ -3126,7 +3265,7 @@ export type SwapRecipeMeta = {
 };
 
 export type SwapToken = {
-  __typename?: 'SwapToken';
+  __typename: 'SwapToken';
   decimals: Scalars['Int']['output'];
   id: Scalars['AccountID']['output'];
   logo: Scalars['String']['output'];
@@ -3135,7 +3274,7 @@ export type SwapToken = {
 };
 
 export type TallyProposal = {
-  __typename?: 'TallyProposal';
+  __typename: 'TallyProposal';
   choices?: Maybe<Array<Scalars['String']['output']>>;
   createdAt: Scalars['Timestamp']['output'];
   creator: Account;
@@ -3171,6 +3310,13 @@ export enum TallyProposalStatus {
   SUBMITTED = 'SUBMITTED'
 }
 
+/** Source of data: Hexagate. actionsData is the analysis per executable call, and proposerRisk is an opiniated value from Hexagate (e.g. High)  */
+export type ThreatAnalysis = {
+  __typename: 'ThreatAnalysis';
+  actionsData: Array<Maybe<ActionThreatData>>;
+  proposerRisk: Scalars['String']['output'];
+};
+
 export enum TimeInterval {
   ALL = 'ALL',
   DAY = 'DAY',
@@ -3183,7 +3329,7 @@ export enum TimeInterval {
 
 /** Core type that describes an onchain Token contract */
 export type Token = {
-  __typename?: 'Token';
+  __typename: 'Token';
   /**
    * EVM Address on chain.  See `id` for chain id
    * @deprecated selector `id` has more context
@@ -3194,6 +3340,7 @@ export type Token = {
   /** Eligibility of an account to claim this token */
   eligibility: Eligibility;
   id: Scalars['AssetID']['output'];
+  isBehind: Scalars['Boolean']['output'];
   isIndexing: Scalars['Boolean']['output'];
   /**
    * Last block that Tally has indexed.  Sometimes our indexer needs to catch up.  Our indexer is usually ~1min behind depending on chain so we don't serve data that might later be reorged.
@@ -3221,7 +3368,7 @@ export type TokeneligibilityArgs = {
 };
 
 export type TokenBalance = {
-  __typename?: 'TokenBalance';
+  __typename: 'TokenBalance';
   balance: Scalars['Uint256']['output'];
   token: Token;
 };
@@ -3232,26 +3379,26 @@ export type TokenBalanceInput = {
 };
 
 export type TokenContract = {
-  __typename?: 'TokenContract';
+  __typename: 'TokenContract';
   address: Scalars['Address']['output'];
   lastBlock: Scalars['Int']['output'];
   type: TokenType;
 };
 
 export type TokenData = {
-  __typename?: 'TokenData';
+  __typename: 'TokenData';
   data: CovalentData;
   id: Scalars['AccountID']['output'];
 };
 
 export type TokenDelegateStats = {
-  __typename?: 'TokenDelegateStats';
+  __typename: 'TokenDelegateStats';
   /** Total count of delegates by token */
   total: Scalars['Int']['output'];
 };
 
 export type TokenSync = {
-  __typename?: 'TokenSync';
+  __typename: 'TokenSync';
   id: Scalars['AssetID']['output'];
   start: Scalars['Int']['output'];
 };
@@ -3263,19 +3410,32 @@ export enum TokenType {
 }
 
 export type Transaction = {
-  __typename?: 'Transaction';
+  __typename: 'Transaction';
   block: Block;
   id: Scalars['HashID']['output'];
 };
 
 export type TransactionSimulation = {
-  __typename?: 'TransactionSimulation';
+  __typename: 'TransactionSimulation';
+  publicURI: Scalars['String']['output'];
+  result: Scalars['String']['output'];
+};
+
+/** Source of data: Tenderly. Array of simulations used for proposal-level checks */
+export type TransactionSimulationArray = {
+  __typename: 'TransactionSimulationArray';
+  simulations: Array<TransactionSimulationV2>;
+};
+
+/** V2 */
+export type TransactionSimulationV2 = {
+  __typename: 'TransactionSimulationV2';
   publicURI: Scalars['String']['output'];
   result: Scalars['String']['output'];
 };
 
 export type Treasury = {
-  __typename?: 'Treasury';
+  __typename: 'Treasury';
   tokens: Array<SafeTokenBalance>;
   totalUSDValue: Scalars['String']['output'];
 };
@@ -3305,7 +3465,7 @@ export type UploadFile = {
 
 /** Votes cast in a Governor proposal */
 export type Vote = {
-  __typename?: 'Vote';
+  __typename: 'Vote';
   /**
    * `Block` vote was cast in.
    * @deprecated selector `transaction` contains the creation block
@@ -3334,7 +3494,7 @@ export type Vote = {
 
 /** The `VoteAttempt` type represents the stored attempt of a user that tried voting on a given proposal. */
 export type VoteAttempt = {
-  __typename?: 'VoteAttempt';
+  __typename: 'VoteAttempt';
   createdAt: Scalars['Timestamp']['output'];
   proposal: Proposal;
   support: SupportType;
@@ -3355,7 +3515,7 @@ export enum VoteSortField {
 
 /** Voting Summary per Choice */
 export type VoteStat = {
-  __typename?: 'VoteStat';
+  __typename: 'VoteStat';
   /** Percent of total weight cast in this `Proposal` */
   percent: Scalars['Float']['output'];
   /** Vote Choice */
@@ -3367,7 +3527,7 @@ export type VoteStat = {
 };
 
 export type VotingParameters = {
-  __typename?: 'VotingParameters';
+  __typename: 'VotingParameters';
   proposalThreshold?: Maybe<Scalars['Uint256']['output']>;
   quorum?: Maybe<Scalars['Uint256']['output']>;
   /** Role user needs to have to update the voting parameters. */
@@ -3378,7 +3538,7 @@ export type VotingParameters = {
 
 /** Represents a voting power change over an interval or triggered by an event. */
 export type VotingPowerChange = {
-  __typename?: 'VotingPowerChange';
+  __typename: 'VotingPowerChange';
   /** The `delegate` address whose voting power is changing */
   delegate: Account;
   /** Net change in voting power caused by this event */
@@ -3411,7 +3571,7 @@ export type DelegatesQueryVariables = Exact<{
 }>;
 
 
-export type DelegatesQuery = { __typename?: 'Query', delegates: { __typename?: 'PaginatedOutput', nodes: Array<{ __typename?: 'Delegate', votesCount: any, account: { __typename?: 'Account', address: any, name: string, ens?: string | null } } | { __typename?: 'DelegationV2' } | { __typename?: 'GovernorV2' } | { __typename?: 'Member' } | { __typename?: 'Organization' }>, pageInfo: { __typename?: 'PageInfo', firstCursor?: string | null, lastCursor?: string | null } } };
+export type DelegatesQuery = { __typename: 'Query', delegates: { __typename: 'PaginatedOutput', nodes: Array<{ __typename: 'Delegate', votesCount: any, account: { __typename: 'Account', address: Address, name: string, ens?: string | null } } | { __typename: 'DelegationV2' } | { __typename: 'GovernorV2' } | { __typename: 'Member' } | { __typename: 'Organization' }>, pageInfo: { __typename: 'PageInfo', lastCursor?: string | null } } };
 
 
-export const DelegatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Delegates"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DelegatesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delegates"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Delegate"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"ens"}}]}},{"kind":"Field","name":{"kind":"Name","value":"votesCount"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"firstCursor"}},{"kind":"Field","name":{"kind":"Name","value":"lastCursor"}}]}}]}}]}}]} as unknown as DocumentNode<DelegatesQuery, DelegatesQueryVariables>;
+export const DelegatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Delegates"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DelegatesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delegates"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Delegate"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"ens"}}]}},{"kind":"Field","name":{"kind":"Name","value":"votesCount"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"lastCursor"}}]}}]}}]}}]} as unknown as DocumentNode<DelegatesQuery, DelegatesQueryVariables>;

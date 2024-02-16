@@ -1,5 +1,6 @@
 "use client"
 
+import { TallyDelegatee } from "@/app/api/delegatees/model"
 import { DelegateeField } from "@/components/form/DelegateeField"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -10,9 +11,8 @@ import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
-import { useTallyDelegates } from "@/lib/hooks/use-tally-delegates"
+import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
-import type { TallyDelegatee } from "@/lib/types"
 import { Info, RotateCw } from "lucide-react"
 import { FormProvider, useForm } from "react-hook-form"
 import type { Address } from "viem"
@@ -27,7 +27,7 @@ export function EditBeneficiaryDelegateeDialogContent({
   delegatee: Address
   stakeId: string
 }) {
-  const { error: tallyDelegateesError, isLoading, tallyDelegatees } = useTallyDelegates()
+  const { error, isLoading, data } = useTallyDelegatees()
 
   return (
     <DialogContent>
@@ -38,11 +38,11 @@ export function EditBeneficiaryDelegateeDialogContent({
         "Loading..."
       ) : (
         <EditBeneficiaryDelegateeForm
-          tallyDelegatees={tallyDelegatees}
+          tallyDelegatees={data ?? []}
           beneficiary={beneficiary}
           delegatee={delegatee}
           stakeId={stakeId}
-          tallyDelegateesError={tallyDelegateesError}
+          tallyDelegateesError={error}
         />
       )}
     </DialogContent>
@@ -59,7 +59,7 @@ const useEditBeneficiaryDelegateeForm = ({
   beneficiary: Address
   delegatee: Address
   stakeId: string
-  tallyDelegatees: Array<TallyDelegatee>
+  tallyDelegatees: ReadonlyArray<TallyDelegatee>
   tallyDelegateesError: Error | null
 }) => {
   const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
@@ -145,7 +145,7 @@ function EditBeneficiaryDelegateeForm({
   beneficiary: Address
   delegatee: Address
   stakeId: string
-  tallyDelegatees: Array<TallyDelegatee>
+  tallyDelegatees: ReadonlyArray<TallyDelegatee>
   tallyDelegateesError: Error | null
 }) {
   const { error, form, isPending, onSubmit } = useEditBeneficiaryDelegateeForm({

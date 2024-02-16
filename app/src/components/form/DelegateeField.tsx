@@ -1,3 +1,4 @@
+import { TallyDelegatee } from "@/app/api/delegatees/model"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { buttonVariants } from "@/components/ui/button"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -5,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import type { TallyDelegatee } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Info, Link } from "lucide-react"
 import { useFormContext } from "react-hook-form"
@@ -20,7 +20,13 @@ function useDelegateeField({ name }: { name: string }) {
   }
 }
 
-export function DelegateeField({ name, tallyDelegatees }: { name: string; tallyDelegatees: Array<TallyDelegatee> }) {
+export function DelegateeField({
+  name,
+  tallyDelegatees
+}: {
+  name: string
+  tallyDelegatees: ReadonlyArray<TallyDelegatee>
+}) {
   const { delegateeOption, form } = useDelegateeField({ name })
 
   return (
@@ -40,8 +46,8 @@ export function DelegateeField({ name, tallyDelegatees }: { name: string; tallyD
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
-                    You must delegate your UNI&apos;s votesCount. The default address is your own, however there are
-                    many active delegatees to choose from. You can view delegatee profiles
+                    You must delegate your UNI&apos;s votes. The default address is your own, however there are many
+                    active delegatees to choose from. You can view delegatee profiles
                     <Link href="https://www.tally.xyz/gov/uniswap" target="_blank">
                       {" "}
                       <div
@@ -135,7 +141,7 @@ export function DelegateeField({ name, tallyDelegatees }: { name: string; tallyD
                                 </div>
                                 <div className="flex items-start space-x-1">
                                   <span>Votes:</span>
-                                  <BigIntDisplay value={delegatee.votesCount} decimals={18} precision={2} />
+                                  <BigIntDisplay value={delegatee.votes} decimals={18} precision={2} />
                                 </div>
                               </SelectItem>
                             ))}

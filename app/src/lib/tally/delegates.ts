@@ -4,6 +4,7 @@ export const DelegatesQuery = graphql(`
   query Delegates($input: DelegatesInput!) {
     delegates(input: $input) {
       nodes {
+        __typename
         ... on Delegate {
           account {
             address
@@ -14,7 +15,6 @@ export const DelegatesQuery = graphql(`
         }
       }
       pageInfo {
-        firstCursor
         lastCursor
       }
     }

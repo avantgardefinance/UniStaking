@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+import { Address, Hex } from "viem"
+import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -14,9 +15,9 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  BigDecimal: { input: any; output: any; }
-  BigInt: { input: any; output: any; }
-  Bytes: { input: any; output: any; }
+  BigDecimal: { input: string; output: string; }
+  BigInt: { input: string; output: string; }
+  Bytes: { input: Hex; output: Hex; }
   /**
    * 8 bytes signed integer
    *
@@ -25,7 +26,7 @@ export type Scalars = {
 };
 
 export type Account = {
-  __typename?: 'Account';
+  __typename: 'Account';
   beneficiaryships: Array<Deposit>;
   claimedRewards: Scalars['BigInt']['output'];
   createdAt: Scalars['Int']['output'];
@@ -149,7 +150,7 @@ export enum Account_orderBy {
 }
 
 export type AdminSet = {
-  __typename?: 'AdminSet';
+  __typename: 'AdminSet';
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
   id: Scalars['Bytes']['output'];
@@ -231,7 +232,7 @@ export enum AdminSet_orderBy {
 }
 
 export type BeneficiaryAltered = DepositEvent & Event & {
-  __typename?: 'BeneficiaryAltered';
+  __typename: 'BeneficiaryAltered';
   affected: Array<Scalars['Bytes']['output']>;
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
@@ -374,7 +375,7 @@ export type Block_height = {
 };
 
 export type DelegateeAltered = DepositEvent & Event & {
-  __typename?: 'DelegateeAltered';
+  __typename: 'DelegateeAltered';
   affected: Array<Scalars['Bytes']['output']>;
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
@@ -507,7 +508,7 @@ export enum DelegateeAltered_orderBy {
 }
 
 export type Deposit = {
-  __typename?: 'Deposit';
+  __typename: 'Deposit';
   amount: Scalars['BigInt']['output'];
   beneficiary: Account;
   createdAt: Scalars['Int']['output'];
@@ -861,7 +862,7 @@ export enum Event_orderBy {
 }
 
 export type FeesClaimed = {
-  __typename?: 'FeesClaimed';
+  __typename: 'FeesClaimed';
   amount0: Scalars['BigInt']['output'];
   amount1: Scalars['BigInt']['output'];
   blockNumber: Scalars['BigInt']['output'];
@@ -981,7 +982,7 @@ export enum OrderDirection {
 }
 
 export type Query = {
-  __typename?: 'Query';
+  __typename: 'Query';
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
   account?: Maybe<Account>;
@@ -1292,7 +1293,7 @@ export type QueryuniStakerHistoryArgs = {
 };
 
 export type RewardClaimed = Event & {
-  __typename?: 'RewardClaimed';
+  __typename: 'RewardClaimed';
   affected: Array<Scalars['Bytes']['output']>;
   amount: Scalars['BigInt']['output'];
   beneficiary: Scalars['Bytes']['output'];
@@ -1386,7 +1387,7 @@ export enum RewardClaimed_orderBy {
 }
 
 export type RewardNotified = Event & {
-  __typename?: 'RewardNotified';
+  __typename: 'RewardNotified';
   affected: Array<Scalars['Bytes']['output']>;
   amount: Scalars['BigInt']['output'];
   blockNumber: Scalars['BigInt']['output'];
@@ -1468,7 +1469,7 @@ export enum RewardNotified_orderBy {
 }
 
 export type StakeDeposited = DepositEvent & Event & {
-  __typename?: 'StakeDeposited';
+  __typename: 'StakeDeposited';
   affected: Array<Scalars['Bytes']['output']>;
   amount: Scalars['BigInt']['output'];
   blockNumber: Scalars['BigInt']['output'];
@@ -1597,7 +1598,7 @@ export enum StakeDeposited_orderBy {
 }
 
 export type StakeWithdrawn = DepositEvent & Event & {
-  __typename?: 'StakeWithdrawn';
+  __typename: 'StakeWithdrawn';
   affected: Array<Scalars['Bytes']['output']>;
   amount: Scalars['BigInt']['output'];
   blockNumber: Scalars['BigInt']['output'];
@@ -1726,7 +1727,7 @@ export enum StakeWithdrawn_orderBy {
 }
 
 export type Subscription = {
-  __typename?: 'Subscription';
+  __typename: 'Subscription';
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
   account?: Maybe<Account>;
@@ -2037,14 +2038,14 @@ export type SubscriptionuniStakerHistoryArgs = {
 };
 
 export type Surrogate = {
-  __typename?: 'Surrogate';
+  __typename: 'Surrogate';
   createdAt: Scalars['Int']['output'];
   delegatee: Account;
   id: Scalars['Bytes']['output'];
 };
 
 export type SurrogateDeployed = Event & {
-  __typename?: 'SurrogateDeployed';
+  __typename: 'SurrogateDeployed';
   affected: Array<Scalars['Bytes']['output']>;
   blockNumber: Scalars['BigInt']['output'];
   blockTimestamp: Scalars['BigInt']['output'];
@@ -2198,7 +2199,7 @@ export enum Surrogate_orderBy {
 }
 
 export type UniStakerHistory = {
-  __typename?: 'UniStakerHistory';
+  __typename: 'UniStakerHistory';
   claimedRewards: Scalars['BigInt']['output'];
   currentlyStaked: Scalars['BigInt']['output'];
   id: Scalars['String']['output'];
@@ -2294,7 +2295,7 @@ export enum UniStakerHistory_orderBy {
 }
 
 export type _Block_ = {
-  __typename?: '_Block_';
+  __typename: '_Block_';
   /** The hash of the block */
   hash?: Maybe<Scalars['Bytes']['output']>;
   /** The block number */
@@ -2305,7 +2306,7 @@ export type _Block_ = {
 
 /** The type for the top-level _meta field */
 export type _Meta_ = {
-  __typename?: '_Meta_';
+  __typename: '_Meta_';
   /**
    * Information about a specific subgraph block. The hash of the block
    * will be null if the _meta field has a block constraint that asks for
@@ -2333,14 +2334,14 @@ export type DepositsQueryVariables = Exact<{
 }>;
 
 
-export type DepositsQuery = { __typename?: 'Query', account?: { __typename?: 'Account', currentlyStaked: any } | null, deposits: Array<{ __typename?: 'Deposit', id: string, amount: any, createdAt: number, updatedAt: number, beneficiary: { __typename?: 'Account', id: any }, delegatee: { __typename?: 'Account', id: any }, owner: { __typename?: 'Account', id: any } }> };
+export type DepositsQuery = { __typename: 'Query', account?: { __typename: 'Account', currentlyStaked: string } | null, deposits: Array<{ __typename: 'Deposit', id: string, amount: string, createdAt: number, updatedAt: number, beneficiary: { __typename: 'Account', id: Hex }, delegatee: { __typename: 'Account', id: Hex }, owner: { __typename: 'Account', id: Hex } }> };
 
 export type EventsQueryVariables = Exact<{
   account: Scalars['Bytes']['input'];
 }>;
 
 
-export type EventsQuery = { __typename?: 'Query', events: Array<{ __typename: 'BeneficiaryAltered', oldBeneficiary: any, newBeneficiary: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'DelegateeAltered', newDelegatee: any, oldDelegatee: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'RewardClaimed', beneficiary: any, amount: any, id: any, blockTimestamp: any } | { __typename: 'RewardNotified', id: any, blockTimestamp: any } | { __typename: 'StakeDeposited', amount: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'StakeWithdrawn', amount: any, id: any, blockTimestamp: any, deposit: { __typename?: 'Deposit', id: string, owner: { __typename?: 'Account', id: any } } } | { __typename: 'SurrogateDeployed', id: any, blockTimestamp: any }> };
+export type EventsQuery = { __typename: 'Query', events: Array<{ __typename: 'BeneficiaryAltered', oldBeneficiary: Hex, newBeneficiary: Hex, id: Hex, blockTimestamp: string, deposit: { __typename: 'Deposit', id: string, owner: { __typename: 'Account', id: Hex } } } | { __typename: 'DelegateeAltered', newDelegatee: Hex, oldDelegatee: Hex, id: Hex, blockTimestamp: string, deposit: { __typename: 'Deposit', id: string, owner: { __typename: 'Account', id: Hex } } } | { __typename: 'RewardClaimed', beneficiary: Hex, amount: string, id: Hex, blockTimestamp: string } | { __typename: 'RewardNotified', id: Hex, blockTimestamp: string } | { __typename: 'StakeDeposited', amount: string, id: Hex, blockTimestamp: string, deposit: { __typename: 'Deposit', id: string, owner: { __typename: 'Account', id: Hex } } } | { __typename: 'StakeWithdrawn', amount: string, id: Hex, blockTimestamp: string, deposit: { __typename: 'Deposit', id: string, owner: { __typename: 'Account', id: Hex } } } | { __typename: 'SurrogateDeployed', id: Hex, blockTimestamp: string }> };
 
 
 export const DepositsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Deposits"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"accountId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"accountId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentlyStaked"}}]}},{"kind":"Field","name":{"kind":"Name","value":"deposits"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"amount_gt"},"value":{"kind":"IntValue","value":"0"}},{"kind":"ObjectField","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"delegatee"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"beneficiary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"beneficiary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"delegatee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<DepositsQuery, DepositsQueryVariables>;

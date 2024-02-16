@@ -10,7 +10,14 @@ const config: CodegenConfig = {
     "src/lib/generated/subgraph/": {
       schema: "http://localhost:8000/subgraphs/name/uniswap/staking",
       documents: "src/lib/subgraph/**/*.ts",
-      preset: "client"
+      preset: "client",
+      plugins: [
+        {
+          add: {
+            content: [`import { Address, Hex } from "viem"`]
+          }
+        }
+      ]
     },
     "src/lib/generated/tally/": {
       schema: {
@@ -21,10 +28,27 @@ const config: CodegenConfig = {
         }
       },
       documents: "src/lib/tally/**/*.ts",
-      preset: "client"
+      preset: "client",
+      plugins: [
+        {
+          add: {
+            content: [`import { Address, Hex } from "viem"`]
+          }
+        }
+      ]
     }
   },
-  config: { namingConvention: "keep" }
+  config: {
+    namingConvention: "keep",
+    useTypeImports: true,
+    nonOptionalTypename: true,
+    scalars: {
+      Address: "Address",
+      Bytes: "Hex",
+      BigDecimal: "string",
+      BigInt: "string"
+    }
+  }
 }
 
 export default config

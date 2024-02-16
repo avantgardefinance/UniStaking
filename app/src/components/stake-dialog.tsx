@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
-import { useTallyDelegates } from "@/lib/hooks/use-tally-delegates"
+import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { Download, Info, RotateCw } from "lucide-react"
 import { useState } from "react"
@@ -32,9 +32,7 @@ const useStakeDialog = ({
   const chainId = useChainId()
 
   const [error, setError] = useState<Error>()
-
-  const { error: errorTallyDelegatees, isLoading: isLoadingTallyDelegatees, tallyDelegatees } = useTallyDelegates()
-
+  const { error: errorTallyDelegatees, isLoading: isLoadingTallyDelegatees, data: tallyDelegatees } = useTallyDelegatees()
   const { error: errorWrite, isPending: isPendingWrite, writeContract } = useWriteContractWithToast()
 
   const form = useForm({
@@ -203,7 +201,7 @@ export function StakeDialogContent({
             {isLoadingTallyDelegatees ? (
               "Loading..."
             ) : (
-              <DelegateeField name="delegateeOption" tallyDelegatees={tallyDelegatees} />
+              <DelegateeField name="delegateeOption" tallyDelegatees={tallyDelegatees ?? []} />
             )}
             {error && (
               <Alert variant="destructive">

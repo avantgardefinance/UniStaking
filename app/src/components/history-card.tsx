@@ -1,4 +1,4 @@
-import { GetHistoryResponse } from "@/app/api/history/route"
+import { HistoryEntry } from "@/app/api/history/model"
 import { AddressDisplay } from "@/components/ui/address-display"
 import { Badge } from "@/components/ui/badge"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
@@ -8,9 +8,7 @@ import { formatDate } from "@/lib/date"
 import { ReactNode } from "react"
 import type { Address } from "viem"
 
-export type HistoryItem = GetHistoryResponse[number]
-
-export function HistoryCard(item: HistoryItem) {
+export function HistoryCard(item: HistoryEntry) {
   const type = item.type
   switch (type) {
     case "StakeDeposited":

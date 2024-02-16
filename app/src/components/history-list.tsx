@@ -1,68 +1,58 @@
 "use client"
 
-import { GetHistoryResponse } from "@/app/api/history/route"
-import { HistoryCard, HistoryItem } from "@/components/history-card"
+import { HistoryEntry, HistoryEntrySchema } from "@/app/api/history/model"
+import { HistoryCard } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Schema } from "@effect/schema"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 import { Address } from "viem"
 
+const decode = Schema.decodeSync(Schema.array(HistoryEntrySchema))
+
 function useHistoryList({ account }: { account: Address }) {
-  const { data, error, isLoading } = useQuery({
+  return useQuery({
     queryKey: ["history", account],
     queryFn: async () => {
       const response = await fetch(`/api/history?account=${account}`)
       if (!response.ok) {
         throw new Error("Failed to fetch history")
       }
-      return response.json()
+
+      return decode(await response.json())
     }
   })
-
-  // TODO improve types
-  const parsedData: GetHistoryResponse =
-    data?.map((event: any) => {
-      return {
-        ...event,
-        amount: event.amount === undefined ? undefined : BigInt(event.amount),
-        date: new Date(event.date * 1000)
-      }
-    }) ?? []
-
-  return {
-    data: parsedData,
-    error,
-    isLoading
-  }
 }
 
 export function HistoryList({ account }: { account: Address }) {
-  const { data, error, isLoading } = useHistoryList({ account })
+  const { data, error, isSuccess, isError, isLoading } = useHistoryList({ account })
 
   if (isLoading) {
     return <div>Loading...</div>
   }
 
-  if (error !== null) {
+  if (isError) {
     return <Alert variant="destructive">{error.message}</Alert>
   }
 
-  if (data.length === 0) {
-    return (
+  if (isSuccess) {
+    return data.length === 0 ? (
       <Card className="w-full">
         <CardHeader>
           <CardTitle>No history</CardTitle>
         </CardHeader>
       </Card>
+    ) : (
+      <List key={account} items={data} />
     )
   }
 
-  return <List key={account} items={data} />
+  return null
 }
 
-function useList(items: HistoryItem[]) {
+function useList(items: ReadonlyArray<HistoryEntry>) {
   const [limit, setLimit] = useState(20)
 
   return {
@@ -72,7 +62,7 @@ function useList(items: HistoryItem[]) {
   }
 }
 
-function List({ items }: { items: HistoryItem[] }) {
+function List({ items }: { items: ReadonlyArray<HistoryEntry> }) {
   const { historyToDisplay, canShowMore, showMore } = useList(items)
 
   return (

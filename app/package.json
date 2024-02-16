@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@effect/schema": "^0.62.7",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@metamask/jazzicon": "^2.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -25,6 +26,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "connectkit": "1.7.0",
+    "effect": "^2.3.6",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "graphql-tag": "^2.12.6",
@@ -40,6 +42,7 @@
     "wagmi": "^2.5.7"
   },
   "devDependencies": {
+    "@graphql-codegen/add": "^5.0.2",
     "@graphql-codegen/cli": "^5.0.2",
     "@graphql-codegen/client-preset": "^4.2.2",
     "@graphql-codegen/client-preset-swc-plugin": "^0.2.0",

@@ -16,12 +16,32 @@ import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { Download, Info, RotateCw } from "lucide-react"
-import { useState } from "react"
+import { useReducer, useState } from "react"
 import { useForm } from "react-hook-form"
 import type { Address } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
-import { useChainId } from "wagmi"
+import { useChainId, useWaitForTransactionReceipt } from "wagmi"
 import { readContract, signTypedData } from "wagmi/actions"
+
+const nextStateGraph = {
+  lit: {
+    TOGGLE: "unlit"
+  },
+  unlit: {
+    TOGGLE: "lit",
+    BREAK: "broken"
+  },
+  broken: {}
+} as const
+
+type State = keyof typeof nextStateGraph
+type Action<TState extends State> = keyof (typeof nextStateGraph)[TState]
+const reducer = <TState extends State, TAction extends Action<TState>>(
+  state: TState,
+  action: TAction
+): (typeof nextStateGraph)[TState][TAction] => nextStateGraph[state][action]
+
+const a = reducer("unlit", "BREAK")
 
 const useStakeDialog = ({
   availableForStakingUni,
@@ -30,19 +50,34 @@ const useStakeDialog = ({
   availableForStakingUni: bigint
   account: Address
 }) => {
+  const [state, dispatch] = useReducer(reducer, "broken")
+
+  // const [state, dispatch] = useReducer(reducer, { age: 42 })
+
   const chainId = useChainId()
   const client = useQueryClient()
 
   const [error, setError] = useState<Error>()
-  const { error: errorTallyDelegatees, isLoading: isLoadingTallyDelegatees, data: tallyDelegatees } = useTallyDelegatees()
+  const {
+    error: errorTallyDelegatees,
+    isLoading: isLoadingTallyDelegatees,
+    data: tallyDelegatees
+  } = useTallyDelegatees()
   const {
     error: errorWrite,
     isPending: isPendingWrite,
-    writeContract
+    writeContract,
+    data: hash
   } = useWriteContractWithToast({
     mutation: {
       onSettled: () => client.invalidateQueries()
     }
+  })
+
+  const result = useWaitForTransactionReceipt({
+    confirmations: 6,
+    hash: hash,
+    onSuccess: () => {}
   })
 
   const form = useForm({

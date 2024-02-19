@@ -64,6 +64,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.20.5
         version: 5.20.5(react@18.2.0)
+      '@xstate/react':
+        specifier: ^4.1.0
+        version: 4.1.0(@types/react@18.2.55)(react@18.2.0)(xstate@5.7.1)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -115,6 +118,9 @@ importers:
       wagmi:
         specifier: ^2.5.7
         version: 2.5.7(@tanstack/react-query@5.20.5)(@types/react@18.2.55)(react-dom@18.2.0)(react-native@0.73.4)(react@18.2.0)(typescript@5.3.3)(viem@2.7.9)
+      xstate:
+        specifier: ^5.7.1
+        version: 5.7.1
     devDependencies:
       '@graphql-codegen/add':
         specifier: ^5.0.2
@@ -5668,6 +5674,23 @@ packages:
       fast-querystring: 1.1.2
       tslib: 2.6.2
     dev: true
+
+  /@xstate/react@4.1.0(@types/react@18.2.55)(react@18.2.0)(xstate@5.7.1):
+    resolution: {integrity: sha512-Fh89luCwuMXIVXIua67d8pNuVgdGpqke2jHfIIL+ZjkfNh6YFtPDSwNSZZDhdNUsOW1zZYSbtUzbC8MIUyTSHQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      xstate: ^5.6.2
+    peerDependenciesMeta:
+      xstate:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      use-isomorphic-layout-effect: 1.1.2(@types/react@18.2.55)(react@18.2.0)
+      use-sync-external-store: 1.2.0(react@18.2.0)
+      xstate: 5.7.1
+    transitivePeerDependencies:
+      - '@types/react'
+    dev: false
 
   /JSONStream@1.3.2:
     resolution: {integrity: sha512-mn0KSip7N4e0UDPZHnqDsHECo5uGQrixQKnAskOM1BIB8hd7QKbd6il8IPRPudPHOeHiECoCFqhyMaRO9+nWyA==}
@@ -12658,6 +12681,19 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /use-isomorphic-layout-effect@1.1.2(@types/react@18.2.55)(react@18.2.0):
+    resolution: {integrity: sha512-49L8yCO3iGT/ZF9QttjwLF/ZD9Iwto5LnH5LmEdk/6cFmXddqi2ulF0edxTwjj+7mqvpVVGQWvbXZdn32wRSHA==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@types/react': 18.2.55
+      react: 18.2.0
+    dev: false
+
   /use-sidecar@1.1.2(@types/react@18.2.55)(react@18.2.0):
     resolution: {integrity: sha512-epTbsLuzZ7lPClpz2TyryBfztm7m+28DlEv2ZCQ3MDr5ssiwyOwGH/e5F9CkfWjJ1t4clvI58yF822/GUkjjhw==}
     engines: {node: '>=10'}
@@ -13063,6 +13099,10 @@ packages:
   /xmlhttprequest-ssl@2.0.0:
     resolution: {integrity: sha512-QKxVRxiRACQcVuQEYFsI1hhkrMlrXHPegbbd1yn9UHOmRxY+si12nQYzri3vbzt8VdTTRviqcKxcyllFas5z2A==}
     engines: {node: '>=0.4.0'}
+    dev: false
+
+  /xstate@5.7.1:
+    resolution: {integrity: sha512-x1fa1X/K2bCdXrN6Hrll30Q00iprXaaPqB0U3N4nUgjngTNxQbnBvAQ4WSH6ctdU3jbH32+S3GDYctM5K7t8Vw==}
     dev: false
 
   /xtend@4.0.2:

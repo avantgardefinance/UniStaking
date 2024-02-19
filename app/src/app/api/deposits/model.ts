@@ -21,4 +21,4 @@ export type AccountDeposits = Schema.Schema.To<typeof AccountDepositsSchema>
 export const AccountDepositsSchema = Schema.struct({
   deposits: DepositsSchema,
   total: Schema.bigint
-}) 
+})

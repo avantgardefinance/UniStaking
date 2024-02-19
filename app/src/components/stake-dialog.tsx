@@ -34,7 +34,11 @@ const useStakeDialog = ({
   const client = useQueryClient()
 
   const [error, setError] = useState<Error>()
-  const { error: errorTallyDelegatees, isLoading: isLoadingTallyDelegatees, data: tallyDelegatees } = useTallyDelegatees()
+  const {
+    error: errorTallyDelegatees,
+    isLoading: isLoadingTallyDelegatees,
+    data: tallyDelegatees
+  } = useTallyDelegatees()
   const {
     error: errorWrite,
     isPending: isPendingWrite,

@@ -5,7 +5,19 @@ export const DepositsQuery = graphql(`
     account(id: $accountId) {
       currentlyStaked
     }
-    deposits(where: { amount_gt: 0, owner: $account, delegatee: $account, beneficiary: $account}) {
+    deposits(where: {
+      and: [{
+        amount_gt: 0,
+      }, {
+        or: [{
+          owner: $account,
+        }, {
+          delegatee: $account,
+        }, {
+          beneficiary: $account
+        }]
+      }]
+    }) {
       beneficiary {
         id
       }

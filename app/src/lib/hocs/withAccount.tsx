@@ -12,7 +12,7 @@ export function withAccount<Props extends object>(WrappedComponent: React.Compon
       return (
         <Card className="flex items-center flex-col">
           <CardHeader>
-            <CardTitle>Wallet not connected</CardTitle>
+            <CardTitle>Connect your wallet to stake UNI</CardTitle>
           </CardHeader>
           <CardContent>
             <ConnectButton />

@@ -497,7 +497,7 @@ export type Delegate = {
   account: Account;
   delegatorsCount: Scalars['Int']['output'];
   id: Scalars['IntID']['output'];
-  proposalsCount?: Maybe<Scalars['Int']['output']>;
+  /** @deprecated use statementV2 instead */
   statement?: Maybe<DelegateStatement>;
   statementV2?: Maybe<DelegateStatement>;
   token?: Maybe<Token>;
@@ -662,8 +662,11 @@ export type DelegationV2 = {
   __typename: 'DelegationV2';
   blockNumber: Scalars['Int']['output'];
   blockTimestamp: Scalars['Timestamp']['output'];
+  chainId: Scalars['ChainID']['output'];
   delegate: Delegate;
   delegator: Account;
+  governor: Governor;
+  id: Scalars['IntID']['output'];
   token: Token;
   votes: Scalars['Uint256']['output'];
 };

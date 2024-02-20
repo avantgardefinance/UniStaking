@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { invariant } from "@/lib/assertion"
+import { invariant, never } from "@/lib/assertion"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
@@ -19,15 +19,17 @@ import { useMachine } from "@xstate/react"
 import { Download, Info, RotateCw } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import type { Address, Hex } from "viem"
+import type { Address, Hex, ReplacementReason } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
 import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
-import { assertEvent, assign, fromPromise, setup } from "xstate"
+import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
 
 type Event =
   | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address; client: QueryClient }
   | { type: "resend" }
-  | { type: "txReplaced"; txHash: Hex }
+  | { type: "confirmTx" }
+  | { type: "cancelTx" }
+  | { type: "replaceTx"; txHash: Hex }
 
 const permitAndStakeMachine = setup({
   actors: {
@@ -86,34 +88,26 @@ const permitAndStakeMachine = setup({
         return txHash
       }
     ),
-    validateSignatureNotExpired: fromPromise(
-      async ({
-        input: { deadline }
-      }: {
-        input: {
-          deadline: bigint
-        }
-      }) => {
-        return new Date().getTime() / 1000 < Number(deadline)
-      }
-    ),
     waitForTransactionReceipt: fromPromise(
       async ({
-        input: { txHash, send }
+        input: { txHash }
       }: {
-        input: { txHash: Hex; send: (event: Event) => void }
+        input: { txHash: Hex }
       }) => {
-        await waitForTransactionReceipt(config, {
-          hash: txHash,
-          confirmations: 3,
-          onReplaced: ({ transaction }) => {
-            console.log("Replaced", transaction.hash)
-            send({ type: "txReplaced", txHash: transaction.hash }) // TODO: what will happen with this machine? Should it be stopped somehow?
-          }
+        return new Promise<{ txHash: Hex; status: ReplacementReason | "confirmed" }>((resolve, reject) => {
+          waitForTransactionReceipt(config, {
+            hash: txHash,
+            onReplaced: ({ transaction, reason }) => {
+              resolve({ txHash: transaction.hash, status: reason })
+            }
+          })
+            .then(() => resolve({ txHash, status: "confirmed" }))
+            .catch((error) => reject(error))
         })
       }
     )
   },
+
   actions: {
     invalidateQueries: (_, client: QueryClient) => {
       client.invalidateQueries()
@@ -148,11 +142,7 @@ const permitAndStakeMachine = setup({
         sign: {
           target: "signing",
           actions: assign(({ event }) => ({
-            amount: event.amount,
-            signer: event.signer,
-            delegatee: event.delegatee,
-            beneficiary: event.beneficiary,
-            client: event.client,
+            ...event,
             error: undefined
           }))
         }
@@ -177,16 +167,8 @@ const permitAndStakeMachine = setup({
           }))
         },
         onError: {
-          target: "signingError",
+          target: "initial",
           actions: assign({ error: "Failed to sign the message" })
-        }
-      }
-    },
-    signingError: {
-      on: {
-        sign: {
-          target: "signing",
-          actions: assign(({ event }) => ({ amount: event.amount, signer: event.signer, error: undefined }))
         }
       }
     },
@@ -199,7 +181,7 @@ const permitAndStakeMachine = setup({
             actions: assign({ error: undefined })
           },
           {
-            target: "signingError",
+            target: "initial",
             actions: assign({ error: "Signature expired" })
           }
         ]
@@ -232,20 +214,45 @@ const permitAndStakeMachine = setup({
     },
     sent: {
       on: {
-        txReplaced: {
+        replaceTx: {
           target: "sent",
           actions: assign(({ event }) => ({ txHash: event.txHash }))
+        },
+        cancelTx: {
+          target: "initial",
+          actions: assign({ error: "Transaction was cancelled", txHash: undefined })
+        },
+        confirmTx: {
+          target: "confirmed"
         }
       },
       invoke: {
         id: "waitForTransactionReceipt",
         src: "waitForTransactionReceipt",
-        input: ({ context: { txHash }, self }) => {
+        input: ({ context: { txHash } }) => {
           invariant(txHash !== undefined, "Invalid input")
-          return { txHash, send: self.send }
+          return { txHash }
         },
         onDone: {
-          target: "confirmed"
+          actions: raise(
+            ({
+              event: {
+                output: { status, txHash }
+              }
+            }) => {
+              switch (status) {
+                case "confirmed":
+                  return { type: "confirmTx" }
+                case "cancelled":
+                  return { type: "cancelTx" }
+                case "replaced":
+                case "repriced":
+                  return { type: "replaceTx", txHash }
+                default:
+                  never(status, `Unhandled status for transaction receipt ${status}`)
+              }
+            }
+          )
         },
         onError: {
           target: "signed",
@@ -277,7 +284,7 @@ const useStakeDialog = ({
   const client = useQueryClient()
   const [snapshot, send] = useMachine(permitAndStakeMachine)
 
-  console.log(snapshot)
+  console.log(snapshot.value)
 
   const [error, setError] = useState<Error>()
   const {

@@ -14,17 +14,19 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
-import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
-import { useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Download, Info, RotateCw } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
-import { useChainId, useWaitForTransactionReceipt } from "wagmi"
-import { readContract, signTypedData, writeContract } from "wagmi/actions"
+import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
 import { assertEvent, assign, fromPromise, setup } from "xstate"
+
+type Event =
+  | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address }
+  | { type: "resend" }
+  | { type: "txReplaced"; txHash: Hex }
 
 const permitAndStakeMachine = setup({
   actors: {
@@ -80,7 +82,6 @@ const permitAndStakeMachine = setup({
           functionName: "permitAndStake",
           args: [amount, delegatee, beneficiary, deadline, Number(v), r, s]
         })
-
         return txHash
       }
     ),
@@ -94,6 +95,20 @@ const permitAndStakeMachine = setup({
       }) => {
         return new Date().getTime() / 1000 < Number(deadline)
       }
+    ),
+    waitForTransactionReceipt: fromPromise(
+      async ({
+        input: { txHash, send }
+      }: {
+        input: { txHash: Hex; send: (event: Event) => void }
+      }) => {
+        await waitForTransactionReceipt(config, {
+          hash: txHash,
+          onReplaced: ({ transaction }) => {
+            send({ type: "txReplaced", txHash: transaction.hash })
+          }
+        })
+      }
     )
   },
   types: {
@@ -105,11 +120,9 @@ const permitAndStakeMachine = setup({
       delegatee: Address
       beneficiary: Address
       txHash: Hex
+      replaced: boolean
     }>,
-    events: {} as
-      | { type: "sign"; amount: bigint; signer: Address }
-      | { type: "resend" }
-      | { type: "txReplaced"; txHash: Hex }
+    events: {} as Event
   }
 }).createMachine({
   id: "permitAndStake",
@@ -122,6 +135,8 @@ const permitAndStakeMachine = setup({
           actions: assign(({ event }) => ({
             amount: event.amount,
             signer: event.signer,
+            delegatee: event.delegatee,
+            beneficiary: event.beneficiary,
             error: undefined
           }))
         }
@@ -139,11 +154,14 @@ const permitAndStakeMachine = setup({
         },
         onDone: {
           target: "validateSignatureNotExpired",
-          actions: assign(({ event }) => ({
-            signature: event.output.signature,
-            deadline: event.output.deadline,
-            error: undefined
-          }))
+          actions: assign(({ event }) => {
+            console.log({ eventDeadline: event.output.deadline })
+            return {
+              signature: event.output.signature,
+              deadline: event.output.deadline,
+              error: undefined
+            }
+          })
         },
         onError: {
           target: "signingError",
@@ -164,9 +182,8 @@ const permitAndStakeMachine = setup({
         id: "validateSignatureNotExpired",
         src: "validateSignatureNotExpired",
         input: ({ context: { deadline } }) => {
-          if (deadline === undefined) {
-            throw new Error() // TODO: how to verify that this is not undefined?
-          }
+          console.log({ deadline })
+          invariant(deadline !== undefined, "Deadline is not undefined")
           return { deadline }
         },
         onDone: {
@@ -216,9 +233,21 @@ const permitAndStakeMachine = setup({
         txReplaced: {
           target: "sent",
           actions: assign(({ event }) => ({ txHash: event.txHash }))
+        }
+      },
+      invoke: {
+        id: "waitForTransactionReceipt",
+        src: "waitForTransactionReceipt",
+        input: ({ context: { txHash }, self }) => {
+          invariant(txHash !== undefined, "Invalid input")
+          return { txHash, send: self.send }
         },
-        confirmed: {
+        onDone: {
           target: "confirmed"
+        },
+        onError: {
+          target: "signed",
+          actions: assign({ error: "Failed to send the message" })
         }
       }
     },
@@ -233,10 +262,9 @@ const useStakeDialog = ({
   availableForStakingUni: bigint
   account: Address
 }) => {
-  const chainId = useChainId()
-  const client = useQueryClient()
-
   const [snapshot, send] = useMachine(permitAndStakeMachine)
+
+  console.log(snapshot)
 
   const [error, setError] = useState<Error>()
   const {
@@ -244,22 +272,6 @@ const useStakeDialog = ({
     isLoading: isLoadingTallyDelegatees,
     data: tallyDelegatees
   } = useTallyDelegatees()
-  const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    // writeContract,
-    data: hash
-  } = useWriteContractWithToast({
-    mutation: {
-      onSettled: () => client.invalidateQueries()
-    }
-  })
-
-  const result = useWaitForTransactionReceipt({
-    confirmations: 6,
-    hash: hash,
-    onSuccess: () => {}
-  })
 
   const form = useForm({
     defaultValues: {
@@ -286,44 +298,13 @@ const useStakeDialog = ({
     if (values.beneficiary === undefined || delegatee === undefined) {
       return
     }
-
-    try {
-      const nonce = await readContract(config, {
-        address: governanceToken,
-        abi: uniAbi,
-        functionName: "nonces",
-        args: [account]
-      })
-
-      const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
-
-      const value = parseUnits(values.amount, 18)
-
-      const permitSignature = await signTypedData(config, {
-        account,
-        types: permitEIP712Options.permitTypes,
-        domain: {
-          ...permitEIP712Options.domainBase,
-          chainId: chainId
-        },
-        primaryType: permitEIP712Options.primaryType,
-        message: {
-          owner: account,
-          spender: uniStaker,
-          value,
-          nonce: nonce,
-          deadline: signedDeadline
-        }
-      })
-
-      const { v, r, s } = hexToSignature(permitSignature)
-    } catch (e) {
-      if (e instanceof Error) {
-        setError(e)
-      } else {
-        setError(new Error("Something went wrong"))
-      }
-    }
+    send({
+      type: "sign",
+      amount: parseUnits(values.amount, 18),
+      signer: account,
+      delegatee,
+      beneficiary: values.beneficiary
+    })
   }
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18))
@@ -331,8 +312,8 @@ const useStakeDialog = ({
   return {
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    error: errorWrite || errorTallyDelegatees || error,
-    isPending: isPendingWrite,
+    error: errorTallyDelegatees || error,
+    isPending: false,
     setMaxAmount,
     tallyDelegatees,
     isLoadingTallyDelegatees

@@ -15,15 +15,17 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant, never } from "@/lib/assertion"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Download, Info, PartyPopper, RotateCw } from "lucide-react"
 import React from "react"
-import { useForm } from "react-hook-form"
+import { UseFormReturn, useForm } from "react-hook-form"
 import type { Address, Hex, ReplacementReason } from "viem"
-import { formatUnits, hexToSignature, parseUnits } from "viem"
+import { formatUnits, hexToSignature, isAddress, parseUnits } from "viem"
 import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
 import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
+import { z } from "zod"
 
 const permitAndStakeMachine = setup({
   actors: {
@@ -350,6 +352,31 @@ function getProgress(machineState: "confirmed" | "initial" | "signing" | "sendin
   }
 }
 
+const address = z.string().transform((value, ctx) => {
+  if (!isAddress(value)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid address"
+    })
+
+    return z.NEVER
+  }
+  return value
+})
+
+const formSchema = z.object({
+  beneficiary: address,
+  customDelegatee: address,
+  tallyDelegatee: address,
+  amount: z.string().transform((res) => {
+    if (res === "") {
+      return 0n
+    }
+    return parseUnits(res, 18)
+  }),
+  delegateeOption: z.enum(["custom", "tally"])
+})
+
 const useStakeDialog = ({
   availableForStakingUni,
   account
@@ -376,24 +403,25 @@ const useStakeDialog = ({
     data: tallyDelegatees
   } = useTallyDelegatees()
 
-  const form = useForm({
+  const form = useForm<z.input<typeof formSchema>, any, z.output<typeof formSchema>>({
     defaultValues: {
       beneficiary: account,
       customDelegatee: account,
       tallyDelegatee: undefined,
       amount: formatUnits(availableForStakingUni, 18),
       delegateeOption: "custom"
-    }
+    },
+    resolver: zodResolver(formSchema)
   })
 
   const { setValue } = form
 
   const onSubmit = async (values: {
-    beneficiary: Address | undefined
-    customDelegatee: Address | undefined
-    tallyDelegatee: Address | undefined
+    beneficiary: Address
+    customDelegatee: Address
+    tallyDelegatee: Address
     delegateeOption: string
-    amount: string
+    amount: bigint
   }) => {
     if (machineState === "signed") {
       send({ type: "resend" })
@@ -406,7 +434,7 @@ const useStakeDialog = ({
     }
     send({
       type: "sign",
-      amount: parseUnits(values.amount, 18),
+      amount: values.amount,
       signer: account,
       delegatee,
       beneficiary: values.beneficiary,
@@ -460,7 +488,7 @@ export function StakeDialogContent({
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-4">
             <FormField
-              control={form.control}
+              control={(form as UseFormReturn<any>).control}
               name="amount"
               disabled={isFormDisabled}
               render={({ field }) => (
@@ -490,7 +518,7 @@ export function StakeDialogContent({
               )}
             />
             <FormField
-              control={form.control}
+              control={(form as UseFormReturn<any>).control}
               name="beneficiary"
               disabled={isFormDisabled}
               render={({ field }) => (

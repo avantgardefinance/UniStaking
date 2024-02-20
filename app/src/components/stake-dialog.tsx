@@ -151,11 +151,10 @@ const permitAndStakeMachine = setup({
       invoke: {
         id: "sign",
         src: "sign",
-        input: ({ context: { amount }, event }) => {
+        input: ({ event }) => {
           assertEvent(event, "sign")
-          invariant(amount !== undefined, "Amount is not undefined")
 
-          return { amount, signer: event.signer }
+          return { amount: event.amount, signer: event.signer }
         },
         onDone: {
           target: "sending",

@@ -25,13 +25,6 @@ import { formatUnits, hexToSignature, parseUnits } from "viem"
 import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
 import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
 
-type Event =
-  | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address; client: QueryClient }
-  | { type: "resend" }
-  | { type: "confirmTx" }
-  | { type: "cancelTx" }
-  | { type: "replaceTx"; txHash: Hex }
-
 const permitAndStakeMachine = setup({
   actors: {
     sign: fromPromise(async ({ input: { signer, amount } }: { input: { signer: Address; amount: bigint } }) => {
@@ -91,9 +84,9 @@ const permitAndStakeMachine = setup({
     ),
     waitForTransactionReceipt: fromPromise(
       async ({
-        input: { txHash }
+        input: txHash
       }: {
-        input: { txHash: Hex }
+        input: Hex
       }) => {
         return new Promise<{ txHash: Hex; status: ReplacementReason | "confirmed" }>((resolve, reject) => {
           waitForTransactionReceipt(config, {
@@ -132,7 +125,12 @@ const permitAndStakeMachine = setup({
       replaced: boolean
       client: QueryClient
     }>,
-    events: {} as Event
+    events: {} as
+      | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address; client: QueryClient }
+      | { type: "resend" }
+      | { type: "confirmTx" }
+      | { type: "cancelTx" }
+      | { type: "replaceTx"; txHash: Hex }
   }
 }).createMachine({
   id: "permitAndStake",
@@ -232,7 +230,7 @@ const permitAndStakeMachine = setup({
         src: "waitForTransactionReceipt",
         input: ({ context: { txHash } }) => {
           invariant(txHash !== undefined, "Invalid input")
-          return { txHash }
+          return txHash
         },
         onDone: {
           actions: raise(
@@ -335,7 +333,12 @@ function getProgress(machineState: "confirmed" | "initial" | "signing" | "sendin
     case "confirmed":
       return {
         value: 100,
-        buttonContent: "Stake",
+        buttonContent: (
+          <>
+            <Download size={16} />
+            <span>Permit & Stake</span>
+          </>
+        ),
         progressDescription: (
           <span className="space-x-2 flex flex-row items-baseline">
             <span>Transaction confirmed!</span>
@@ -363,7 +366,6 @@ const useStakeDialog = ({
     value: machineState
   } = snapshot
 
-  const isLoading = machineState === "signing" || machineState === "sending"
   const isFormDisabled = machineState !== "initial"
   const isSubmitButtonEnabled = machineState === "initial" || machineState === "signed"
 
@@ -419,7 +421,6 @@ const useStakeDialog = ({
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
     error: errorTallyDelegatees?.message ?? error,
-    isLoading,
     isFormDisabled,
     setMaxAmount,
     progress,

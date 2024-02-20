@@ -474,6 +474,7 @@ export function StakeDialogContent({
                     You have{" "}
                     <Button
                       variant="link"
+                      disabled={isFormDisabled}
                       onClick={(e) => {
                         e.preventDefault()
                         setMaxAmount()

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
+import { useState } from "react"
 import { Address } from "viem"
 
 interface Props {
@@ -27,6 +28,8 @@ export function AvailableUniForStaking(props: Props) {
 }
 
 function AvailableUniForStakingContent({ availableForStakingUni, isLoading, error, account }: Props) {
+  const [opened, setOpened] = useState(false)
+
   if (isLoading) {
     return "Loading..."
   }
@@ -47,14 +50,14 @@ function AvailableUniForStakingContent({ availableForStakingUni, isLoading, erro
         </span>
         <span className="text-xl">UNI</span>
       </h3>
-      <Dialog>
+      <Dialog onOpenChange={setOpened}>
         <DialogTrigger asChild>
           <Button size="lg" className="space-x-2 flex-grow">
             <Plus size={16} />
             <span>Create position</span>
           </Button>
         </DialogTrigger>
-        <StakeDialogContent account={account} availableForStakingUni={availableForStakingUni} />
+        <StakeDialogContent key={opened.toString()} account={account} availableForStakingUni={availableForStakingUni} />
       </Dialog>
     </>
   )

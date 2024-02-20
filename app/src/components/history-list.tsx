@@ -1,6 +1,6 @@
 "use client"
 
-import { History, HistoryEntry, HistorySchema } from "@/app/api/history/model"
+import { History, HistorySchema } from "@/app/api/history/model"
 import { HistoryCard } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"

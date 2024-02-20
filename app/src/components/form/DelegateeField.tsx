@@ -22,9 +22,11 @@ function useDelegateeField({ name }: { name: string }) {
 
 export function DelegateeField({
   name,
-  tallyDelegatees
+  tallyDelegatees,
+  disabled
 }: {
   name: string
+  disabled: boolean
   tallyDelegatees: ReadonlyArray<TallyDelegatee>
 }) {
   const { delegateeOption, form } = useDelegateeField({ name })
@@ -33,6 +35,7 @@ export function DelegateeField({
     <FormField
       control={form.control}
       name={name}
+      disabled={disabled}
       render={({ field: delegateeOptionField }) => (
         <FormItem className="space-y-3">
           <FormLabel>
@@ -69,6 +72,7 @@ export function DelegateeField({
           </FormLabel>
           <FormControl>
             <RadioGroup
+              disabled={disabled}
               onValueChange={delegateeOptionField.onChange}
               defaultValue={delegateeOptionField.value}
               value={delegateeOptionField.value}
@@ -86,6 +90,7 @@ export function DelegateeField({
                   <span>Custom address</span>
                   <FormField
                     control={form.control}
+                    disabled={disabled}
                     name="customDelegatee"
                     render={({ field: customDelegateeField }) => (
                       <FormItem>
@@ -122,6 +127,7 @@ export function DelegateeField({
                     render={({ field: fieldTallyDelegatee }) => (
                       <FormItem>
                         <Select
+                          disabled={disabled}
                           onValueChange={(value) => {
                             fieldTallyDelegatee.onChange(value)
                             delegateeOptionField.onChange("tally")

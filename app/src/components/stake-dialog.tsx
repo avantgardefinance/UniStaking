@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
@@ -16,8 +17,8 @@ import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker 
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
-import { Download, Info, RotateCw } from "lucide-react"
-import { useState } from "react"
+import { Download, Info, PartyPopper, RotateCw } from "lucide-react"
+import React from "react"
 import { useForm } from "react-hook-form"
 import type { Address, Hex, ReplacementReason } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
@@ -97,6 +98,7 @@ const permitAndStakeMachine = setup({
         return new Promise<{ txHash: Hex; status: ReplacementReason | "confirmed" }>((resolve, reject) => {
           waitForTransactionReceipt(config, {
             hash: txHash,
+            confirmations: 3,
             onReplaced: ({ transaction, reason }) => {
               resolve({ txHash: transaction.hash, status: reason })
             }
@@ -107,7 +109,6 @@ const permitAndStakeMachine = setup({
       }
     )
   },
-
   actions: {
     invalidateQueries: (_, client: QueryClient) => {
       client.invalidateQueries()
@@ -154,7 +155,7 @@ const permitAndStakeMachine = setup({
         src: "sign",
         input: ({ context: { amount }, event }) => {
           assertEvent(event, "sign")
-          invariant(amount !== undefined, "Amount is not undefined") // TODO: is there a better way to verify that the context value is not undefined?
+          invariant(amount !== undefined, "Amount is not undefined")
 
           return { amount, signer: event.signer }
         },
@@ -274,6 +275,79 @@ const permitAndStakeMachine = setup({
   }
 })
 
+function getProgress(machineState: "confirmed" | "initial" | "signing" | "sending" | "signed" | "sent") {
+  switch (machineState) {
+    case "initial":
+      return {
+        value: 0,
+        buttonContent: (
+          <>
+            <Download size={16} />
+            <span>Permit & Stake</span>
+          </>
+        ),
+        progressDescription: null
+      }
+    case "signing":
+      return {
+        value: 20,
+        buttonContent: (
+          <>
+            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
+            <span>Signing</span>
+          </>
+        ),
+        progressDescription: <span>Sign transaction in your wallet</span>
+      }
+    case "signed":
+      return {
+        value: 40,
+        buttonContent: (
+          <>
+            <Download size={16} />
+            <span>Stake</span>
+          </>
+        ),
+        progressDescription: <span>Transaction signed, send to stake</span>
+      }
+    case "sending":
+      return {
+        value: 60,
+        buttonContent: (
+          <>
+            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
+            <span>Sending</span>
+          </>
+        ),
+        progressDescription: <span>Confirm transaction in your wallet</span>
+      }
+    case "sent":
+      return {
+        value: 80,
+        buttonContent: (
+          <>
+            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
+            <span>Confirming</span>
+          </>
+        ),
+        progressDescription: <span>Transaction sent, waiting for confirmation...</span>
+      }
+    case "confirmed":
+      return {
+        value: 100,
+        buttonContent: "Stake",
+        progressDescription: (
+          <span className="space-x-2 flex flex-row items-baseline">
+            <span>Transaction confirmed!</span>
+            <PartyPopper size={16} />
+          </span>
+        )
+      }
+    default:
+      never(machineState, `Unhandled value for progress ${machineState}`)
+  }
+}
+
 const useStakeDialog = ({
   availableForStakingUni,
   account
@@ -284,9 +358,17 @@ const useStakeDialog = ({
   const client = useQueryClient()
   const [snapshot, send] = useMachine(permitAndStakeMachine)
 
-  console.log(snapshot.value)
+  const {
+    context: { error },
+    value: machineState
+  } = snapshot
 
-  const [error, setError] = useState<Error>()
+  const isLoading = machineState === "signing" || machineState === "sending"
+  const isFormDisabled = machineState !== "initial"
+  const isSubmitButtonEnabled = machineState === "initial" || machineState === "signed"
+
+  const progress = getProgress(machineState)
+
   const {
     error: errorTallyDelegatees,
     isLoading: isLoadingTallyDelegatees,
@@ -312,7 +394,10 @@ const useStakeDialog = ({
     delegateeOption: string
     amount: string
   }) => {
-    setError(undefined)
+    if (machineState === "signed") {
+      send({ type: "resend" })
+      return
+    }
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
 
     if (values.beneficiary === undefined || delegatee === undefined) {
@@ -333,11 +418,14 @@ const useStakeDialog = ({
   return {
     form,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    error: errorTallyDelegatees || error,
-    isPending: false,
+    error: errorTallyDelegatees?.message ?? error,
+    isLoading,
+    isFormDisabled,
     setMaxAmount,
+    progress,
     tallyDelegatees,
-    isLoadingTallyDelegatees
+    isLoadingTallyDelegatees,
+    isSubmitButtonEnabled
   }
 }
 
@@ -345,7 +433,17 @@ export function StakeDialogContent({
   availableForStakingUni,
   account
 }: { availableForStakingUni: bigint; account: Address }) {
-  const { error, form, isLoadingTallyDelegatees, isPending, onSubmit, setMaxAmount, tallyDelegatees } = useStakeDialog({
+  const {
+    error,
+    form,
+    isLoadingTallyDelegatees,
+    isFormDisabled,
+    onSubmit,
+    setMaxAmount,
+    isSubmitButtonEnabled,
+    tallyDelegatees,
+    progress
+  } = useStakeDialog({
     availableForStakingUni,
     account
   })
@@ -364,6 +462,7 @@ export function StakeDialogContent({
             <FormField
               control={form.control}
               name="amount"
+              disabled={isFormDisabled}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
@@ -392,6 +491,7 @@ export function StakeDialogContent({
             <FormField
               control={form.control}
               name="beneficiary"
+              disabled={isFormDisabled}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
@@ -422,21 +522,28 @@ export function StakeDialogContent({
             {isLoadingTallyDelegatees ? (
               "Loading..."
             ) : (
-              <DelegateeField name="delegateeOption" tallyDelegatees={tallyDelegatees ?? []} />
+              <DelegateeField
+                name="delegateeOption"
+                tallyDelegatees={tallyDelegatees ?? []}
+                disabled={isFormDisabled}
+              />
             )}
-            {error && (
+            {error !== undefined && (
               <Alert variant="destructive">
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription className="break-all">{error.message}</AlertDescription>
+                <AlertDescription className="break-all">{error}</AlertDescription>
               </Alert>
             )}
           </div>
-
+          {progress.value === 0 ? null : (
+            <div className="space-y-1">
+              {progress.progressDescription}
+              <Progress value={progress.value} />
+            </div>
+          )}
           <DialogFooter>
-            <Button type="submit" className="space-x-2" disabled={isPending}>
-              {isPending ? <RotateCw size={16} className="mr-2 size-4 animate-spin" /> : <Download size={16} />}
-
-              <span>Permit & Stake</span>
+            <Button type="submit" className="space-x-2" disabled={!isSubmitButtonEnabled}>
+              {progress.buttonContent}
             </Button>
           </DialogFooter>
         </form>

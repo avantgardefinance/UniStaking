@@ -119,7 +119,12 @@ const permitAndStakeMachine = setup({
       client.invalidateQueries()
     }
   },
-
+  guards: {
+    hasSignatureNotExpired: ({ context }) => {
+      invariant(context.deadline !== undefined, "Deadline is not undefined")
+      return new Date().getTime() / 1000 < Number(context.deadline)
+    }
+  },
   types: {
     context: {} as Partial<{
       signature: Hex
@@ -159,12 +164,12 @@ const permitAndStakeMachine = setup({
         src: "sign",
         input: ({ context: { amount }, event }) => {
           assertEvent(event, "sign")
-          invariant(amount !== undefined, "Amount is not undefined")
+          invariant(amount !== undefined, "Amount is not undefined") // TODO: is there a better way to verify that the context value is not undefined?
 
           return { amount, signer: event.signer }
         },
         onDone: {
-          target: "validateSignatureNotExpired",
+          target: "sending",
           actions: assign(({ event }) => ({
             signature: event.output.signature,
             deadline: event.output.deadline,
@@ -173,7 +178,7 @@ const permitAndStakeMachine = setup({
         },
         onError: {
           target: "signingError",
-          actions: assign({ error: "Failed to sing the message" })
+          actions: assign({ error: "Failed to sign the message" })
         }
       }
     },
@@ -185,29 +190,19 @@ const permitAndStakeMachine = setup({
         }
       }
     },
-    validateSignatureNotExpired: {
-      invoke: {
-        id: "validateSignatureNotExpired",
-        src: "validateSignatureNotExpired",
-        input: ({ context: { deadline } }) => {
-          invariant(deadline !== undefined, "Deadline is not undefined")
-          return { deadline }
-        },
-        onDone: {
-          target: "sending"
-        },
-        onError: {
-          target: "signingError",
-          actions: assign({ error: "Signature expired", signature: undefined, deadline: undefined })
-        }
-      }
-    },
     signed: {
       on: {
-        resend: {
-          target: "validateSignatureNotExpired",
-          actions: assign({ error: undefined })
-        }
+        resend: [
+          {
+            target: "sending",
+            guard: "hasSignatureNotExpired",
+            actions: assign({ error: undefined })
+          },
+          {
+            target: "signingError",
+            actions: assign({ error: "Signature expired" })
+          }
+        ]
       }
     },
     sending: {

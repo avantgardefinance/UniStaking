@@ -14,6 +14,7 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Download, Info, RotateCw } from "lucide-react"
 import { useState } from "react"
@@ -24,7 +25,7 @@ import { readContract, signTypedData, waitForTransactionReceipt, writeContract }
 import { assertEvent, assign, fromPromise, setup } from "xstate"
 
 type Event =
-  | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address }
+  | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address; client: QueryClient }
   | { type: "resend" }
   | { type: "txReplaced"; txHash: Hex }
 
@@ -104,13 +105,21 @@ const permitAndStakeMachine = setup({
       }) => {
         await waitForTransactionReceipt(config, {
           hash: txHash,
+          confirmations: 3,
           onReplaced: ({ transaction }) => {
-            send({ type: "txReplaced", txHash: transaction.hash })
+            console.log("Replaced", transaction.hash)
+            send({ type: "txReplaced", txHash: transaction.hash }) // TODO: what will happen with this machine? Should it be stopped somehow?
           }
         })
       }
     )
   },
+  actions: {
+    invalidateQueries: (_, client: QueryClient) => {
+      client.invalidateQueries()
+    }
+  },
+
   types: {
     context: {} as Partial<{
       signature: Hex
@@ -121,6 +130,7 @@ const permitAndStakeMachine = setup({
       beneficiary: Address
       txHash: Hex
       replaced: boolean
+      client: QueryClient
     }>,
     events: {} as Event
   }
@@ -137,6 +147,7 @@ const permitAndStakeMachine = setup({
             signer: event.signer,
             delegatee: event.delegatee,
             beneficiary: event.beneficiary,
+            client: event.client,
             error: undefined
           }))
         }
@@ -154,14 +165,11 @@ const permitAndStakeMachine = setup({
         },
         onDone: {
           target: "validateSignatureNotExpired",
-          actions: assign(({ event }) => {
-            console.log({ eventDeadline: event.output.deadline })
-            return {
-              signature: event.output.signature,
-              deadline: event.output.deadline,
-              error: undefined
-            }
-          })
+          actions: assign(({ event }) => ({
+            signature: event.output.signature,
+            deadline: event.output.deadline,
+            error: undefined
+          }))
         },
         onError: {
           target: "signingError",
@@ -182,7 +190,6 @@ const permitAndStakeMachine = setup({
         id: "validateSignatureNotExpired",
         src: "validateSignatureNotExpired",
         input: ({ context: { deadline } }) => {
-          console.log({ deadline })
           invariant(deadline !== undefined, "Deadline is not undefined")
           return { deadline }
         },
@@ -251,7 +258,17 @@ const permitAndStakeMachine = setup({
         }
       }
     },
-    confirmed: {}
+    confirmed: {
+      entry: [
+        {
+          type: "invalidateQueries",
+          params: ({ context }) => {
+            invariant(context.client !== undefined, "Client is not undefined")
+            return context.client
+          }
+        }
+      ]
+    }
   }
 })
 
@@ -262,6 +279,7 @@ const useStakeDialog = ({
   availableForStakingUni: bigint
   account: Address
 }) => {
+  const client = useQueryClient()
   const [snapshot, send] = useMachine(permitAndStakeMachine)
 
   console.log(snapshot)
@@ -303,7 +321,8 @@ const useStakeDialog = ({
       amount: parseUnits(values.amount, 18),
       signer: account,
       delegatee,
-      beneficiary: values.beneficiary
+      beneficiary: values.beneficiary,
+      client
     })
   }
 

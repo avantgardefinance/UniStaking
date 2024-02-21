@@ -13,6 +13,7 @@ import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
 import { useState } from "react"
@@ -21,6 +22,36 @@ import type { Address } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
 import { useChainId } from "wagmi"
 import { readContract, signTypedData } from "wagmi/actions"
+import { z } from "zod"
+
+const formSchema = z
+  .object({
+    balance: z.bigint(),
+    amount: z.string().transform((value, ctx) => {
+      const parsedValue = value === "" ? 0n : parseUnits(value, 18)
+      if (parsedValue === 0n) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Amount must be greater than 0"
+        })
+        return z.NEVER
+      }
+
+      return parsedValue
+    })
+  })
+  .transform((value, ctx) => {
+    if (value.balance < value.amount) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Amount must be less than or equal to balance",
+        path: ["amount"]
+      })
+      return z.NEVER
+    }
+
+    return value
+  })
 
 const useStakeMoreDialog = ({
   availableForStakingUni,
@@ -48,11 +79,14 @@ const useStakeMoreDialog = ({
 
   const form = useForm({
     defaultValues: {
-      amount: formatUnits(availableForStakingUni, 18)
-    }
+      amount: formatUnits(availableForStakingUni, 18),
+      balance: availableForStakingUni
+    },
+    mode: "onChange",
+    resolver: zodResolver(formSchema)
   })
 
-  const { setValue } = form
+  const { setValue, formState } = form
 
   const onSubmit = async (values: {
     amount: string
@@ -104,8 +138,11 @@ const useStakeMoreDialog = ({
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18))
 
+  const isSubmitButtonEnabled = formState.isValid
+
   return {
     form,
+    isSubmitButtonEnabled,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
     error: errorWrite ?? error,
     isPending: isPendingWrite,
@@ -126,7 +163,7 @@ export function StakeMoreDialogContent({
   beneficiary: Address
   account: Address
 }) {
-  const { error, form, isPending, onSubmit, setMaxAmount } = useStakeMoreDialog({
+  const { error, form, isPending, onSubmit, setMaxAmount, isSubmitButtonEnabled } = useStakeMoreDialog({
     availableForStakingUni,
     stakeId,
     account
@@ -194,7 +231,7 @@ export function StakeMoreDialogContent({
             )}
           </div>
           <DialogFooter>
-            <Button type="submit" className="space-x-2" disabled={isPending}>
+            <Button type="submit" className="space-x-2" disabled={!isSubmitButtonEnabled}>
               {isPending ? <RotateCw size={16} className="mr-2 size-4 animate-spin" /> : <Download size={16} />}
 
               <span>Permit & Stake</span>

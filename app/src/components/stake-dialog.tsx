@@ -15,6 +15,7 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant, never } from "@/lib/assertion"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
@@ -22,7 +23,7 @@ import { Download, Info, PartyPopper, RotateCw } from "lucide-react"
 import React from "react"
 import { UseFormReturn, useForm } from "react-hook-form"
 import type { Address, Hex, ReplacementReason } from "viem"
-import { formatUnits, hexToSignature, isAddress, parseUnits } from "viem"
+import { formatUnits, hexToSignature, parseUnits } from "viem"
 import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
 import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
 import { z } from "zod"
@@ -352,43 +353,24 @@ function getProgress(machineState: "confirmed" | "initial" | "signing" | "sendin
   }
 }
 
-const address = z.string().transform((value, ctx) => {
-  if (!isAddress(value)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Invalid address"
-    })
-
-    return z.NEVER
-  }
-  return value
-})
-
 const formSchema = z
   .object({
     beneficiary: address,
     customDelegatee: address.optional(),
     tallyDelegatee: address.optional(),
     balance: z.bigint(),
-    amount: z
-      .string()
-      .transform((res) => {
-        if (res === "") {
-          return 0n
-        }
-        return parseUnits(res, 18)
-      })
-      .transform((value, ctx) => {
-        if (value === 0n) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Amount must be greater than 0"
-          })
-          return z.NEVER
-        }
+    amount: z.string().transform((value, ctx) => {
+      const parsedValue = value === "" ? 0n : parseUnits(value, 18)
+      if (parsedValue === 0n) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Amount must be greater than 0"
+        })
+        return z.NEVER
+      }
 
-        return value
-      }),
+      return parsedValue
+    }),
     delegateeOption: z.enum(["custom", "tally"])
   })
   .transform((value, ctx) => {

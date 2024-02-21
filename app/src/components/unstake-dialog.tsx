@@ -15,9 +15,10 @@ import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { RotateCw, Upload } from "lucide-react"
-import { useForm } from "react-hook-form"
+import { UseFormReturn, useForm } from "react-hook-form"
 import type { Address } from "viem"
-import { formatUnits, parseUnits } from "viem"
+import { formatUnits } from "viem"
+import { z } from "zod"
 
 const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string; availableForUnstaking: bigint }) => {
   const client = useQueryClient()
@@ -31,7 +32,7 @@ const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string;
     }
   })
 
-  const form = useForm({
+  const form = useForm<z.input<typeof stakeMoreUnstakeFormSchema>, any, z.output<typeof stakeMoreUnstakeFormSchema>>({
     defaultValues: {
       amount: formatUnits(availableForUnstaking, 18),
       balance: availableForUnstaking
@@ -43,13 +44,13 @@ const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string;
   const { setValue, formState } = form
 
   const onSubmit = (values: {
-    amount: string
+    amount: bigint
   }) =>
     writeContract({
       address: uniStaker,
       abi: abiUniStaker,
       functionName: "withdraw",
-      args: [BigInt(stakeId), parseUnits(values.amount, 18)]
+      args: [BigInt(stakeId), values.amount]
     })
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForUnstaking, 18), { shouldValidate: true })
@@ -93,7 +94,7 @@ export function UnstakeDialogContent({
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-4">
             <FormField
-              control={form.control}
+              control={(form as UseFormReturn<any>).control}
               name="amount"
               render={({ field }) => (
                 <FormItem>

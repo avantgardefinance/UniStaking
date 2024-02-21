@@ -18,11 +18,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { UseFormReturn, useForm } from "react-hook-form"
 import type { Address } from "viem"
-import { formatUnits, hexToSignature, parseUnits } from "viem"
+import { formatUnits, hexToSignature } from "viem"
 import { useChainId } from "wagmi"
 import { readContract, signTypedData } from "wagmi/actions"
+import { z } from "zod"
 
 const useStakeMoreDialog = ({
   availableForStakingUni,
@@ -48,7 +49,7 @@ const useStakeMoreDialog = ({
 
   const [error, setError] = useState<Error>()
 
-  const form = useForm({
+  const form = useForm<z.input<typeof stakeMoreUnstakeFormSchema>, any, z.output<typeof stakeMoreUnstakeFormSchema>>({
     defaultValues: {
       amount: formatUnits(availableForStakingUni, 18),
       balance: availableForStakingUni
@@ -60,7 +61,7 @@ const useStakeMoreDialog = ({
   const { setValue, formState } = form
 
   const onSubmit = async (values: {
-    amount: string
+    amount: bigint
   }) => {
     try {
       const nonce = await readContract(config, {
@@ -71,8 +72,6 @@ const useStakeMoreDialog = ({
       })
 
       const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
-
-      const value = parseUnits(values.amount, 18)
 
       const permitSignature = await signTypedData(config, {
         account,
@@ -85,7 +84,7 @@ const useStakeMoreDialog = ({
         message: {
           owner: account,
           spender: uniStaker,
-          value,
+          value: values.amount,
           nonce: nonce,
           deadline: signedDeadline
         }
@@ -96,7 +95,7 @@ const useStakeMoreDialog = ({
         address: uniStaker,
         abi: abiUniStaker,
         functionName: "permitAndStakeMore",
-        args: [BigInt(stakeId), parseUnits(values.amount, 18), signedDeadline, Number(v), r, s]
+        args: [BigInt(stakeId), values.amount, signedDeadline, Number(v), r, s]
       })
     } catch (e) {
       if (e instanceof Error) {
@@ -150,7 +149,7 @@ export function StakeMoreDialogContent({
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-4">
             <FormField
-              control={form.control}
+              control={(form as UseFormReturn<any>).control}
               name="amount"
               render={({ field }) => (
                 <FormItem>

@@ -445,7 +445,7 @@ const useStakeDialog = ({
     beneficiary: Address
     customDelegatee?: Address
     tallyDelegatee?: Address
-    delegateeOption: string
+    delegateeOption: "custom" | "tally"
     amount: bigint
   }) => {
     if (machineState === "signed") {

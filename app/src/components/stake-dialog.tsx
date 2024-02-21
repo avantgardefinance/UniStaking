@@ -20,7 +20,7 @@ import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Download, Info, PartyPopper, RotateCw } from "lucide-react"
 import React from "react"
-import { DefaultValues, FieldValues, UseFormProps, UseFormReturn, useForm } from "react-hook-form"
+import { UseFormReturn, useForm } from "react-hook-form"
 import type { Address, Hex, ReplacementReason } from "viem"
 import { formatUnits, hexToSignature, isAddress, parseUnits } from "viem"
 import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
@@ -389,10 +389,6 @@ const formSchema = z
 
         return value
       }),
-    // delegatee: z.discriminatedUnion("delegateeOption", [
-    //   z.object({ delegateeOption: z.literal("custom"), customDelegatee: address }),
-    //   z.object({ delegateeOption: z.literal("tally"), tallyDelegatee: address })
-    // ])
     delegateeOption: z.enum(["custom", "tally"])
   })
   .transform((value, ctx) => {
@@ -465,8 +461,8 @@ const useStakeDialog = ({
 
   const onSubmit = async (values: {
     beneficiary: Address
-    customDelegatee: Address
-    tallyDelegatee: Address
+    customDelegatee?: Address
+    tallyDelegatee?: Address
     delegateeOption: string
     amount: bigint
   }) => {
@@ -476,9 +472,8 @@ const useStakeDialog = ({
     }
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
 
-    if (values.beneficiary === undefined || delegatee === undefined) {
-      return
-    }
+    invariant(delegatee !== undefined, "Delegatee is not undefined")
+
     send({
       type: "sign",
       amount: values.amount,
@@ -538,7 +533,7 @@ export function StakeDialogContent({
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-4">
             <FormField
-              control={form.control}
+              control={(form as UseFormReturn<any>).control}
               name="amount"
               disabled={isFormDisabled}
               render={({ field }) => (

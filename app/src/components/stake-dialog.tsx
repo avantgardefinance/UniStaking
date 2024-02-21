@@ -15,11 +15,12 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant, never } from "@/lib/assertion"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { getPermitAndStakeProgress } from "@/lib/permitAndStakeMachine"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
-import { Download, Info, PartyPopper, RotateCw } from "lucide-react"
+import { Info } from "lucide-react"
 import React from "react"
 import { UseFormReturn, useForm } from "react-hook-form"
 import type { Address, Hex, ReplacementReason } from "viem"
@@ -94,7 +95,7 @@ const permitAndStakeMachine = setup({
         return new Promise<{ txHash: Hex; status: ReplacementReason | "confirmed" }>((resolve, reject) => {
           waitForTransactionReceipt(config, {
             hash: txHash,
-            confirmations: 3,
+            confirmations: 1,
             onReplaced: ({ transaction, reason }) => {
               resolve({ txHash: transaction.hash, status: reason })
             }
@@ -125,7 +126,6 @@ const permitAndStakeMachine = setup({
       delegatee: Address
       beneficiary: Address
       txHash: Hex
-      replaced: boolean
       client: QueryClient
     }>,
     events: {} as
@@ -275,84 +275,6 @@ const permitAndStakeMachine = setup({
   }
 })
 
-function getProgress(machineState: "confirmed" | "initial" | "signing" | "sending" | "signed" | "sent") {
-  switch (machineState) {
-    case "initial":
-      return {
-        value: 0,
-        buttonContent: (
-          <>
-            <Download size={16} />
-            <span>Permit & Stake</span>
-          </>
-        ),
-        progressDescription: null
-      }
-    case "signing":
-      return {
-        value: 20,
-        buttonContent: (
-          <>
-            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-            <span>Signing</span>
-          </>
-        ),
-        progressDescription: <span>Sign transaction in your wallet</span>
-      }
-    case "signed":
-      return {
-        value: 40,
-        buttonContent: (
-          <>
-            <Download size={16} />
-            <span>Stake</span>
-          </>
-        ),
-        progressDescription: <span>Transaction signed, send to stake</span>
-      }
-    case "sending":
-      return {
-        value: 60,
-        buttonContent: (
-          <>
-            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-            <span>Sending</span>
-          </>
-        ),
-        progressDescription: <span>Confirm transaction in your wallet</span>
-      }
-    case "sent":
-      return {
-        value: 80,
-        buttonContent: (
-          <>
-            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-            <span>Confirming</span>
-          </>
-        ),
-        progressDescription: <span>Transaction sent, waiting for confirmation...</span>
-      }
-    case "confirmed":
-      return {
-        value: 100,
-        buttonContent: (
-          <>
-            <Download size={16} />
-            <span>Permit & Stake</span>
-          </>
-        ),
-        progressDescription: (
-          <span className="space-x-2 flex flex-row items-baseline">
-            <span>Transaction confirmed!</span>
-            <PartyPopper size={16} />
-          </span>
-        )
-      }
-    default:
-      never(machineState, `Unhandled value for progress ${machineState}`)
-  }
-}
-
 const formSchema = z
   .object({
     beneficiary: address,
@@ -418,7 +340,7 @@ const useStakeDialog = ({
     value: machineState
   } = snapshot
 
-  const progress = getProgress(machineState)
+  const progress = getPermitAndStakeProgress(machineState)
 
   const {
     error: errorTallyDelegatees,

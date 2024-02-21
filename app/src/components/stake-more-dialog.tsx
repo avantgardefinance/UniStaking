@@ -10,56 +10,28 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
-import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { invariant, never } from "@/lib/assertion"
-import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
+import { invariant } from "@/lib/assertion"
+import { uniStaker } from "@/lib/consts"
+import { invalidateQueries } from "@/lib/machines/actions"
+import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permitAndStakeProgress"
+import { signGovernanceTokenPermitActor } from "@/lib/machines/signGovernanceTokenPermitActor"
+import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/waitForTransactionReceipt"
 import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { UseFormReturn, useForm } from "react-hook-form"
-import type { Address, Hex, ReplacementReason } from "viem"
+import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature } from "viem"
-import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
+import { writeContract } from "wagmi/actions"
 import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
 import { z } from "zod"
 
 const permitAndStakeMoreMachine = setup({
   actors: {
-    sign: fromPromise(async ({ input: { signer, amount } }: { input: { signer: Address; amount: bigint } }) => {
-      const nonce = await readContract(config, {
-        address: governanceToken,
-        abi: uniAbi,
-        functionName: "nonces",
-        args: [signer]
-      })
-
-      const deadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
-
-      const signature = await signTypedData(config, {
-        account: signer,
-        types: permitEIP712Options.permitTypes,
-        domain: {
-          ...permitEIP712Options.domainBase,
-          chainId: config.state.chainId
-        },
-        primaryType: permitEIP712Options.primaryType,
-        message: {
-          owner: signer,
-          spender: uniStaker,
-          value: amount,
-          nonce: nonce,
-          deadline
-        }
-      })
-
-      return {
-        signature,
-        deadline
-      }
-    }),
+    sign: signGovernanceTokenPermitActor,
     send: fromPromise(
       async ({
         input: { stakeId, amount, signature, deadline }
@@ -82,35 +54,15 @@ const permitAndStakeMoreMachine = setup({
         return txHash
       }
     ),
-    waitForTransactionReceipt: fromPromise(
-      async ({
-        input: txHash
-      }: {
-        input: Hex
-      }) => {
-        return new Promise<{ txHash: Hex; status: ReplacementReason | "confirmed" }>((resolve, reject) => {
-          waitForTransactionReceipt(config, {
-            hash: txHash,
-            confirmations: 1,
-            onReplaced: ({ transaction, reason }) => {
-              resolve({ txHash: transaction.hash, status: reason })
-            }
-          })
-            .then(() => resolve({ txHash, status: "confirmed" }))
-            .catch((error) => reject(error))
-        })
-      }
-    )
+    waitForTransactionReceipt: waitForTransactionReceiptActor
   },
   actions: {
-    invalidateQueries: (_, client: QueryClient) => {
-      client.invalidateQueries()
-    }
+    invalidateQueries
   },
   guards: {
     hasSignatureNotExpired: ({ context }) => {
       invariant(context.deadline !== undefined, "Deadline is not undefined")
-      return new Date().getTime() / 1000 < Number(context.deadline)
+      return hasSignatureNotExpired(Number(context.deadline))
     }
   },
   types: {
@@ -126,9 +78,7 @@ const permitAndStakeMoreMachine = setup({
     events: {} as
       | { type: "sign"; stakeId: bigint; amount: bigint; signer: Address; client: QueryClient }
       | { type: "resend" }
-      | { type: "confirmTx" }
-      | { type: "cancelTx" }
-      | { type: "replaceTx"; txHash: Hex }
+      | TxEvent
   }
 }).createMachine({
   id: "permitAndMoreStake",
@@ -231,19 +181,7 @@ const permitAndStakeMoreMachine = setup({
               event: {
                 output: { status, txHash }
               }
-            }) => {
-              switch (status) {
-                case "confirmed":
-                  return { type: "confirmTx" }
-                case "cancelled":
-                  return { type: "cancelTx" }
-                case "replaced":
-                case "repriced":
-                  return { type: "replaceTx", txHash }
-                default:
-                  never(status, `Unhandled status for transaction receipt ${status}`)
-              }
-            }
+            }) => getTxEvent({ status, txHash })
           )
         },
         onError: {

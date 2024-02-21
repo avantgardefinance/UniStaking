@@ -5,19 +5,19 @@ import { AddressDisplay } from "@/components/ui/address-display"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
-import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
+import { TransactionFooter } from "@/components/ui/transaction-footer"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
 import { invalidateQueries } from "@/lib/machines/actions"
 import { hasSignatureNotExpired } from "@/lib/machines/guards"
-import { getPermitAndStakeProgress } from "@/lib/machines/permitAndStakeProgress"
-import { signGovernanceTokenPermitActor } from "@/lib/machines/signGovernanceTokenPermitActor"
-import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/waitForTransactionReceipt"
+import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
+import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
+import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
@@ -348,17 +348,7 @@ export function StakeMoreDialogContent({
               </Alert>
             )}
           </div>
-          {progress.value === 0 ? null : (
-            <div className="space-y-1">
-              {progress.progressDescription}
-              <Progress value={progress.value} />
-            </div>
-          )}
-          <DialogFooter>
-            <Button type="submit" className="space-x-2" disabled={!isSubmitButtonEnabled}>
-              {progress.buttonContent}
-            </Button>
-          </DialogFooter>
+          <TransactionFooter progress={progress} isSubmitButtonEnabled={isSubmitButtonEnabled} />
         </form>
       </Form>
     </DialogContent>

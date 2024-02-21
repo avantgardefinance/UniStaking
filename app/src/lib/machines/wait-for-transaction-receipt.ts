@@ -13,7 +13,6 @@ export const waitForTransactionReceiptActor = fromPromise(
     return new Promise<{ txHash: Hex; status: ReplacementReason | "confirmed" }>((resolve, reject) => {
       waitForTransactionReceipt(config, {
         hash: txHash,
-        confirmations: 1,
         onReplaced: ({ transaction, reason }) => {
           resolve({ txHash: transaction.hash, status: reason })
         }

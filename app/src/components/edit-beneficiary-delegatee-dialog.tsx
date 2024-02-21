@@ -2,26 +2,202 @@
 
 import { TallyDelegatee } from "@/app/api/delegatees/model"
 import { DelegateeField } from "@/components/form/DelegateeField"
+import { config } from "@/components/providers/wagmi-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { TransactionFooter } from "@/components/ui/transaction-footer"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
-import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { invalidateQueries } from "@/lib/machines/actions"
+import { getTransactionProgress } from "@/lib/machines/transaction-progress"
+import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useQueryClient } from "@tanstack/react-query"
-import { Info, RotateCw } from "lucide-react"
+import { QueryClient, useQueryClient } from "@tanstack/react-query"
+import { useMachine } from "@xstate/react"
+import { Info } from "lucide-react"
 import { FormProvider, useForm } from "react-hook-form"
-import type { Address } from "viem"
+import type { Address, Hex } from "viem"
 import { encodeFunctionData, isAddressEqual } from "viem"
+import { writeContract } from "wagmi/actions"
+import { assign, fromPromise, raise, setup } from "xstate"
 import { z } from "zod"
+
+const editBeneficiaryDelegateeMachine = setup({
+  actors: {
+    send: fromPromise(
+      async ({
+        input: { stakeId, beneficiary, delegatee, currentBeneficiary, currentDelegatee }
+      }: {
+        input: {
+          stakeId: bigint
+          beneficiary: Address
+          delegatee: Address
+          currentBeneficiary: Address
+          currentDelegatee: Address
+        }
+      }) => {
+        if (isAddressEqual(beneficiary, currentBeneficiary)) {
+          return await writeContract(config, {
+            address: uniStaker,
+            abi: abiUniStaker,
+            functionName: "alterDelegatee",
+            args: [BigInt(stakeId), delegatee]
+          })
+        }
+
+        if (isAddressEqual(delegatee, currentDelegatee)) {
+          return await writeContract(config, {
+            address: uniStaker,
+            abi: abiUniStaker,
+            functionName: "alterBeneficiary",
+            args: [BigInt(stakeId), beneficiary]
+          })
+        }
+
+        const encodedDataAlterDelegatee = encodeFunctionData({
+          abi: abiUniStaker,
+          functionName: "alterDelegatee",
+          args: [BigInt(stakeId), delegatee]
+        })
+        const encodedDataAlterBeneficiary = encodeFunctionData({
+          abi: abiUniStaker,
+          functionName: "alterBeneficiary",
+          args: [BigInt(stakeId), beneficiary]
+        })
+
+        return await writeContract(config, {
+          address: uniStaker,
+          abi: abiUniStaker,
+          functionName: "multicall",
+          args: [[encodedDataAlterDelegatee, encodedDataAlterBeneficiary]]
+        })
+      }
+    ),
+    waitForTransactionReceipt: waitForTransactionReceiptActor
+  },
+  actions: {
+    invalidateQueries
+  },
+  types: {
+    context: {} as Partial<{
+      delegatee: Address
+      beneficiary: Address
+      currentBeneficiary: Address
+      currentDelegatee: Address
+      account: Address
+      error: string
+      txHash: Hex
+      stakeId: bigint
+      client: QueryClient
+    }>,
+    events: {} as
+      | {
+          type: "send"
+          stakeId: bigint
+          delegatee: Address
+          beneficiary: Address
+          currentBeneficiary: Address
+          currentDelegatee: Address
+          client: QueryClient
+        }
+      | TxEvent
+  }
+}).createMachine({
+  id: "editBeneficiaryDelegatee",
+  initial: "initial",
+  states: {
+    initial: {
+      on: {
+        send: {
+          target: "sending",
+          actions: assign(({ event }) => ({
+            ...event,
+            error: undefined
+          }))
+        }
+      }
+    },
+    sending: {
+      invoke: {
+        id: "send",
+        src: "send",
+        input: ({ context: { stakeId, delegatee, currentBeneficiary, beneficiary, currentDelegatee } }) => {
+          invariant(
+            stakeId !== undefined &&
+              delegatee !== undefined &&
+              beneficiary !== undefined &&
+              currentBeneficiary !== undefined &&
+              currentDelegatee !== undefined,
+            "Invalid input"
+          )
+          return { stakeId, delegatee, beneficiary, currentBeneficiary, currentDelegatee }
+        },
+        onDone: {
+          target: "sent",
+          actions: assign(({ event }) => ({ error: undefined, txHash: event.output }))
+        },
+        onError: {
+          target: "initial",
+          actions: assign({ error: "Failed to send the message" })
+        }
+      }
+    },
+    sent: {
+      on: {
+        replaceTx: {
+          target: "sent",
+          actions: assign(({ event }) => ({ txHash: event.txHash }))
+        },
+        cancelTx: {
+          target: "initial",
+          actions: assign({ error: "Transaction was cancelled", txHash: undefined })
+        },
+        confirmTx: {
+          target: "confirmed"
+        }
+      },
+      invoke: {
+        id: "waitForTransactionReceipt",
+        src: "waitForTransactionReceipt",
+        input: ({ context: { txHash } }) => {
+          invariant(txHash !== undefined, "Invalid input")
+          return txHash
+        },
+        onDone: {
+          actions: raise(
+            ({
+              event: {
+                output: { status, txHash }
+              }
+            }) => getTxEvent({ status, txHash })
+          )
+        },
+        onError: {
+          target: "initial",
+          actions: assign({ error: "Failed to send the message" })
+        }
+      }
+    },
+    confirmed: {
+      entry: [
+        {
+          type: "invalidateQueries",
+          params: ({ context }) => {
+            invariant(context.client !== undefined, "Client is not undefined")
+            return context.client
+          }
+        }
+      ]
+    }
+  }
+})
 
 export function EditBeneficiaryDelegateeDialogContent({
   beneficiary,
@@ -57,7 +233,9 @@ export function EditBeneficiaryDelegateeDialogContent({
 const formSchema = z
   .object({
     beneficiary: address,
+    currentBeneficiary: address,
     customDelegatee: address.optional(),
+    currentDelegatee: address,
     tallyDelegatee: address.optional(),
     delegateeOption: z.enum(["custom", "tally"])
   })
@@ -80,6 +258,22 @@ const formSchema = z
       return z.NEVER
     }
 
+    const delegatee = value.delegateeOption === "tally" ? value.tallyDelegatee : value.customDelegatee
+
+    invariant(delegatee !== undefined, "Delegatee is not undefined")
+
+    if (
+      isAddressEqual(value.beneficiary, value.currentBeneficiary) &&
+      isAddressEqual(value.currentDelegatee, delegatee)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Both beneficiary and delegatee are the same as the current ones",
+        path: ["beneficiary"]
+      })
+      return z.NEVER
+    }
+
     return value
   })
 
@@ -97,14 +291,16 @@ const useEditBeneficiaryDelegateeForm = ({
   tallyDelegateesError: Error | null
 }) => {
   const client = useQueryClient()
+  const [snapshot, send] = useMachine(editBeneficiaryDelegateeMachine)
+
   const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    writeContract
-  } = useWriteContractWithToast({
-    mutation: {
-      onSettled: () => client.invalidateQueries()
-    }
+    context: { error },
+    value: machineState
+  } = snapshot
+
+  const progress = getTransactionProgress({
+    machineState,
+    initialButtonContent: <span>Send</span>
   })
 
   const tallyDelegatee = tallyDelegatees.find((delegatee) => isAddressEqual(delegatee.address, currentDelegatee))
@@ -113,6 +309,8 @@ const useEditBeneficiaryDelegateeForm = ({
     defaultValues: {
       beneficiary: currentBeneficiary,
       customDelegatee: currentDelegatee,
+      currentBeneficiary,
+      currentDelegatee,
       tallyDelegatee: tallyDelegatee?.address,
       delegateeOption: tallyDelegatee === undefined ? "custom" : "tally"
     },
@@ -124,60 +322,35 @@ const useEditBeneficiaryDelegateeForm = ({
     beneficiary: Address
     customDelegatee?: Address
     tallyDelegatee?: Address
+    currentBeneficiary: Address
+    currentDelegatee: Address
     delegateeOption: "custom" | "tally"
   }) => {
     const delegatee = values.delegateeOption === "custom" ? values.customDelegatee : values.tallyDelegatee
 
     invariant(delegatee !== undefined, "Delegatee is not undefined")
 
-    if (isAddressEqual(values.beneficiary, currentBeneficiary)) {
-      writeContract({
-        address: uniStaker,
-        abi: abiUniStaker,
-        functionName: "alterDelegatee",
-        args: [BigInt(stakeId), delegatee]
-      })
-
-      return
-    }
-
-    if (isAddressEqual(delegatee, currentDelegatee)) {
-      writeContract({
-        address: uniStaker,
-        abi: abiUniStaker,
-        functionName: "alterBeneficiary",
-        args: [BigInt(stakeId), values.beneficiary]
-      })
-
-      return
-    }
-
-    const encodedDataAlterDelegatee = encodeFunctionData({
-      abi: abiUniStaker,
-      functionName: "alterDelegatee",
-      args: [BigInt(stakeId), delegatee]
-    })
-    const encodedDataAlterBeneficiary = encodeFunctionData({
-      abi: abiUniStaker,
-      functionName: "alterBeneficiary",
-      args: [BigInt(stakeId), values.beneficiary]
-    })
-    writeContract({
-      address: uniStaker,
-      abi: abiUniStaker,
-      functionName: "multicall",
-      args: [[encodedDataAlterDelegatee, encodedDataAlterBeneficiary]]
+    send({
+      type: "send",
+      stakeId: BigInt(stakeId),
+      beneficiary: values.beneficiary,
+      delegatee,
+      currentBeneficiary: values.currentBeneficiary,
+      currentDelegatee: values.currentDelegatee,
+      client
     })
   }
 
-  const isSubmitButtonEnabled = form.formState.isValid
+  const isFormDisabled = machineState !== "initial"
+  const isSubmitButtonEnabled = machineState === "initial" && form.formState.isValid
 
   return {
     form,
+    isFormDisabled,
     isSubmitButtonEnabled,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    error: errorWrite ?? tallyDelegateesError,
-    isPending: isPendingWrite
+    error: error ?? tallyDelegateesError?.message,
+    progress
   }
 }
 
@@ -194,7 +367,7 @@ function EditBeneficiaryDelegateeForm({
   tallyDelegatees: ReadonlyArray<TallyDelegatee>
   tallyDelegateesError: Error | null
 }) {
-  const { error, form, isPending, onSubmit, isSubmitButtonEnabled } = useEditBeneficiaryDelegateeForm({
+  const { error, form, isFormDisabled, onSubmit, progress, isSubmitButtonEnabled } = useEditBeneficiaryDelegateeForm({
     beneficiary,
     delegatee,
     stakeId,
@@ -212,6 +385,7 @@ function EditBeneficiaryDelegateeForm({
         <Separator />
         <div className="space-y-4">
           <FormField
+            disabled={isFormDisabled}
             control={form.control}
             name="beneficiary"
             render={({ field }) => (
@@ -241,22 +415,15 @@ function EditBeneficiaryDelegateeForm({
               </FormItem>
             )}
           />
-          <DelegateeField name="delegateeOption" tallyDelegatees={tallyDelegatees} />
-          {error && (
+          <DelegateeField name="delegateeOption" tallyDelegatees={tallyDelegatees} disabled={isFormDisabled} />
+          {error !== undefined && (
             <Alert variant="destructive">
               <AlertTitle>Error</AlertTitle>
-              <AlertDescription className="break-all">{error.message}</AlertDescription>
+              <AlertDescription className="break-all">{error}</AlertDescription>
             </Alert>
           )}
         </div>
-
-        <DialogFooter>
-          <Button type="submit" className="space-x-2" disabled={!isSubmitButtonEnabled}>
-            {isPending ? <RotateCw className="mr-2 size-4 animate-spin" /> : null}
-
-            <span>Confirm</span>
-          </Button>
-        </DialogFooter>
+        <TransactionFooter progress={progress} isSubmitButtonEnabled={isSubmitButtonEnabled} />
       </form>
     </FormProvider>
   )

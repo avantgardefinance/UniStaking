@@ -15,7 +15,9 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant, never } from "@/lib/assertion"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
-import { getPermitAndStakeProgress } from "@/lib/permitAndStakeMachine"
+import { getPermitAndStakeProgress } from "@/lib/machines/permitAndStakeProgress"
+import { signGovernanceTokenPermitActor } from "@/lib/machines/signGovernanceTokenPermitActor"
+import { waitForTransactionReceiptActor } from "@/lib/machines/waitForTransactionReceipt"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
@@ -23,46 +25,19 @@ import { useMachine } from "@xstate/react"
 import { Info } from "lucide-react"
 import React from "react"
 import { UseFormReturn, useForm } from "react-hook-form"
-import type { Address, Hex, ReplacementReason } from "viem"
+import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
-import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
-import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
+import { writeContract } from "wagmi/actions"
+import { ActionArgs, assertEvent, assign, fromPromise, raise, setup } from "xstate"
 import { z } from "zod"
+
+function invalidateQueries(_: ActionArgs<any, any, any>, client: QueryClient) {
+  client.invalidateQueries()
+}
 
 const permitAndStakeMachine = setup({
   actors: {
-    sign: fromPromise(async ({ input: { signer, amount } }: { input: { signer: Address; amount: bigint } }) => {
-      const nonce = await readContract(config, {
-        address: governanceToken,
-        abi: uniAbi,
-        functionName: "nonces",
-        args: [signer]
-      })
-
-      const deadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
-
-      const signature = await signTypedData(config, {
-        account: signer,
-        types: permitEIP712Options.permitTypes,
-        domain: {
-          ...permitEIP712Options.domainBase,
-          chainId: config.state.chainId
-        },
-        primaryType: permitEIP712Options.primaryType,
-        message: {
-          owner: signer,
-          spender: uniStaker,
-          value: amount,
-          nonce: nonce,
-          deadline
-        }
-      })
-
-      return {
-        signature,
-        deadline
-      }
-    }),
+    sign: signGovernanceTokenPermitActor,
     send: fromPromise(
       async ({
         input: { delegatee, beneficiary, amount, signature, deadline }
@@ -86,30 +61,10 @@ const permitAndStakeMachine = setup({
         return txHash
       }
     ),
-    waitForTransactionReceipt: fromPromise(
-      async ({
-        input: txHash
-      }: {
-        input: Hex
-      }) => {
-        return new Promise<{ txHash: Hex; status: ReplacementReason | "confirmed" }>((resolve, reject) => {
-          waitForTransactionReceipt(config, {
-            hash: txHash,
-            confirmations: 1,
-            onReplaced: ({ transaction, reason }) => {
-              resolve({ txHash: transaction.hash, status: reason })
-            }
-          })
-            .then(() => resolve({ txHash, status: "confirmed" }))
-            .catch((error) => reject(error))
-        })
-      }
-    )
+    waitForTransactionReceipt: waitForTransactionReceiptActor
   },
   actions: {
-    invalidateQueries: (_, client: QueryClient) => {
-      client.invalidateQueries()
-    }
+    invalidateQueries
   },
   guards: {
     hasSignatureNotExpired: ({ context }) => {

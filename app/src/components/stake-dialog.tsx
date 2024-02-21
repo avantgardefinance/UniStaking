@@ -20,7 +20,7 @@ import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Download, Info, PartyPopper, RotateCw } from "lucide-react"
 import React from "react"
-import { UseFormReturn, useForm } from "react-hook-form"
+import { DefaultValues, FieldValues, UseFormProps, UseFormReturn, useForm } from "react-hook-form"
 import type { Address, Hex, ReplacementReason } from "viem"
 import { formatUnits, hexToSignature, isAddress, parseUnits } from "viem"
 import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
@@ -364,18 +364,66 @@ const address = z.string().transform((value, ctx) => {
   return value
 })
 
-const formSchema = z.object({
-  beneficiary: address,
-  customDelegatee: address,
-  tallyDelegatee: address,
-  amount: z.string().transform((res) => {
-    if (res === "") {
-      return 0n
+const formSchema = z
+  .object({
+    beneficiary: address,
+    customDelegatee: address.optional(),
+    tallyDelegatee: address.optional(),
+    balance: z.bigint(),
+    amount: z
+      .string()
+      .transform((res) => {
+        if (res === "") {
+          return 0n
+        }
+        return parseUnits(res, 18)
+      })
+      .transform((value, ctx) => {
+        if (value === 0n) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Amount must be greater than 0"
+          })
+          return z.NEVER
+        }
+
+        return value
+      }),
+    // delegatee: z.discriminatedUnion("delegateeOption", [
+    //   z.object({ delegateeOption: z.literal("custom"), customDelegatee: address }),
+    //   z.object({ delegateeOption: z.literal("tally"), tallyDelegatee: address })
+    // ])
+    delegateeOption: z.enum(["custom", "tally"])
+  })
+  .transform((value, ctx) => {
+    if (value.balance < value.amount) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Amount must be less than or equal to balance",
+        path: ["amount"]
+      })
+      return z.NEVER
     }
-    return parseUnits(res, 18)
-  }),
-  delegateeOption: z.enum(["custom", "tally"])
-})
+    if (value.delegateeOption === "tally" && value.tallyDelegatee === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Address required",
+        path: ["tallyDelegatee"]
+      })
+      return z.NEVER
+    }
+
+    if (value.delegateeOption === "custom" && value.customDelegatee === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Address required",
+        path: ["customDelegatee"]
+      })
+      return z.NEVER
+    }
+
+    return value
+  })
 
 const useStakeDialog = ({
   availableForStakingUni,
@@ -392,9 +440,6 @@ const useStakeDialog = ({
     value: machineState
   } = snapshot
 
-  const isFormDisabled = machineState !== "initial"
-  const isSubmitButtonEnabled = machineState === "initial" || machineState === "signed"
-
   const progress = getProgress(machineState)
 
   const {
@@ -409,8 +454,10 @@ const useStakeDialog = ({
       customDelegatee: account,
       tallyDelegatee: undefined,
       amount: formatUnits(availableForStakingUni, 18),
+      balance: availableForStakingUni,
       delegateeOption: "custom"
     },
+    mode: "onChange",
     resolver: zodResolver(formSchema)
   })
 
@@ -442,7 +489,10 @@ const useStakeDialog = ({
     })
   }
 
-  const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18))
+  const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18), { shouldValidate: true })
+
+  const isFormDisabled = machineState !== "initial"
+  const isSubmitButtonEnabled = (machineState === "initial" || machineState === "signed") && form.formState.isValid
 
   return {
     form,
@@ -488,7 +538,7 @@ export function StakeDialogContent({
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-4">
             <FormField
-              control={(form as UseFormReturn<any>).control}
+              control={form.control}
               name="amount"
               disabled={isFormDisabled}
               render={({ field }) => (

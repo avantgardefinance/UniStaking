@@ -13,6 +13,7 @@ import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
 import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { Download, RotateCw } from "lucide-react"
@@ -22,36 +23,6 @@ import type { Address } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
 import { useChainId } from "wagmi"
 import { readContract, signTypedData } from "wagmi/actions"
-import { z } from "zod"
-
-const formSchema = z
-  .object({
-    balance: z.bigint(),
-    amount: z.string().transform((value, ctx) => {
-      const parsedValue = value === "" ? 0n : parseUnits(value, 18)
-      if (parsedValue === 0n) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Amount must be greater than 0"
-        })
-        return z.NEVER
-      }
-
-      return parsedValue
-    })
-  })
-  .transform((value, ctx) => {
-    if (value.balance < value.amount) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Amount must be less than or equal to balance",
-        path: ["amount"]
-      })
-      return z.NEVER
-    }
-
-    return value
-  })
 
 const useStakeMoreDialog = ({
   availableForStakingUni,
@@ -83,7 +54,7 @@ const useStakeMoreDialog = ({
       balance: availableForStakingUni
     },
     mode: "onChange",
-    resolver: zodResolver(formSchema)
+    resolver: zodResolver(stakeMoreUnstakeFormSchema)
   })
 
   const { setValue, formState } = form
@@ -136,7 +107,7 @@ const useStakeMoreDialog = ({
     }
   }
 
-  const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18))
+  const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18), { shouldValidate: true })
 
   const isSubmitButtonEnabled = formState.isValid
 

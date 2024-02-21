@@ -10,14 +10,15 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { uniAbi } from "@/lib/abi/uni"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { invariant, never } from "@/lib/assertion"
-import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
+import { invariant } from "@/lib/assertion"
+import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { invalidateQueries } from "@/lib/machines/actions"
+import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permitAndStakeProgress"
 import { signGovernanceTokenPermitActor } from "@/lib/machines/signGovernanceTokenPermitActor"
-import { waitForTransactionReceiptActor } from "@/lib/machines/waitForTransactionReceipt"
+import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/waitForTransactionReceipt"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
@@ -28,12 +29,8 @@ import { UseFormReturn, useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
 import { writeContract } from "wagmi/actions"
-import { ActionArgs, assertEvent, assign, fromPromise, raise, setup } from "xstate"
+import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
 import { z } from "zod"
-
-function invalidateQueries(_: ActionArgs<any, any, any>, client: QueryClient) {
-  client.invalidateQueries()
-}
 
 const permitAndStakeMachine = setup({
   actors: {
@@ -69,7 +66,7 @@ const permitAndStakeMachine = setup({
   guards: {
     hasSignatureNotExpired: ({ context }) => {
       invariant(context.deadline !== undefined, "Deadline is not undefined")
-      return new Date().getTime() / 1000 < Number(context.deadline)
+      return hasSignatureNotExpired(Number(context.deadline))
     }
   },
   types: {
@@ -86,9 +83,7 @@ const permitAndStakeMachine = setup({
     events: {} as
       | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address; client: QueryClient }
       | { type: "resend" }
-      | { type: "confirmTx" }
-      | { type: "cancelTx" }
-      | { type: "replaceTx"; txHash: Hex }
+      | TxEvent
   }
 }).createMachine({
   id: "permitAndStake",
@@ -195,19 +190,7 @@ const permitAndStakeMachine = setup({
               event: {
                 output: { status, txHash }
               }
-            }) => {
-              switch (status) {
-                case "confirmed":
-                  return { type: "confirmTx" }
-                case "cancelled":
-                  return { type: "cancelTx" }
-                case "replaced":
-                case "repriced":
-                  return { type: "replaceTx", txHash }
-                default:
-                  never(status, `Unhandled status for transaction receipt ${status}`)
-              }
-            }
+            }) => getTxEvent({ status, txHash })
           )
         },
         onError: {

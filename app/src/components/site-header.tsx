@@ -12,7 +12,7 @@ export function SiteHeader() {
     <header className="bg-background w-full">
       <div className="flex items-center space-x-4 sm:justify-between sm:space-x-0 flex-wrap">
         <Link href="/" className="flex items-center space-x-2">
-          <Logo className="size-6" />
+          <h1 className="scroll-m-20 text-xl font-bold tracking-tight lg:text-xl">Uniswap Protocol Staking</h1>
         </Link>
         <nav className="flex flex-1 items-center gap-2 flex-wrap justify-end">
           <ConnectButton />

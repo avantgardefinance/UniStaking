@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
-import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { Trophy } from "lucide-react"
 import { Address } from "viem"
-import { useReadContract } from "wagmi"
+import { useReadContract, useWriteContract } from "wagmi"
 
 function useStakeCardRewards(account: Address) {
   const { data: rewards, status } = useReadContract({
@@ -20,7 +19,7 @@ function useStakeCardRewards(account: Address) {
   })
 
   const queryClient = useQueryClient()
-  const { writeContract } = useWriteContractWithToast({
+  const { writeContract } = useWriteContract({
     mutation: {
       onSettled: () => queryClient.invalidateQueries()
     }

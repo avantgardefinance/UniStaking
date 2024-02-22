@@ -5,63 +5,36 @@ import { config } from "@/components/providers/wagmi-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
-import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { uniAbi } from "@/lib/abi/uni"
+import { TransactionFooter } from "@/components/ui/transaction-footer"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { invariant, never } from "@/lib/assertion"
-import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
+import { invariant } from "@/lib/assertion"
+import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { invalidateQueries } from "@/lib/machines/actions"
+import { hasSignatureNotExpired } from "@/lib/machines/guards"
+import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
+import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
+import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
-import { Download, Info, PartyPopper, RotateCw } from "lucide-react"
+import { Info } from "lucide-react"
 import React from "react"
 import { UseFormReturn, useForm } from "react-hook-form"
-import type { Address, Hex, ReplacementReason } from "viem"
+import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
-import { readContract, signTypedData, waitForTransactionReceipt, writeContract } from "wagmi/actions"
+import { writeContract } from "wagmi/actions"
 import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
 import { z } from "zod"
 
 const permitAndStakeMachine = setup({
   actors: {
-    sign: fromPromise(async ({ input: { signer, amount } }: { input: { signer: Address; amount: bigint } }) => {
-      const nonce = await readContract(config, {
-        address: governanceToken,
-        abi: uniAbi,
-        functionName: "nonces",
-        args: [signer]
-      })
-
-      const deadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
-
-      const signature = await signTypedData(config, {
-        account: signer,
-        types: permitEIP712Options.permitTypes,
-        domain: {
-          ...permitEIP712Options.domainBase,
-          chainId: config.state.chainId
-        },
-        primaryType: permitEIP712Options.primaryType,
-        message: {
-          owner: signer,
-          spender: uniStaker,
-          value: amount,
-          nonce: nonce,
-          deadline
-        }
-      })
-
-      return {
-        signature,
-        deadline
-      }
-    }),
+    sign: signGovernanceTokenPermitActor,
     send: fromPromise(
       async ({
         input: { delegatee, beneficiary, amount, signature, deadline }
@@ -85,35 +58,15 @@ const permitAndStakeMachine = setup({
         return txHash
       }
     ),
-    waitForTransactionReceipt: fromPromise(
-      async ({
-        input: txHash
-      }: {
-        input: Hex
-      }) => {
-        return new Promise<{ txHash: Hex; status: ReplacementReason | "confirmed" }>((resolve, reject) => {
-          waitForTransactionReceipt(config, {
-            hash: txHash,
-            confirmations: 3,
-            onReplaced: ({ transaction, reason }) => {
-              resolve({ txHash: transaction.hash, status: reason })
-            }
-          })
-            .then(() => resolve({ txHash, status: "confirmed" }))
-            .catch((error) => reject(error))
-        })
-      }
-    )
+    waitForTransactionReceipt: waitForTransactionReceiptActor
   },
   actions: {
-    invalidateQueries: (_, client: QueryClient) => {
-      client.invalidateQueries()
-    }
+    invalidateQueries
   },
   guards: {
     hasSignatureNotExpired: ({ context }) => {
       invariant(context.deadline !== undefined, "Deadline is not undefined")
-      return new Date().getTime() / 1000 < Number(context.deadline)
+      return hasSignatureNotExpired(Number(context.deadline))
     }
   },
   types: {
@@ -125,15 +78,12 @@ const permitAndStakeMachine = setup({
       delegatee: Address
       beneficiary: Address
       txHash: Hex
-      replaced: boolean
       client: QueryClient
     }>,
     events: {} as
       | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address; client: QueryClient }
       | { type: "resend" }
-      | { type: "confirmTx" }
-      | { type: "cancelTx" }
-      | { type: "replaceTx"; txHash: Hex }
+      | TxEvent
   }
 }).createMachine({
   id: "permitAndStake",
@@ -240,19 +190,7 @@ const permitAndStakeMachine = setup({
               event: {
                 output: { status, txHash }
               }
-            }) => {
-              switch (status) {
-                case "confirmed":
-                  return { type: "confirmTx" }
-                case "cancelled":
-                  return { type: "cancelTx" }
-                case "replaced":
-                case "repriced":
-                  return { type: "replaceTx", txHash }
-                default:
-                  never(status, `Unhandled status for transaction receipt ${status}`)
-              }
-            }
+            }) => getTxEvent({ status, txHash })
           )
         },
         onError: {
@@ -274,84 +212,6 @@ const permitAndStakeMachine = setup({
     }
   }
 })
-
-function getProgress(machineState: "confirmed" | "initial" | "signing" | "sending" | "signed" | "sent") {
-  switch (machineState) {
-    case "initial":
-      return {
-        value: 0,
-        buttonContent: (
-          <>
-            <Download size={16} />
-            <span>Permit & Stake</span>
-          </>
-        ),
-        progressDescription: null
-      }
-    case "signing":
-      return {
-        value: 20,
-        buttonContent: (
-          <>
-            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-            <span>Signing</span>
-          </>
-        ),
-        progressDescription: <span>Sign transaction in your wallet</span>
-      }
-    case "signed":
-      return {
-        value: 40,
-        buttonContent: (
-          <>
-            <Download size={16} />
-            <span>Stake</span>
-          </>
-        ),
-        progressDescription: <span>Transaction signed, send to stake</span>
-      }
-    case "sending":
-      return {
-        value: 60,
-        buttonContent: (
-          <>
-            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-            <span>Sending</span>
-          </>
-        ),
-        progressDescription: <span>Confirm transaction in your wallet</span>
-      }
-    case "sent":
-      return {
-        value: 80,
-        buttonContent: (
-          <>
-            <RotateCw size={16} className="mr-2 size-4 animate-spin" />
-            <span>Confirming</span>
-          </>
-        ),
-        progressDescription: <span>Transaction sent, waiting for confirmation...</span>
-      }
-    case "confirmed":
-      return {
-        value: 100,
-        buttonContent: (
-          <>
-            <Download size={16} />
-            <span>Permit & Stake</span>
-          </>
-        ),
-        progressDescription: (
-          <span className="space-x-2 flex flex-row items-baseline">
-            <span>Transaction confirmed!</span>
-            <PartyPopper size={16} />
-          </span>
-        )
-      }
-    default:
-      never(machineState, `Unhandled value for progress ${machineState}`)
-  }
-}
 
 const formSchema = z
   .object({
@@ -418,7 +278,7 @@ const useStakeDialog = ({
     value: machineState
   } = snapshot
 
-  const progress = getProgress(machineState)
+  const progress = getPermitAndStakeProgress(machineState)
 
   const {
     error: errorTallyDelegatees,
@@ -591,17 +451,7 @@ export function StakeDialogContent({
               </Alert>
             )}
           </div>
-          {progress.value === 0 ? null : (
-            <div className="space-y-1">
-              {progress.progressDescription}
-              <Progress value={progress.value} />
-            </div>
-          )}
-          <DialogFooter>
-            <Button type="submit" className="space-x-2" disabled={!isSubmitButtonEnabled}>
-              {progress.buttonContent}
-            </Button>
-          </DialogFooter>
+          <TransactionFooter progress={progress} isSubmitButtonEnabled={isSubmitButtonEnabled} />
         </form>
       </Form>
     </DialogContent>

@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { UnstakeDialogContent } from "@/components/unstake-dialog"
 import { formatDate } from "@/lib/date"
 import { Download, Info, Upload } from "lucide-react"
+import { useState } from "react"
 import { type Address, isAddressEqual } from "viem"
 
 export type StakeDepositCardProps = {
@@ -20,12 +21,38 @@ export type StakeDepositCardProps = {
   account: Address
 }
 
+function useStakeDepositCard({ account, owner }: { account: Address; owner: Address }) {
+  const isOwner = isAddressEqual(account, owner)
+  const [stakeMoreOpened, setStakeMoreOpened] = useState(false)
+  const [unstakeOpened, setUnstakeOpened] = useState(false)
+  const [editBeneficiaryDelegateeOpened, setEditBeneficiaryDelegateeOpened] = useState(false)
+
+  return {
+    isOwner,
+    stakeMoreOpened,
+    setStakeMoreOpened,
+    unstakeOpened,
+    setUnstakeOpened,
+    editBeneficiaryDelegateeOpened,
+    setEditBeneficiaryDelegateeOpened
+  }
+}
+
 export function StakeDepositCard({
   deposit: { beneficiary, createdAt, delegatee, owner, stakeId, stakedAmount, updatedAt },
   governanceTokenBalanceValue,
   account
 }: StakeDepositCardProps) {
-  const isOwner = isAddressEqual(account, owner)
+  const {
+    isOwner,
+    stakeMoreOpened,
+    setStakeMoreOpened,
+    unstakeOpened,
+    setUnstakeOpened,
+    editBeneficiaryDelegateeOpened,
+    setEditBeneficiaryDelegateeOpened
+  } = useStakeDepositCard({ account, owner })
+
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between flex-wrap">
@@ -62,11 +89,12 @@ export function StakeDepositCard({
             <AddressDisplay value={beneficiary} />
           </div>
           {isOwner && (
-            <Dialog>
+            <Dialog onOpenChange={setEditBeneficiaryDelegateeOpened}>
               <DialogTrigger asChild>
                 <Button variant="ghost">Edit</Button>
               </DialogTrigger>
               <EditBeneficiaryDelegateeDialogContent
+                key={`edit${editBeneficiaryDelegateeOpened}`}
                 stakeId={stakeId}
                 delegatee={delegatee}
                 beneficiary={beneficiary}
@@ -77,7 +105,7 @@ export function StakeDepositCard({
         <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
           {isOwner ? (
             <>
-              <Dialog>
+              <Dialog onOpenChange={setUnstakeOpened}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" className="space-x-2 w-full md:w-auto">
                     <Upload size={16} />
@@ -85,13 +113,14 @@ export function StakeDepositCard({
                   </Button>
                 </DialogTrigger>
                 <UnstakeDialogContent
+                  key={`unstake${unstakeOpened}`}
                   availableForUnstaking={stakedAmount}
                   stakeId={stakeId}
                   delegatee={delegatee}
                   beneficiary={beneficiary}
                 />
               </Dialog>
-              <Dialog>
+              <Dialog onOpenChange={setStakeMoreOpened}>
                 <DialogTrigger asChild>
                   <Button
                     variant="secondary"
@@ -102,6 +131,7 @@ export function StakeDepositCard({
                   </Button>
                 </DialogTrigger>
                 <StakeMoreDialogContent
+                  key={`stakeMore${stakeMoreOpened}`}
                   account={account}
                   availableForStakingUni={governanceTokenBalanceValue}
                   stakeId={stakeId}

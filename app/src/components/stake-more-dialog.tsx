@@ -5,25 +5,204 @@ import { AddressDisplay } from "@/components/ui/address-display"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Button } from "@/components/ui/button"
-import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { uniAbi } from "@/lib/abi/uni"
+import { TransactionFooter } from "@/components/ui/transaction-footer"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
-import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
-import { useWriteContractWithToast } from "@/lib/hooks/use-write-contract-with-toast"
+import { invariant } from "@/lib/assertion"
+import { uniStaker } from "@/lib/consts"
+import { invalidateQueries } from "@/lib/machines/actions"
+import { hasSignatureNotExpired } from "@/lib/machines/guards"
+import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
+import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
+import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useQueryClient } from "@tanstack/react-query"
-import { Download, RotateCw } from "lucide-react"
-import { useState } from "react"
+import { QueryClient, useQueryClient } from "@tanstack/react-query"
+import { useMachine } from "@xstate/react"
 import { UseFormReturn, useForm } from "react-hook-form"
-import type { Address } from "viem"
+import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature } from "viem"
-import { useChainId } from "wagmi"
-import { readContract, signTypedData } from "wagmi/actions"
+import { writeContract } from "wagmi/actions"
+import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
 import { z } from "zod"
+
+const permitAndStakeMoreMachine = setup({
+  actors: {
+    sign: signGovernanceTokenPermitActor,
+    send: fromPromise(
+      async ({
+        input: { stakeId, amount, signature, deadline }
+      }: {
+        input: {
+          amount: bigint
+          stakeId: bigint
+          signature: Hex
+          deadline: bigint
+        }
+      }) => {
+        const { v, r, s } = hexToSignature(signature)
+
+        const txHash = await writeContract(config, {
+          address: uniStaker,
+          abi: abiUniStaker,
+          functionName: "permitAndStakeMore",
+          args: [stakeId, amount, deadline, Number(v), r, s]
+        })
+        return txHash
+      }
+    ),
+    waitForTransactionReceipt: waitForTransactionReceiptActor
+  },
+  actions: {
+    invalidateQueries
+  },
+  guards: {
+    hasSignatureNotExpired: ({ context }) => {
+      invariant(context.deadline !== undefined, "Deadline is not undefined")
+      return hasSignatureNotExpired(Number(context.deadline))
+    }
+  },
+  types: {
+    context: {} as Partial<{
+      signature: Hex
+      deadline: bigint
+      amount: bigint
+      error: string
+      txHash: Hex
+      stakeId: bigint
+      client: QueryClient
+    }>,
+    events: {} as
+      | { type: "sign"; stakeId: bigint; amount: bigint; signer: Address; client: QueryClient }
+      | { type: "resend" }
+      | TxEvent
+  }
+}).createMachine({
+  id: "permitAndMoreStake",
+  initial: "initial",
+  states: {
+    initial: {
+      on: {
+        sign: {
+          target: "signing",
+          actions: assign(({ event }) => ({
+            ...event,
+            error: undefined
+          }))
+        }
+      }
+    },
+    signing: {
+      invoke: {
+        id: "sign",
+        src: "sign",
+        input: ({ event }) => {
+          assertEvent(event, "sign")
+
+          return { amount: event.amount, signer: event.signer }
+        },
+        onDone: {
+          target: "sending",
+          actions: assign(({ event }) => ({
+            signature: event.output.signature,
+            deadline: event.output.deadline,
+            error: undefined
+          }))
+        },
+        onError: {
+          target: "initial",
+          actions: assign({ error: "Failed to sign the message" })
+        }
+      }
+    },
+    signed: {
+      on: {
+        resend: [
+          {
+            target: "sending",
+            guard: "hasSignatureNotExpired",
+            actions: assign({ error: undefined })
+          },
+          {
+            target: "initial",
+            actions: assign({ error: "Signature expired" })
+          }
+        ]
+      }
+    },
+    sending: {
+      invoke: {
+        id: "send",
+        src: "send",
+        input: ({ context: { amount, deadline, signature, stakeId } }) => {
+          invariant(
+            stakeId !== undefined && signature !== undefined && deadline !== undefined && amount !== undefined,
+            "Invalid input"
+          )
+          return { stakeId, amount, signature, deadline }
+        },
+        onDone: {
+          target: "sent",
+          actions: assign(({ event }) => ({ error: undefined, txHash: event.output }))
+        },
+        onError: {
+          target: "signed",
+          actions: assign({ error: "Failed to send the message" })
+        }
+      }
+    },
+    sent: {
+      on: {
+        replaceTx: {
+          target: "sent",
+          actions: assign(({ event }) => ({ txHash: event.txHash }))
+        },
+        cancelTx: {
+          target: "initial",
+          actions: assign({ error: "Transaction was cancelled", txHash: undefined })
+        },
+        confirmTx: {
+          target: "confirmed"
+        }
+      },
+      invoke: {
+        id: "waitForTransactionReceipt",
+        src: "waitForTransactionReceipt",
+        input: ({ context: { txHash } }) => {
+          invariant(txHash !== undefined, "Invalid input")
+          return txHash
+        },
+        onDone: {
+          actions: raise(
+            ({
+              event: {
+                output: { status, txHash }
+              }
+            }) => getTxEvent({ status, txHash })
+          )
+        },
+        onError: {
+          target: "signed",
+          actions: assign({ error: "Failed to send the message" })
+        }
+      }
+    },
+    confirmed: {
+      entry: [
+        {
+          type: "invalidateQueries",
+          params: ({ context }) => {
+            invariant(context.client !== undefined, "Client is not undefined")
+            return context.client
+          }
+        }
+      ]
+    }
+  }
+})
 
 const useStakeMoreDialog = ({
   availableForStakingUni,
@@ -35,19 +214,14 @@ const useStakeMoreDialog = ({
   account: Address
 }) => {
   const client = useQueryClient()
-  const chainId = useChainId()
+  const [snapshot, send] = useMachine(permitAndStakeMoreMachine)
 
   const {
-    error: errorWrite,
-    isPending: isPendingWrite,
-    writeContract
-  } = useWriteContractWithToast({
-    mutation: {
-      onSettled: () => client.invalidateQueries()
-    }
-  })
+    context: { error },
+    value: machineState
+  } = snapshot
 
-  const [error, setError] = useState<Error>()
+  const progress = getPermitAndStakeProgress(machineState)
 
   const form = useForm<z.input<typeof stakeMoreUnstakeFormSchema>, any, z.output<typeof stakeMoreUnstakeFormSchema>>({
     defaultValues: {
@@ -58,65 +232,38 @@ const useStakeMoreDialog = ({
     resolver: zodResolver(stakeMoreUnstakeFormSchema)
   })
 
-  const { setValue, formState } = form
+  const { setValue } = form
 
   const onSubmit = async (values: {
     amount: bigint
   }) => {
-    try {
-      const nonce = await readContract(config, {
-        address: governanceToken,
-        abi: uniAbi,
-        functionName: "nonces",
-        args: [account]
-      })
-
-      const signedDeadline = BigInt(Number((new Date().getTime() / 1000).toFixed()) + timeToMakeTransaction)
-
-      const permitSignature = await signTypedData(config, {
-        account,
-        types: permitEIP712Options.permitTypes,
-        domain: {
-          ...permitEIP712Options.domainBase,
-          chainId: chainId
-        },
-        primaryType: permitEIP712Options.primaryType,
-        message: {
-          owner: account,
-          spender: uniStaker,
-          value: values.amount,
-          nonce: nonce,
-          deadline: signedDeadline
-        }
-      })
-
-      const { v, r, s } = hexToSignature(permitSignature)
-      writeContract({
-        address: uniStaker,
-        abi: abiUniStaker,
-        functionName: "permitAndStakeMore",
-        args: [BigInt(stakeId), values.amount, signedDeadline, Number(v), r, s]
-      })
-    } catch (e) {
-      if (e instanceof Error) {
-        setError(e)
-      } else {
-        setError(new Error("Something went wrong"))
-      }
+    if (machineState === "signed") {
+      send({ type: "resend" })
+      return
     }
+
+    send({
+      type: "sign",
+      amount: values.amount,
+      signer: account,
+      stakeId: BigInt(stakeId),
+      client
+    })
   }
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18), { shouldValidate: true })
 
-  const isSubmitButtonEnabled = formState.isValid
+  const isFormDisabled = machineState !== "initial"
+  const isSubmitButtonEnabled = (machineState === "initial" || machineState === "signed") && form.formState.isValid
 
   return {
     form,
     isSubmitButtonEnabled,
     onSubmit: form.handleSubmit((values) => onSubmit(values)),
-    error: errorWrite ?? error,
-    isPending: isPendingWrite,
-    setMaxAmount
+    error,
+    isFormDisabled,
+    setMaxAmount,
+    progress
   }
 }
 
@@ -133,7 +280,7 @@ export function StakeMoreDialogContent({
   beneficiary: Address
   account: Address
 }) {
-  const { error, form, isPending, onSubmit, setMaxAmount, isSubmitButtonEnabled } = useStakeMoreDialog({
+  const { error, form, isFormDisabled, onSubmit, setMaxAmount, progress, isSubmitButtonEnabled } = useStakeMoreDialog({
     availableForStakingUni,
     stakeId,
     account
@@ -149,6 +296,7 @@ export function StakeMoreDialogContent({
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-4">
             <FormField
+              disabled={isFormDisabled}
               control={(form as UseFormReturn<any>).control}
               name="amount"
               render={({ field }) => (
@@ -193,20 +341,14 @@ export function StakeMoreDialogContent({
               </div>
             </div>
 
-            {error && (
+            {error !== undefined && (
               <Alert variant="destructive">
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription className="break-all">{error.message}</AlertDescription>
+                <AlertDescription className="break-all">{error}</AlertDescription>
               </Alert>
             )}
           </div>
-          <DialogFooter>
-            <Button type="submit" className="space-x-2" disabled={!isSubmitButtonEnabled}>
-              {isPending ? <RotateCw size={16} className="mr-2 size-4 animate-spin" /> : <Download size={16} />}
-
-              <span>Permit & Stake</span>
-            </Button>
-          </DialogFooter>
+          <TransactionFooter progress={progress} isSubmitButtonEnabled={isSubmitButtonEnabled} />
         </form>
       </Form>
     </DialogContent>

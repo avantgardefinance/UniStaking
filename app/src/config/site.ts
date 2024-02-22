@@ -1,9 +1,8 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: "Next.js",
-  description:
-    "Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source.",
+  name: "Uniswap Protocol Staking",
+  description: "Uniswap Protocol Staking powered by Avantgarde Finance.",
   mainNav: [
     {
       title: "Home",
@@ -11,8 +10,7 @@ export const siteConfig = {
     }
   ],
   links: {
-    twitter: "https://twitter.com/shadcn",
-    github: "https://github.com/shadcn/ui",
-    docs: "https://ui.shadcn.com"
+    twitter: "https://twitter.com/avantgardefinance",
+    github: "https://github.com/avantgardefinance/UniStaking"
   }
 }

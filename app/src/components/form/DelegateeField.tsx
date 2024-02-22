@@ -143,7 +143,9 @@ export function DelegateeField({
                             {tallyDelegatees.map((delegatee) => (
                               <SelectItem key={delegatee.address} value={delegatee.address}>
                                 <div className="flex items-start">
-                                  <span>{delegatee.label}</span>
+                                  {delegatee.label.length > 50
+                                    ? `${delegatee.label.slice(0, 50)}...`
+                                    : delegatee.label}{" "}
                                 </div>
                                 <div className="flex items-start space-x-1">
                                   <span>Votes:</span>

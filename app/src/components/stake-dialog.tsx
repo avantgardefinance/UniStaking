@@ -263,6 +263,56 @@ const formSchema = z
     return value
   })
 
+const formSchema = z
+  .object({
+    beneficiary: address,
+    customDelegatee: address.optional(),
+    tallyDelegatee: address.optional(),
+    balance: z.bigint(),
+    amount: z.string().transform((value, ctx) => {
+      const parsedValue = value === "" ? 0n : parseUnits(value, 18)
+      if (parsedValue === 0n) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Amount must be greater than 0"
+        })
+        return z.NEVER
+      }
+
+      return parsedValue
+    }),
+    delegateeOption: z.enum(["custom", "tally"])
+  })
+  .transform((value, ctx) => {
+    if (value.balance < value.amount) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Amount must be less than or equal to balance",
+        path: ["amount"]
+      })
+      return z.NEVER
+    }
+    if (value.delegateeOption === "tally" && value.tallyDelegatee === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Address required",
+        path: ["tallyDelegatee"]
+      })
+      return z.NEVER
+    }
+
+    if (value.delegateeOption === "custom" && value.customDelegatee === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Address required",
+        path: ["customDelegatee"]
+      })
+      return z.NEVER
+    }
+
+    return value
+  })
+
 const useStakeDialog = ({
   availableForStakingUni,
   account

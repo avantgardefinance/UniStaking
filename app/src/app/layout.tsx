@@ -72,7 +72,6 @@ export default function RootLayout({
               </div>
             </Link>
           </div>
-          {/* <div /> */}
         </footer>
       </body>
     </html>

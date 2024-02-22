@@ -26,7 +26,7 @@ export function DelegateeField({
   disabled
 }: {
   name: string
-  disabled: boolean
+  disabled?: boolean
   tallyDelegatees: ReadonlyArray<TallyDelegatee>
 }) {
   const { delegateeOption, form } = useDelegateeField({ name })

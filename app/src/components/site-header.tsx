@@ -1,5 +1,4 @@
 import { ConnectButton } from "@/components/connect-button"
-import { Logo } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"

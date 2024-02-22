@@ -71,7 +71,7 @@ const unstakeMachine = setup({
     initial: {
       on: {
         send: {
-          target: "sent",
+          target: "sending",
           actions: assign(({ event }) => ({
             ...event,
             error: undefined

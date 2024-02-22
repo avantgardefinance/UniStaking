@@ -42,8 +42,11 @@ export default function RootLayout({
         </div>
         <TailwindIndicator />
         <Toaster />
-        <footer className="bg-blue-900 flex flex-col items-center py-2">
-          <div>
+        <footer className="bg-blue-900 grid grid-cols-1 md:grid-cols-3 py-2">
+          <Link href="/" className="flex flex-row items-center justify-center">
+            <h1 className="text-white text-xl font-bold tracking-tight lg:text-xl">Uniswap Protocol Staking</h1>
+          </Link>
+          <div className="flex flex-row justify-center">
             <Link href="/">
               <div
                 className={cn(
@@ -69,6 +72,7 @@ export default function RootLayout({
               </div>
             </Link>
           </div>
+          {/* <div /> */}
         </footer>
       </body>
     </html>

@@ -48,6 +48,7 @@ down: ## Stop and destroy the docker environment
 contracts: ## Deploy the contracts
 > $(FORGE) script $(SCRIPTS)/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
 > $(FORGE) script $(SCRIPTS)/Seed.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
+> $(FORGE) script $(SCRIPTS)/Deal.s.sol 1 --rpc-url http://127.0.0.1:8545 --broadcast --sig "run(uint32)"
 
 .PHONY: subgraph
 subgraph: ## Deploy the subgraph

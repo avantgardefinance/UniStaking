@@ -58,7 +58,7 @@ Manually add the wallet to tools like MetaMask using the following parameters:
 
 ## Scripts
 
-Interact with the node using various scripts located in the `contracts/scripts/` folder:
+Interact with the node using various scripts located in the [`contracts/scripts/`](contracts/scripts/) folder:
 
 ```sh
 # Deal to Wallet: Sends 10,000 governance tokens to the chosen private key from the initial mnemonic. This script runs automatically with the "make" command.
@@ -76,6 +76,6 @@ forge script contracts/scripts/DistributeRewards.s.sol 10000000 --rpc-url http:/
 
 ## Subgraph
 
-The subgraph is available at `http://localhost:8000/subgraphs/name/uniswap/staking`.
+The subgraph is available at http://localhost:8000/subgraphs/name/uniswap/staking.
 
 After making changes to the subgraph, run `make subgraph` to redeploy only the subgraph with your changes. The `make subgraph` command is part of the overall `make` command.

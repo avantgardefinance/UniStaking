@@ -1,10 +1,12 @@
-# Uniswap Staking App
+# Uniswap Protocol Staking
+
+Uniswap Protocol Staking by Avantgarde Finance. 
 
 ## Prerequisites
 
 ### Automatic
 
-This repository comes with a reproducible development environment based on `nix` and `direnv`.
+This repository comes with a reproducible development environment based on `nix` and `direnv`. This allows the development of the app based on locally deployed contracts and subgraph.
 
 For the best possible developer experience, make sure you have the following installed:
 
@@ -41,4 +43,16 @@ pnpm dev
 
 You should now be able to access the app at http://localhost:3000.
 
-## Troubleshooting
+## Local Network and Wallet
+
+Manually add the local network to e.g. MetaMask using the following parameters:
+- Network name: Localhost
+- RPC URL: http://localhost:8545
+- Chain Id: 31337
+- Currency symbol: ETH
+
+Manually add the wallet to e.g. MetaMask using the following parameters:
+- Wallet address: `0x70997970C51812dc3A010C7d01b50e0d17dc79C8`
+- Private key: `0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d`
+
+

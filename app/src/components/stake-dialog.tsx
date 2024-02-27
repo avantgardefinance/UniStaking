@@ -1,6 +1,6 @@
 "use client"
 
-import { DelegateeField } from "@/components/form/DelegateeField"
+import { DelegateeField } from "@/components/form/delegatee-field"
 import { config } from "@/components/providers/wagmi-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { BigIntDisplay } from "@/components/ui/big-int-display"

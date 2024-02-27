@@ -1,7 +1,7 @@
 "use client"
 
 import { TallyDelegatee } from "@/app/api/delegatees/model"
-import { DelegateeField } from "@/components/form/DelegateeField"
+import { DelegateeField } from "@/components/form/delegatee-field"
 import { config } from "@/components/providers/wagmi-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"

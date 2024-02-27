@@ -1,7 +1,7 @@
 "use client"
 
 import { HistoryList } from "@/components/history-list"
-import { withAccount } from "@/lib/hocs/withAccount"
+import { withAccount } from "@/lib/hocs/with-account"
 import { History } from "lucide-react"
 import { Address } from "viem"
 

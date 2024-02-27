@@ -6,7 +6,8 @@
     "format": "biome check --apply-unsafe .",
     "build": "pnpm --filter app run build",
     "start": "pnpm --filter app run start",
-    "dev": "pnpm --filter app run dev"
+    "dev": "pnpm --filter app run dev",
+    "typecheck": "pnpm --filter app run typecheck"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.5.3",
@@ -14,7 +15,7 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "@graphprotocol/graph-cli@0.68.0": "patches/@graphprotocol__graph-cli@0.68.0.patch"
+      "@graphprotocol/graph-cli@0.68.3": "patches/@graphprotocol__graph-cli@0.68.3.patch"
     }
   }
 }

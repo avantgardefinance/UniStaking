@@ -4,6 +4,8 @@
   "scripts": {
     "lint": "biome check .",
     "format": "biome check --apply-unsafe .",
+    "build": "pnpm --filter app run build",
+    "start": "pnpm --filter app run start",
     "dev": "pnpm --filter app run dev"
   },
   "devDependencies": {

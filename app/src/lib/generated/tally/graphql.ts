@@ -614,10 +614,9 @@ export enum DelegateStatementSource {
 export type DelegatesFiltersInput = {
   /** `address` filter in combination with `organizationId` allows fetching delegate info of this address from each chain */
   address?: InputMaybe<Scalars['Address']['input']>;
-  /** Exclude any delegates that have not received any votes. */
-  excludeWithoutVotes?: InputMaybe<Scalars['Boolean']['input']>;
-  governanceId?: InputMaybe<Scalars['AccountID']['input']>;
   governorId?: InputMaybe<Scalars['AccountID']['input']>;
+  hasDelegators?: InputMaybe<Scalars['Boolean']['input']>;
+  hasVotes?: InputMaybe<Scalars['Boolean']['input']>;
   isSeekingDelegation?: InputMaybe<Scalars['Boolean']['input']>;
   issueIds?: InputMaybe<Array<Scalars['IntID']['input']>>;
   organizationId?: InputMaybe<Scalars['IntID']['input']>;
@@ -1988,9 +1987,11 @@ export type OrganizationVotingParametersInput = {
 };
 
 export type OrganizationsFiltersInput = {
-  accountId?: InputMaybe<Scalars['AccountID']['input']>;
+  address?: InputMaybe<Scalars['Address']['input']>;
   chainId?: InputMaybe<Scalars['ChainID']['input']>;
-  mustHaveLogo?: InputMaybe<Scalars['Boolean']['input']>;
+  hasLogo?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Indicates whether the user holds any of the governance tokens associated with the organization. */
+  isMember?: InputMaybe<Scalars['Boolean']['input']>;
   roles?: InputMaybe<Array<OrganizationRole>>;
 };
 

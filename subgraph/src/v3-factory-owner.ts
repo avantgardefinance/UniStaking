@@ -1,7 +1,5 @@
-import type {
-  AdminSet as AdminSetEvent,
-  FeesClaimed as FeesClaimedEvent
-} from "../generated/V3FactoryOwner/V3FactoryOwner"
+// biome-ignore lint/style/useImportType: <explanation>
+import { AdminSet as AdminSetEvent, FeesClaimed as FeesClaimedEvent } from "../generated/V3FactoryOwner/V3FactoryOwner"
 import { AdminSet, FeesClaimed } from "../generated/schema"
 
 export function handleAdminSet(event: AdminSetEvent): void {

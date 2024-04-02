@@ -1,5 +1,6 @@
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-import { type Address, BigInt, type ethereum } from "@graphprotocol/graph-ts"
+// biome-ignore lint/style/useImportType: <explanation>
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { Account } from "../generated/schema"
 
 export function getOrCreateAccount(address: Address, event: ethereum.Event): Account {

@@ -4,10 +4,11 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ uniswap/staking",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --version-label v0.0.1 --ipfs http://localhost:5001 uniswap/staking",
-    "create-local": "graph create --node http://localhost:8020/ uniswap/staking",
-    "remove-local": "graph remove --node http://localhost:8020/ uniswap/staking"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ enzymefinance/uni-staking",
+    "deploy-sepolia": "graph deploy --node https://api.thegraph.com/deploy/ enzymefinance/uni-staking-sepolia",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --version-label v0.0.1 --ipfs http://localhost:5001 enzymefinance/uni-staking",
+    "create-local": "graph create --node http://localhost:8020/ enzymefinance/uni-staking",
+    "remove-local": "graph remove --node http://localhost:8020/ enzymefinance/uni-staking"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.68.3",

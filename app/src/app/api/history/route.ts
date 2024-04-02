@@ -9,7 +9,7 @@ import { isAddress } from "viem"
 const encode = Schema.encodeSync(Schema.array(HistoryEntrySchema))
 
 // TODO: Use the "production" subgraph url here when not in development mode.
-const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/staking", {
+const client = new GraphQLClient("https://api.thegraph.com/subgraphs/name/enzymefinance/uni-staking-sepolia", {
   fetch
 })
 

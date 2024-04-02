@@ -198,13 +198,6 @@ export type AddressInfoparticipationsArgs = {
 };
 
 /** Source of data: Hexagate. Action-level (executable call) analysis data point, the name is a label (e.g. SMARTCONTRACT_IMPLEMENTS_ANTI_SIMULATION_TECHNIQUES) and the result gives an indication whether or not it passed the check */
-export type AnalysisDataPoint = {
-  __typename: 'AnalysisDataPoint';
-  name: Scalars['String']['output'];
-  result: Scalars['Boolean']['output'];
-};
-
-/** Source of data: Hexagate. Action-level (executable call) analysis data point, the name is a label (e.g. SMARTCONTRACT_IMPLEMENTS_ANTI_SIMULATION_TECHNIQUES) and the result gives an indication whether or not it passed the check */
 export type AnalysisDataPointV2 = {
   __typename: 'AnalysisDataPointV2';
   name: Scalars['String']['output'];
@@ -267,6 +260,7 @@ export type CandidateExport = {
 };
 
 export enum CandidateSort {
+  ALPHABETICAL = 'ALPHABETICAL',
   RANDOM = 'RANDOM',
   VOTES = 'VOTES'
 }
@@ -417,11 +411,6 @@ export enum ContenderFilter {
   SEEKING_VOTES = 'SEEKING_VOTES'
 }
 
-export type ContractVerification = {
-  __typename: 'ContractVerification';
-  isVerified: Scalars['Boolean']['output'];
-};
-
 export type ContractVerificationV2 = {
   __typename: 'ContractVerificationV2';
   isVerified: Scalars['Boolean']['output'];
@@ -438,7 +427,7 @@ export type Council = {
   cohortSize: Scalars['Int']['output'];
   description: Scalars['String']['output'];
   elections: Array<Election>;
-  id: Scalars['Int']['output'];
+  id: Scalars['IntID']['output'];
   members: CouncilMembers;
   name: Scalars['String']['output'];
   slug: Scalars['String']['output'];
@@ -464,10 +453,25 @@ export type CovalentData = {
   symbol: Scalars['String']['output'];
 };
 
-export type CreateGovernorOrganizationInput = {
-  governor: OrganizationGovernorInput;
-  organization: CreateOrganizationInput;
-  token: OrganizationTokenInput;
+export type CreateGovernorInput = {
+  id: Scalars['AccountID']['input'];
+  kind?: InputMaybe<GovernorKind>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  /** The block height at which the Governor contract was originally deployed. */
+  startBlock: Scalars['Int']['input'];
+  tokenId: Scalars['AssetID']['input'];
+  type: GovernorType;
+};
+
+export type CreateGovernorsInput = {
+  governors: Array<CreateGovernorInput>;
+  /** Organization is required when creating a new DAO with govenors and tokens */
+  organization?: InputMaybe<CreateOrganizationInput>;
+  /** Organization id is required when creating governors for an existing DAO */
+  organizationId?: InputMaybe<Scalars['IntID']['input']>;
+  /** Tokens are required when creating a new DAO with govenors and tokens or when tokens for govenrors have not been created yet */
+  tokens?: InputMaybe<Array<CreateTokenInput>>;
 };
 
 export type CreateOrganizationInput = {
@@ -480,6 +484,12 @@ export type CreateSafeInput = {
   id: Scalars['AccountID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   organizationId: Scalars['IntID']['input'];
+};
+
+export type CreateTokenInput = {
+  id: Scalars['AssetID']['input'];
+  /** The block height at which the Token contract was originally deployed. */
+  startBlock: Scalars['Int']['input'];
 };
 
 /** A single parameter used in a method. */
@@ -495,10 +505,13 @@ export type DecodedParameter = {
 export type Delegate = {
   __typename: 'Delegate';
   account: Account;
+  chainId?: Maybe<Scalars['ChainID']['output']>;
   delegatorsCount: Scalars['Int']['output'];
+  governor?: Maybe<GovernorV2>;
   id: Scalars['IntID']['output'];
-  /** @deprecated use statementV2 instead */
+  organization?: Maybe<Organization>;
   statement?: Maybe<DelegateStatement>;
+  /** @deprecated use statement instead */
   statementV2?: Maybe<DelegateStatement>;
   token?: Maybe<Token>;
   voteChanges: Array<VotingPowerChange>;
@@ -506,8 +519,8 @@ export type Delegate = {
 };
 
 
-export type DelegatestatementArgs = {
-  governanceId: Scalars['AccountID']['input'];
+export type DelegatevotesCountArgs = {
+  blockNumber?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type DelegateActionMetadata = {
@@ -599,7 +612,12 @@ export enum DelegateStatementSource {
 }
 
 export type DelegatesFiltersInput = {
+  /** `address` filter in combination with `organizationId` allows fetching delegate info of this address from each chain */
+  address?: InputMaybe<Scalars['Address']['input']>;
+  /** Exclude any delegates that have not received any votes. */
+  excludeWithoutVotes?: InputMaybe<Scalars['Boolean']['input']>;
   governanceId?: InputMaybe<Scalars['AccountID']['input']>;
+  governorId?: InputMaybe<Scalars['AccountID']['input']>;
   isSeekingDelegation?: InputMaybe<Scalars['Boolean']['input']>;
   issueIds?: InputMaybe<Array<Scalars['IntID']['input']>>;
   organizationId?: InputMaybe<Scalars['IntID']['input']>;
@@ -704,6 +722,7 @@ export type DelegationWeightStats = {
 export type DelegationsFiltersInput = {
   address: Scalars['Address']['input'];
   governorId?: InputMaybe<Scalars['AccountID']['input']>;
+  organizationId?: InputMaybe<Scalars['IntID']['input']>;
 };
 
 export type DelegationsInput = {
@@ -814,6 +833,11 @@ export type ExecutableCall = {
 
 export type ExecutableCallMeta = RewardsMeta | SwapRecipeMeta;
 
+export type ExecutableCallV2 = {
+  __typename: 'ExecutableCallV2';
+  id: Scalars['IntID']['output'];
+};
+
 export type FeatureState = {
   __typename: 'FeatureState';
   account?: Maybe<Account>;
@@ -895,17 +919,13 @@ export enum GnosisStatusChangeType {
 export type Governance = {
   __typename: 'Governance';
   active: Scalars['Boolean']['output'];
-  balance: Scalars['Uint256']['output'];
   chainId: Scalars['ChainID']['output'];
   contracts: Contracts;
-  delegatedVotingPower: Scalars['Uint256']['output'];
-  /** @deprecated use root level `delegates` */
-  delegates: Array<Participation>;
   features?: Maybe<Array<FeatureState>>;
   id: Scalars['AccountID']['output'];
   isBehind: Scalars['Boolean']['output'];
   isIndexing: Scalars['Boolean']['output'];
-  kind: MultiGovernanceSupport;
+  kind: GovernorKind;
   name: Scalars['String']['output'];
   organization?: Maybe<Organization>;
   parameters: GovernorParameters;
@@ -917,23 +937,6 @@ export type Governance = {
   tallyProposals: Array<TallyProposal>;
   timelockId?: Maybe<Scalars['AccountID']['output']>;
   tokens: Array<Token>;
-};
-
-
-export type GovernancebalanceArgs = {
-  id: Scalars['AccountID']['input'];
-};
-
-
-export type GovernancedelegatedVotingPowerArgs = {
-  id: Scalars['AccountID']['input'];
-};
-
-
-export type GovernancedelegatesArgs = {
-  filter?: InputMaybe<DelegateFilter>;
-  pagination?: InputMaybe<Pagination>;
-  sort?: InputMaybe<DelegateSort>;
 };
 
 
@@ -981,6 +984,8 @@ export enum GovernanceType {
   aave = 'aave',
   governoralpha = 'governoralpha',
   governorbravo = 'governorbravo',
+  memberelection = 'memberelection',
+  nomineeelection = 'nomineeelection',
   nounsfork = 'nounsfork',
   openzeppelingovernor = 'openzeppelingovernor'
 }
@@ -994,21 +999,12 @@ export type GovernanceTypeData = {
 /** Core type that describes an onchain Governor contract */
 export type Governor = {
   __typename: 'Governor';
-  /** Current tokens owned by a particular address */
-  balance: Scalars['Uint256']['output'];
   contracts: Contracts;
-  /** Current voting power of a particular address */
-  delegatedVotingPower: Scalars['Uint256']['output'];
-  /**
-   * List of users that can currently create proposals and vote.
-   * @deprecated use root level `delegates`
-   */
-  delegates: Array<Participation>;
   features?: Maybe<Array<FeatureState>>;
   id: Scalars['AccountID']['output'];
   isBehind: Scalars['Boolean']['output'];
   isIndexing: Scalars['Boolean']['output'];
-  kind: MultiGovernanceSupport;
+  kind: GovernorKind;
   /** Last block that Tally has indexed.  Sometimes our indexer needs to catch up.  Our indexer is usually ~1min behind depending on chain so we don't serve data that might later be reorged. */
   lastIndexedBlock: Block;
   /** Tally name of the governor contract */
@@ -1031,27 +1027,6 @@ export type Governor = {
   tokens: Array<Token>;
   /** Governor contract type */
   type: GovernanceType;
-};
-
-
-/** Core type that describes an onchain Governor contract */
-export type GovernorbalanceArgs = {
-  id: Scalars['AccountID']['input'];
-};
-
-
-/** Core type that describes an onchain Governor contract */
-export type GovernordelegatedVotingPowerArgs = {
-  blockNumber?: InputMaybe<Scalars['Int']['input']>;
-  id: Scalars['AccountID']['input'];
-};
-
-
-/** Core type that describes an onchain Governor contract */
-export type GovernordelegatesArgs = {
-  filter?: InputMaybe<DelegateFilter>;
-  pagination?: InputMaybe<Pagination>;
-  sort?: InputMaybe<DelegateSort>;
 };
 
 
@@ -1143,6 +1118,15 @@ export type GovernorInput = {
   slug?: InputMaybe<Scalars['String']['input']>;
 };
 
+export enum GovernorKind {
+  hub = 'hub',
+  multiother = 'multiother',
+  multiprimary = 'multiprimary',
+  multisecondary = 'multisecondary',
+  single = 'single',
+  spoke = 'spoke'
+}
+
 export type GovernorParameters = GovernorAaveParameters | GovernorAlphaParameters | GovernorBravoParameters | NounsForkGovernorParameters | OpenZeppelinGovernorParameters;
 
 export type GovernorSort = {
@@ -1155,35 +1139,45 @@ export enum GovernorSortField {
   TOTAL_PROPOSALS = 'TOTAL_PROPOSALS'
 }
 
-/** Current token stats */
-export type GovernorTokenStats = {
-  __typename: 'GovernorTokenStats';
-  /** Total delegated voting power from `DelegateVotesChanged` events */
-  delegatedVotingPower: Scalars['Uint256']['output'];
-  /** Number of addresses with non-zero balances of this token derived from `Transfer` events */
-  owners: Scalars['Int']['output'];
-  /** Supply derived from `Transfer` events */
-  supply: Scalars['Uint256']['output'];
-  /** Number of addresses with non-zero voting power of this token derived from `DelegateVotesChanged` events */
-  voters: Scalars['Int']['output'];
-};
-
-/** Governor contract type */
 export enum GovernorType {
   aave = 'aave',
   governoralpha = 'governoralpha',
   governorbravo = 'governorbravo',
+  hub = 'hub',
+  memberelection = 'memberelection',
+  nomineeelection = 'nomineeelection',
   nounsfork = 'nounsfork',
-  openzeppelingovernor = 'openzeppelingovernor'
+  openzeppelingovernor = 'openzeppelingovernor',
+  spoke = 'spoke'
 }
 
 export type GovernorV2 = {
   __typename: 'GovernorV2';
+  chainId: Scalars['ChainID']['output'];
+  contracts: Contracts;
+  delegatesCount: Scalars['Int']['output'];
+  delegatesVotesCount: Scalars['Uint256']['output'];
+  features?: Maybe<Array<FeatureState>>;
   id: Scalars['AccountID']['output'];
+  isBehind: Scalars['Boolean']['output'];
+  isIndexing: Scalars['Boolean']['output'];
+  kind: GovernorKind;
+  /** Last block that Tally has indexed.  Sometimes our indexer needs to catch up.  Our indexer is usually ~1min behind depending on chain so we don't serve data that might later be reorged. */
+  lastIndexedBlock: Block;
+  /** Tally name of the governor contract */
   name: Scalars['String']['output'];
+  organization: Organization;
   parameters: GovernorV2Parameters;
+  proposalStats: ProposalStats;
+  /** The minumum amount of votes (total or for depending on type) that are currently required to pass a proposal. */
+  quorum: Scalars['Uint256']['output'];
+  /** Tally slug used for this goverance: tally.xyz/gov/[slug] */
+  slug: Scalars['String']['output'];
+  /** Chain scoped address of the timelock contract for this governor if it exists. */
   timelockId?: Maybe<Scalars['AccountID']['output']>;
+  token: Token;
   tokenId: Scalars['AssetID']['output'];
+  tokenOwnersCount: Scalars['Int']['output'];
   type: GovernorType;
 };
 
@@ -1202,6 +1196,7 @@ export type GovernorV2Parameters = {
 };
 
 export type GovernorsFiltersInput = {
+  includeInactive?: InputMaybe<Scalars['Boolean']['input']>;
   organizationId: Scalars['IntID']['input'];
 };
 
@@ -1267,13 +1262,16 @@ export type JoinOrganizationInput = {
   password?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type LinkGovernorInput = {
+  id: Scalars['AccountID']['input'];
+  organizationId: Scalars['IntID']['input'];
+};
+
 export type Member = {
   __typename: 'Member';
   account: Account;
   id: Scalars['ID']['output'];
   organization: Organization;
-  /** Number of polls the member has voted on. */
-  pollVotesCount: Scalars['Int']['output'];
   role: OrganizationRole;
 };
 
@@ -1331,12 +1329,6 @@ export enum MetaTransactionSortField {
   CREATED = 'CREATED'
 }
 
-export enum MultiGovernanceSupport {
-  MULTI_GOV_PRIMARY = 'MULTI_GOV_PRIMARY',
-  MULTI_GOV_SECONDARY = 'MULTI_GOV_SECONDARY',
-  SINGLE_GOV = 'SINGLE_GOV'
-}
-
 export type Mutation = {
   __typename: 'Mutation';
   addWhitelabelDomain: Scalars['Boolean']['output'];
@@ -1349,28 +1341,19 @@ export type Mutation = {
   /** Creates a `ClaimAndDelegateAttempt` with the data called by the user. */
   createClaimAndDelegateAttempt: Scalars['Boolean']['output'];
   createDelegateMetaTransaction: MetaTransaction;
-  createDelegateStatement: DelegateStatement;
-  createDelegateStatementV2: DelegateStatement;
   /** Creates a `DelegationAttempt` with the user intended to delegate */
   createDelegationAttempt: Scalars['Boolean']['output'];
-  /** Creates a Governance on Tally associated with an Organization.  If the Governance is already indexed it only updates the Organization. */
+  /**
+   * Creates a Governance on Tally associated with an Organization.  If the Governance is already indexed it only updates the Organization.
+   * @deprecated Use `createGovernors` instead.
+   */
   createGovernance: Scalars['Boolean']['output'];
-  createGovernanceV2: Scalars['Boolean']['output'];
-  /** Creates an organization with a governor and token. */
-  createGovernorOrganization: Organization;
-  /** Creates an organization for a group. Adds a demo proposal for that group. */
-  createGroupOrganization: Organization;
+  createGovernors: Organization;
   createIssue: Scalars['Boolean']['output'];
   createOrganization: Organization;
-  createPoll: Scalars['String']['output'];
   /** Creates a `TallyProposal`. Returns a TallyProposal ID. */
   createProposal: Scalars['ID']['output'];
   createProposalActionAttempt: Scalars['Boolean']['output'];
-  /** Creates a `TallyProposal` with a `Poll`, which immediately begins voting. Returns a Poll ID. */
-  createProposalWithPoll: Scalars['ID']['output'];
-  /** Creates a `TallyProposal` with a `Poll` for a Group. Returns a Poll ID. */
-  createProposalWithPollForGroup: Scalars['ID']['output'];
-  createProposalWithPollForGroupV2: Scalars['ID']['output'];
   /** Much like governors we can add a safe to an existing DAO.  A DAO can have an unlimited amount of `GnosisSafe`s. */
   createSafe: Scalars['Boolean']['output'];
   createSafeV2: Scalars['Boolean']['output'];
@@ -1384,27 +1367,29 @@ export type Mutation = {
   ingestOFACAddresses: Scalars['Boolean']['output'];
   /** Adds the authenticated user to the organization. */
   joinOrganization: Scalars['Boolean']['output'];
-  /** Links a Governance to an Organization if it is unlinked.  Fails if Governance doesn't exist or isn't indexed. */
-  linkGovernance: Governance;
-  linkGovernanceV2: Governance;
+  linkGovernor: Governor;
   login: Scalars['String']['output'];
   loginAsSafe: Scalars['String']['output'];
   logout: Scalars['Boolean']['output'];
   /** pauseSync, when pause syncing events from a contrat. */
   pauseSync: Scalars['Boolean']['output'];
   registerAsContenderAttempt: Scalars['Boolean']['output'];
+  removeAccountENS: Scalars['Boolean']['output'];
+  removeAccountTwitter: Scalars['Boolean']['output'];
+  /** This mutation is used to remove an organization by its id. It will remove the organization and all its related data. */
+  removeOrganization: Scalars['Boolean']['output'];
+  removeSuperAdmin: Scalars['Boolean']['output'];
   /** Restores a previous version of a proposal draft as the latest proposal. */
   restorePreviousProposalDraft: Scalars['Boolean']['output'];
   /** ResumeSync, resumes syncing an contract. */
   resumeSync: Scalars['Boolean']['output'];
+  resync: Scalars['Boolean']['output'];
   runProposalSimulation: Array<Simulation>;
   setArbitrumProposalExecuted: Scalars['Boolean']['output'];
   /** SyncNewContract, used by admin/developers to try new processors */
   syncNewContract: Scalars['Boolean']['output'];
   /** Unlinks a Safe from it's Organization for linking to other Organizations */
   unlinkGnosisSafe: Scalars['Boolean']['output'];
-  /** Unlinks a Governance from it's Organization for linking to other Organizations */
-  unlinkGovernance: Governance;
   /** Updates tally stored `Account` metadata (name, bio, picture, email, identity providers, etc) */
   updateAccount: Scalars['Boolean']['output'];
   /** Updates an Account for a user via their account id */
@@ -1428,8 +1413,6 @@ export type Mutation = {
   updateSafe: Scalars['Boolean']['output'];
   upload: File;
   upsertDelegateProfile: DelegateStatement;
-  upsertDelegateProfileV2: DelegateStatement;
-  vote: Scalars['Boolean']['output'];
 };
 
 
@@ -1484,32 +1467,6 @@ export type MutationcreateDelegateMetaTransactionArgs = {
 };
 
 
-export type MutationcreateDelegateStatementArgs = {
-  dataSource: DelegateStatementSource;
-  dataSourceURL?: InputMaybe<Scalars['String']['input']>;
-  delegateAddress: Scalars['Address']['input'];
-  delegateStatement: Scalars['String']['input'];
-  delegateStatementSummary?: InputMaybe<Scalars['String']['input']>;
-  discourseProfileLink?: InputMaybe<Scalars['String']['input']>;
-  discourseUserName?: InputMaybe<Scalars['String']['input']>;
-  organizationID: Scalars['String']['input'];
-  seekingDelegations?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-export type MutationcreateDelegateStatementV2Args = {
-  dataSource: DelegateStatementSource;
-  dataSourceURL?: InputMaybe<Scalars['String']['input']>;
-  delegateAddress: Scalars['Address']['input'];
-  delegateStatement: Scalars['String']['input'];
-  delegateStatementSummary?: InputMaybe<Scalars['String']['input']>;
-  discourseProfileLink?: InputMaybe<Scalars['String']['input']>;
-  discourseUserName?: InputMaybe<Scalars['String']['input']>;
-  organizationID: Scalars['Int']['input'];
-  seekingDelegations?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
 export type MutationcreateDelegationAttemptArgs = {
   delegateeId: Scalars['AccountID']['input'];
   delegatorId: Scalars['AccountID']['input'];
@@ -1530,25 +1487,8 @@ export type MutationcreateGovernanceArgs = {
 };
 
 
-export type MutationcreateGovernanceV2Args = {
-  address: Scalars['Address']['input'];
-  chainId: Scalars['ChainID']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-  organizationId: Scalars['IntID']['input'];
-  slug?: InputMaybe<Scalars['String']['input']>;
-  start: Scalars['Int']['input'];
-  tokenId: Scalars['AssetID']['input'];
-  type: GovernanceType;
-};
-
-
-export type MutationcreateGovernorOrganizationArgs = {
-  input: CreateGovernorOrganizationInput;
-};
-
-
-export type MutationcreateGroupOrganizationArgs = {
-  input: CreateOrganizationInput;
+export type MutationcreateGovernorsArgs = {
+  input: CreateGovernorsInput;
 };
 
 
@@ -1562,11 +1502,6 @@ export type MutationcreateOrganizationArgs = {
 };
 
 
-export type MutationcreatePollArgs = {
-  proposalId: Scalars['ID']['input'];
-};
-
-
 export type MutationcreateProposalArgs = {
   choices?: InputMaybe<Array<Scalars['String']['input']>>;
   description: Scalars['String']['input'];
@@ -1574,6 +1509,8 @@ export type MutationcreateProposalArgs = {
   governorExecutableCalls: Array<GovernorExecutableCallInput>;
   originalProposalId?: InputMaybe<Scalars['ID']['input']>;
   simulationValue?: InputMaybe<Scalars['Uint256']['input']>;
+  skipHexagate?: InputMaybe<Scalars['Boolean']['input']>;
+  skipTenderly?: InputMaybe<Scalars['Boolean']['input']>;
   title: Scalars['String']['input'];
   txHash?: InputMaybe<Scalars['String']['input']>;
 };
@@ -1585,30 +1522,6 @@ export type MutationcreateProposalActionAttemptArgs = {
   governanceId: Scalars['AccountID']['input'];
   proposalId: Scalars['ID']['input'];
   txID: Scalars['Bytes32']['input'];
-};
-
-
-export type MutationcreateProposalWithPollArgs = {
-  choices?: InputMaybe<Array<Scalars['String']['input']>>;
-  description: Scalars['String']['input'];
-  governanceId: Scalars['AccountID']['input'];
-  title: Scalars['String']['input'];
-};
-
-
-export type MutationcreateProposalWithPollForGroupArgs = {
-  choices?: InputMaybe<Array<Scalars['String']['input']>>;
-  description: Scalars['String']['input'];
-  organizationId: Scalars['ID']['input'];
-  title: Scalars['String']['input'];
-};
-
-
-export type MutationcreateProposalWithPollForGroupV2Args = {
-  choices?: InputMaybe<Array<Scalars['String']['input']>>;
-  description: Scalars['String']['input'];
-  organizationId: Scalars['IntID']['input'];
-  title: Scalars['String']['input'];
 };
 
 
@@ -1645,7 +1558,7 @@ export type MutationdeleteIssueArgs = {
 
 
 export type MutationdeleteSyncArgs = {
-  accountID?: InputMaybe<Scalars['AccountID']['input']>;
+  accountID: Scalars['AccountID']['input'];
 };
 
 
@@ -1659,15 +1572,8 @@ export type MutationjoinOrganizationArgs = {
 };
 
 
-export type MutationlinkGovernanceArgs = {
-  id: Scalars['AccountID']['input'];
-  organizationId: Scalars['ID']['input'];
-};
-
-
-export type MutationlinkGovernanceV2Args = {
-  id: Scalars['AccountID']['input'];
-  organizationId: Scalars['IntID']['input'];
+export type MutationlinkGovernorArgs = {
+  input: LinkGovernorInput;
 };
 
 
@@ -1698,6 +1604,26 @@ export type MutationregisterAsContenderAttemptArgs = {
 };
 
 
+export type MutationremoveAccountENSArgs = {
+  id: Scalars['AccountID']['input'];
+};
+
+
+export type MutationremoveAccountTwitterArgs = {
+  id: Scalars['AccountID']['input'];
+};
+
+
+export type MutationremoveOrganizationArgs = {
+  input: RemoveOrgsInput;
+};
+
+
+export type MutationremoveSuperAdminArgs = {
+  input: RemoveSuperAdminInput;
+};
+
+
 export type MutationrestorePreviousProposalDraftArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1705,6 +1631,11 @@ export type MutationrestorePreviousProposalDraftArgs = {
 
 export type MutationresumeSyncArgs = {
   id: Scalars['AccountID']['input'];
+};
+
+
+export type MutationresyncArgs = {
+  input: ResyncInput;
 };
 
 
@@ -1727,11 +1658,6 @@ export type MutationsyncNewContractArgs = {
 
 
 export type MutationunlinkGnosisSafeArgs = {
-  id: Scalars['AccountID']['input'];
-};
-
-
-export type MutationunlinkGovernanceArgs = {
   id: Scalars['AccountID']['input'];
 };
 
@@ -1830,30 +1756,7 @@ export type MutationuploadArgs = {
 
 
 export type MutationupsertDelegateProfileArgs = {
-  delegateStatement: Scalars['String']['input'];
-  delegateStatementSummary?: InputMaybe<Scalars['String']['input']>;
-  issues?: InputMaybe<Array<Scalars['ID']['input']>>;
-  organizationID: Scalars['String']['input'];
-  seekingDelegations?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-export type MutationupsertDelegateProfileV2Args = {
-  delegateStatement: Scalars['String']['input'];
-  delegateStatementSummary?: InputMaybe<Scalars['String']['input']>;
-  issues?: InputMaybe<Array<Scalars['ID']['input']>>;
-  organizationID: Scalars['IntID']['input'];
-  seekingDelegations?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-export type MutationvoteArgs = {
-  choice?: InputMaybe<Scalars['String']['input']>;
-  message: Scalars['String']['input'];
-  pollId: Scalars['ID']['input'];
-  reason?: InputMaybe<Scalars['String']['input']>;
-  signature: Scalars['String']['input'];
-  support?: InputMaybe<Scalars['String']['input']>;
+  input: UpsertDelegateProfileInput;
 };
 
 export type NativeCurrency = {
@@ -1872,13 +1775,15 @@ export type Node = Delegate | DelegationV2 | GovernorV2 | Member | Organization;
 export type NominationRound = Round & {
   __typename: 'NominationRound';
   availableVotes: Scalars['Uint256']['output'];
+  contenderRegistrationStart: Block;
   contenders: Array<Contender>;
   end: Block;
   endNomineeVotingPeriod: Block;
   id: Scalars['ProposalID']['output'];
   start: Block;
   status: RoundStatus;
-  threshold: Scalars['Uint256']['output'];
+  threshold?: Maybe<Scalars['Uint256']['output']>;
+  vettingDuration: Scalars['Uint256']['output'];
 };
 
 
@@ -1906,6 +1811,17 @@ export type Nominee = Candidate & {
 
 export type NomineevotesArgs = {
   pagination?: InputMaybe<Pagination>;
+};
+
+export type NonceOutput = {
+  __typename: 'NonceOutput';
+  /** Nonce expiration time; this is same as expirationTime in siwe message */
+  expirationTime: Scalars['Timestamp']['output'];
+  /** Nonce issued time; this is same as issuedAt in siwe message */
+  issuedAt: Scalars['Timestamp']['output'];
+  nonce: Scalars['String']['output'];
+  /** Pass this token as the 'Nonce' header in the login request. This is temporary until we figure out cookie usage */
+  nonceToken: Scalars['String']['output'];
 };
 
 export type NounsForkGovernorParameters = {
@@ -1945,14 +1861,16 @@ export enum OrgUxVersion {
 
 export type Organization = {
   __typename: 'Organization';
-  activeProposalsCount: Scalars['Int']['output'];
   /** Can only be accessed by a TallyAdmin or Organization Admin */
   adminData?: Maybe<OrganizationAdminData>;
   chainIds: Array<Scalars['ChainID']['output']>;
   creator?: Maybe<Account>;
+  delegatesCount: Scalars['Int']['output'];
+  delegatesVotesCount: Scalars['Uint256']['output'];
   features?: Maybe<Array<FeatureState>>;
   governances: Array<Governance>;
   governorIds: Array<Scalars['AccountID']['output']>;
+  hasActiveProposals: Scalars['Boolean']['output'];
   id: Scalars['IntID']['output'];
   metadata?: Maybe<OrganizationMetadata>;
   myRole?: Maybe<OrganizationRole>;
@@ -1960,12 +1878,13 @@ export type Organization = {
   proposalsCount: Scalars['Int']['output'];
   requiresPasswordToJoin: Scalars['Boolean']['output'];
   slug: Scalars['String']['output'];
+  /** @deprecated use `tokenOwnersCount` instead */
   tokenHoldersCount: Scalars['Int']['output'];
+  tokenOwnersCount: Scalars['Int']['output'];
   /** Organization type, for UX purposes only. */
   uxVersion: OrgUxVersion;
+  /** @deprecated use `delegatesCount` instead */
   votersCount: Scalars['Int']['output'];
-  /** @deprecated no longer used/supported */
-  votingParameters?: Maybe<VotingParameters>;
 };
 
 
@@ -1987,13 +1906,6 @@ export type OrganizationAdminsInput = {
   add?: InputMaybe<Array<AddAdminInput>>;
   id: Scalars['IntID']['input'];
   remove?: InputMaybe<Array<Scalars['ID']['input']>>;
-};
-
-export type OrganizationGovernorInput = {
-  id: Scalars['AccountID']['input'];
-  /** The block height at which the Governor contract was originally deployed. */
-  start: Scalars['Int']['input'];
-  type: GovernanceType;
 };
 
 export type OrganizationInput = {
@@ -2067,12 +1979,6 @@ export enum OrganizationRole {
   SUPERADMIN = 'SUPERADMIN'
 }
 
-export type OrganizationTokenInput = {
-  id: Scalars['AssetID']['input'];
-  /** The block height at which the Token contract was originally deployed. */
-  start: Scalars['Int']['input'];
-};
-
 export type OrganizationVotingParametersInput = {
   id: Scalars['IntID']['input'];
   proposalThreshold?: InputMaybe<Scalars['Uint256']['input']>;
@@ -2084,6 +1990,7 @@ export type OrganizationVotingParametersInput = {
 export type OrganizationsFiltersInput = {
   accountId?: InputMaybe<Scalars['AccountID']['input']>;
   chainId?: InputMaybe<Scalars['ChainID']['input']>;
+  mustHaveLogo?: InputMaybe<Scalars['Boolean']['input']>;
   roles?: InputMaybe<Array<OrganizationRole>>;
 };
 
@@ -2298,54 +2205,6 @@ export type ParticipationWeightStats = {
   total: Scalars['Uint256']['output'];
 };
 
-export type Poll = {
-  __typename: 'Poll';
-  author: Account;
-  createdAt: Scalars['Timestamp']['output'];
-  end: Scalars['Uint256']['output'];
-  endTs: Scalars['Timestamp']['output'];
-  id: Scalars['ID']['output'];
-  myVotingPower: Scalars['Uint256']['output'];
-  pollVoteStats?: Maybe<Array<PollVoteStat>>;
-  quorum: Scalars['Uint256']['output'];
-  snapshot: Scalars['Uint256']['output'];
-  start: Scalars['Uint256']['output'];
-  startTs: Scalars['Timestamp']['output'];
-  status: PollStatus;
-  tallyProposal: TallyProposal;
-  voteStats?: Maybe<Array<VoteStat>>;
-  votes?: Maybe<Array<PollVote>>;
-};
-
-
-export type PollvotesArgs = {
-  pagination?: InputMaybe<Pagination>;
-};
-
-export enum PollStatus {
-  ACTIVE = 'ACTIVE',
-  DRAFT = 'DRAFT',
-  ENDED = 'ENDED'
-}
-
-export type PollVote = {
-  __typename: 'PollVote';
-  createdAt: Scalars['Timestamp']['output'];
-  id: Scalars['ID']['output'];
-  reason?: Maybe<Scalars['String']['output']>;
-  support: Scalars['String']['output'];
-  voter: Account;
-  weight: Scalars['Uint256']['output'];
-};
-
-export type PollVoteStat = {
-  __typename: 'PollVoteStat';
-  percent: Scalars['Float']['output'];
-  support: Scalars['String']['output'];
-  votes: Scalars['Uint256']['output'];
-  weight: Scalars['Uint256']['output'];
-};
-
 export type PriceChecker = {
   __typename: 'PriceChecker';
   feePath: Array<Scalars['Uint256']['output']>;
@@ -2441,18 +2300,31 @@ export type ProposalActionAttempt = {
   txID: Scalars['HashID']['output'];
 };
 
-export type ProposalActionSecurityCheckInput = {
-  executableCall: GovernorExecutableCallInput;
-  governorId: Scalars['AccountID']['input'];
-  value?: InputMaybe<Scalars['Uint256']['input']>;
-};
-
 /** The `ProposalActionType` type represents the attempted action on a `Proposal` as part of a `ProposalActionAttempt`. */
 export enum ProposalActionType {
   CANCEL = 'CANCEL',
   EXECUTE = 'EXECUTE',
   QUEUE = 'QUEUE'
 }
+
+export type ProposalMetadata = {
+  __typename: 'ProposalMetadata';
+  /** Proposal description onchain */
+  description: Scalars['String']['output'];
+  /** Proposal title: usually first line of description */
+  title: Scalars['String']['output'];
+  txHash?: Maybe<Scalars['String']['output']>;
+};
+
+export type ProposalParameters = {
+  __typename: 'ProposalParameters';
+  /** Last block when you can cast a vote */
+  end: BlockOrTimestamp;
+  /** Time at which a proposal can be executed */
+  eta?: Maybe<Scalars['Uint256']['output']>;
+  /** First block when you can cast a vote, also the time when quorum is established */
+  start: BlockOrTimestamp;
+};
 
 export enum ProposalParticipationType {
   notdelegate = 'notdelegate',
@@ -2503,6 +2375,18 @@ export type ProposalStats = {
   total: Scalars['Int']['output'];
 };
 
+export enum ProposalStatus {
+  active = 'active',
+  archived = 'archived',
+  canceled = 'canceled',
+  draft = 'draft',
+  executed = 'executed',
+  expired = 'expired',
+  extended = 'extended',
+  pending = 'pending',
+  queued = 'queued'
+}
+
 export enum ProposalStatusType {
   /** Voting is in progress. */
   ACTIVE = 'ACTIVE',
@@ -2521,6 +2405,41 @@ export enum ProposalStatusType {
   /** Proposal has succeeded, it can now be queued or executed. */
   SUCCEEDED = 'SUCCEEDED'
 }
+
+export type ProposalV2 = {
+  __typename: 'ProposalV2';
+  /** `Block` at proposal creation */
+  block: Block;
+  chainId: Scalars['ChainID']['output'];
+  /** `Account` that submitted this proposal onchain */
+  creator?: Maybe<Account>;
+  executable: Executable;
+  executableCalls?: Maybe<Array<ExecutableCallV2>>;
+  governor: GovernorV2;
+  id: Scalars['IntID']['output'];
+  metadata: ProposalMetadata;
+  organization: Organization;
+  originalId?: Maybe<Scalars['IntID']['output']>;
+  parameters: ProposalParameters;
+  participationType: ProposalParticipationType;
+  /** `Account` that created this proposal */
+  proposer: Account;
+  status: ProposalStatus;
+  /** List of state transitions for this proposal.  The last `StatusChange` is the current state. */
+  statusChanges?: Maybe<Array<StatusChange>>;
+  /** Delegated vote count of a given address on this proposal */
+  votesCount: Scalars['Uint256']['output'];
+};
+
+
+export type ProposalV2participationTypeArgs = {
+  address: Scalars['Address']['input'];
+};
+
+
+export type ProposalV2votesCountArgs = {
+  address: Scalars['Address']['input'];
+};
 
 export type ProposalsCreatedCountInput = {
   governorId?: InputMaybe<Scalars['AccountID']['input']>;
@@ -2551,16 +2470,19 @@ export type Query = {
   council: Council;
   councilSlugToId: Scalars['AccountID']['output'];
   councils: Array<Council>;
-  createProposalActionSecurityCheck: Array<SecurityCheck>;
   createProposalSimulation: Array<Simulation>;
+  /** Returns delegate information by an address for an organization or governor. */
   delegate?: Maybe<Delegate>;
   /** @deprecated Use `delegate.statement` instead. */
   delegateStatement?: Maybe<DelegateStatement>;
+  /** Returns a delegatee of a user, to whom this user has delegated, for a governor */
   delegatee?: Maybe<DelegationV2>;
+  /** Returns a paginated list of delegatees of a user, to whom this user has delegated, that match the provided filters. */
   delegatees: PaginatedOutput;
   /** Returns a paginated list of delegates that match the provided filters. */
   delegates: PaginatedOutput;
   delegationAttempt?: Maybe<DelegationAttempt>;
+  /** Returns a paginated list of delegators of a delegate that match the provided filters. */
   delegators: PaginatedOutput;
   election: Election;
   generateAdminToolToken: Scalars['String']['output'];
@@ -2572,15 +2494,21 @@ export type Query = {
   /** This will return a list of `GnosisSafe`s related to a DAO along with `GnosisSafe` info similar to the governances query. */
   gnosisSafes: Array<GnosisSafe>;
   gnosisSafesV2: Array<GnosisSafe>;
+  /** @deprecated Use `governor` instead. */
   governance: Governance;
+  /** @deprecated Use `governor` instead. */
   governanceBySlug: Governance;
   governanceSyncs?: Maybe<Array<GovernanceSync>>;
   governanceTypes?: Maybe<Array<GovernanceTypeData>>;
+  /** @deprecated Use `governorsV2` instead. */
   governances: Array<Governance>;
-  governancesV2: Array<Governance>;
   governor: GovernorV2;
-  /** Returns a list of governors that match the provided filters.  Note: Tally may deactivate governors from time to time.  If you wish to include those set `includeInactive` to `true`. */
+  /**
+   * Returns a list of governors that match the provided filters.  Note: Tally may deactivate governors from time to time.  If you wish to include those set `includeInactive` to `true`.
+   * @deprecated Use `governorsV2` instead.
+   */
   governors: Array<Governor>;
+  /** Returns a paginated list of governors that match the provided filters.  Note: Tally may deactivate governors from time to time.  If you wish to include those set `includeInactive` to `true`. */
   governorsV2: PaginatedOutput;
   issues?: Maybe<Array<Maybe<Issue>>>;
   me: Account;
@@ -2588,13 +2516,13 @@ export type Query = {
   metaTransactions?: Maybe<Array<MetaTransaction>>;
   nominationRound: NominationRound;
   nominee: Nominee;
+  nonce: NonceOutput;
+  /** Get organization by ID or slug. */
   organization: Organization;
   organizationMembers: PaginatedOutput;
   organizationSlugToId: Scalars['IntID']['output'];
+  /** Returns paginated list of organizations. */
   organizations: PaginatedOutput;
-  poll: Poll;
-  polls: Array<Poll>;
-  pollsV2: Array<Poll>;
   proposal: Proposal;
   proposalActionAttempt: ProposalActionAttempt;
   proposalSecurityCheck: ProposalSecurityCheck;
@@ -2602,12 +2530,14 @@ export type Query = {
   /** Returns a quote for a swap. */
   quoteSwap: SwapQuote;
   searchOrganization: Array<Organization>;
-  securityChecks: Array<SecurityCheck>;
   tallyProposal: TallyProposal;
   tallyProposalWithVersions: Array<TallyProposal>;
   tallyProposals: Array<TallyProposal>;
   tallyProposalsV2: Array<TallyProposal>;
+  /** @deprecated use `tokenBalances` instead */
   tokenBalance: TokenBalance;
+  /** Returns all token balances of an address for a governor or organization */
+  tokenBalances: Array<TokenBalance>;
   tokenSyncs?: Maybe<Array<TokenSync>>;
   /** Fetches the last vote attempt from a given user on a proposal. */
   voteAttempt?: Maybe<VoteAttempt>;
@@ -2701,11 +2631,6 @@ export type QuerycouncilSlugToIdArgs = {
 
 export type QuerycouncilsArgs = {
   tokenId: Scalars['AssetID']['input'];
-};
-
-
-export type QuerycreateProposalActionSecurityCheckArgs = {
-  input: ProposalActionSecurityCheckInput;
 };
 
 
@@ -2811,17 +2736,6 @@ export type QuerygovernancesArgs = {
 };
 
 
-export type QuerygovernancesV2Args = {
-  chainIds?: InputMaybe<Array<Scalars['ChainID']['input']>>;
-  ids?: InputMaybe<Array<Scalars['AccountID']['input']>>;
-  includeInactive?: InputMaybe<Scalars['Boolean']['input']>;
-  includeUnlinked?: InputMaybe<Scalars['Boolean']['input']>;
-  organizationIds?: InputMaybe<Array<Scalars['Int']['input']>>;
-  pagination?: InputMaybe<Pagination>;
-  sort?: InputMaybe<GovernorSort>;
-};
-
-
 export type QuerygovernorArgs = {
   input: GovernorInput;
 };
@@ -2898,25 +2812,6 @@ export type QueryorganizationsArgs = {
 };
 
 
-export type QuerypollArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QuerypollsArgs = {
-  governanceId?: InputMaybe<Scalars['AccountID']['input']>;
-  organizationId?: InputMaybe<Scalars['String']['input']>;
-  pagination?: InputMaybe<Pagination>;
-};
-
-
-export type QuerypollsV2Args = {
-  governanceId?: InputMaybe<Scalars['AccountID']['input']>;
-  organizationId?: InputMaybe<Scalars['IntID']['input']>;
-  pagination?: InputMaybe<Pagination>;
-};
-
-
 export type QueryproposalArgs = {
   governanceId: Scalars['AccountID']['input'];
   proposalId: Scalars['ID']['input'];
@@ -2960,11 +2855,6 @@ export type QuerysearchOrganizationArgs = {
 };
 
 
-export type QuerysecurityChecksArgs = {
-  proposalId: Scalars['ID']['input'];
-};
-
-
 export type QuerytallyProposalArgs = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   id: Scalars['ID']['input'];
@@ -3005,6 +2895,11 @@ export type QuerytokenBalanceArgs = {
 };
 
 
+export type QuerytokenBalancesArgs = {
+  input: TokenBalancesInput;
+};
+
+
 export type QuerytokenSyncsArgs = {
   chainIds?: InputMaybe<Array<Scalars['ChainID']['input']>>;
 };
@@ -3025,11 +2920,27 @@ export enum Recipe {
   empty = 'empty',
   erc20_transfer = 'erc20_transfer',
   erc20_transfer_arbitrum = 'erc20_transfer_arbitrum',
+  /** @deprecated use native_transfer */
   nativeAsset_transfer = 'nativeAsset_transfer',
+  native_transfer = 'native_transfer',
   orca_manage_pod = 'orca_manage_pod',
+  other = 'other',
   reward = 'reward',
   swap = 'swap'
 }
+
+export type RemoveOrgsInput = {
+  organizationIds: Array<Scalars['IntID']['input']>;
+};
+
+export type RemoveSuperAdminInput = {
+  accountId: Scalars['AccountID']['input'];
+  organizationId: Scalars['IntID']['input'];
+};
+
+export type ResyncInput = {
+  governorIds: Array<Scalars['AccountID']['input']>;
+};
 
 export type RewardsMeta = {
   __typename: 'RewardsMeta';
@@ -3083,31 +2994,17 @@ export type SearchOrganizationInput = {
   name: Scalars['String']['input'];
 };
 
-export type SecurityAnalysis = {
-  __typename: 'SecurityAnalysis';
-  dataPoints: Array<AnalysisDataPoint>;
-};
-
 export type SecurityAnalysisV2 = {
   __typename: 'SecurityAnalysisV2';
   dataPoints: Array<AnalysisDataPointV2>;
 };
 
-/** Type that describes a security check related to a proposal */
-export type SecurityCheck = {
-  __typename: 'SecurityCheck';
-  createdAt: Scalars['Timestamp']['output'];
-  /** JSON metadata of the security check */
-  metadata: SecurityCheckMetadata;
-};
-
-/** Union that describes the metadata of a security check */
-export type SecurityCheckMetadata = ContractVerification | SecurityAnalysis | TransactionSimulation;
-
 export type SetArbitrumProposalExecutedInput = {
   /** eip155:42161:blockNumber */
   blockId: Scalars['BlockID']['input'];
-  /** eip155:42161:proposalId */
+  /** unix timestamp in seconds */
+  blockTimestamp: Scalars['Int']['input'];
+  /** eip155:42161:governorId/proposalId */
   proposalId: Scalars['ProposalID']['input'];
   /** eip155:42161:transactionHash */
   transactionHash: Scalars['HashID']['input'];
@@ -3291,7 +3188,6 @@ export type TallyProposal = {
   onChainId?: Maybe<Scalars['ID']['output']>;
   organization?: Maybe<Organization>;
   originalProposalId?: Maybe<Scalars['ID']['output']>;
-  poll?: Maybe<Poll>;
   status: TallyProposalStatus;
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['Timestamp']['output']>;
@@ -3354,8 +3250,11 @@ export type Token = {
   lastIndexedBlock: Block;
   /** Onchain name */
   name: Scalars['String']['output'];
-  /** Counts of owners, voters as well as total supply and delegated voting power. */
-  stats: GovernorTokenStats;
+  /**
+   * Counts of owners, voters as well as total supply and delegated voting power.
+   * @deprecated use count fields on `governor` instead
+   */
+  stats: TokenStats;
   /** supply derived from `Transfer` events */
   supply: Scalars['Uint256']['output'];
   /** Onchain symbol */
@@ -3381,6 +3280,12 @@ export type TokenBalanceInput = {
   governorID: Scalars['AccountID']['input'];
 };
 
+export type TokenBalancesInput = {
+  address: Scalars['Address']['input'];
+  governorID?: InputMaybe<Scalars['AccountID']['input']>;
+  organizationID?: InputMaybe<Scalars['IntID']['input']>;
+};
+
 export type TokenContract = {
   __typename: 'TokenContract';
   address: Scalars['Address']['output'];
@@ -3400,6 +3305,22 @@ export type TokenDelegateStats = {
   total: Scalars['Int']['output'];
 };
 
+export type TokenStats = {
+  __typename: 'TokenStats';
+  /** @deprecated use `delegatesVotesCount` instead */
+  delegatedVotingPower: Scalars['Uint256']['output'];
+  /** @deprecated use `delegatesCount` instead */
+  delegates: Scalars['Int']['output'];
+  delegatesCount: Scalars['Int']['output'];
+  delegatesVotesCount: Scalars['Uint256']['output'];
+  /** @deprecated use `ownersCount` instead */
+  owners: Scalars['Int']['output'];
+  ownersCount: Scalars['Int']['output'];
+  supply: Scalars['Uint256']['output'];
+  /** @deprecated use `delegates` instead */
+  voters: Scalars['Int']['output'];
+};
+
 export type TokenSync = {
   __typename: 'TokenSync';
   id: Scalars['AssetID']['output'];
@@ -3416,12 +3337,6 @@ export type Transaction = {
   __typename: 'Transaction';
   block: Block;
   id: Scalars['HashID']['output'];
-};
-
-export type TransactionSimulation = {
-  __typename: 'TransactionSimulation';
-  publicURI: Scalars['String']['output'];
-  result: Scalars['String']['output'];
 };
 
 /** Source of data: Tenderly. Array of simulations used for proposal-level checks */
@@ -3464,6 +3379,18 @@ export type UpdateProposalInput = {
 export type UploadFile = {
   id: Scalars['Int']['input'];
   upload: Scalars['Upload']['input'];
+};
+
+export type UpsertDelegateProfileInput = {
+  address?: InputMaybe<Scalars['Address']['input']>;
+  dataSourceURL?: InputMaybe<Scalars['String']['input']>;
+  discourseProfileLink?: InputMaybe<Scalars['String']['input']>;
+  discourseUsername?: InputMaybe<Scalars['String']['input']>;
+  isSeekingDelegation?: InputMaybe<Scalars['Boolean']['input']>;
+  issueIds?: InputMaybe<Array<Scalars['IntID']['input']>>;
+  organizationId: Scalars['IntID']['input'];
+  statement: Scalars['String']['input'];
+  statementSummary?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Votes cast in a Governor proposal */

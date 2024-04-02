@@ -18,6 +18,8 @@ function useStakeCardRewards(account: Address) {
     args: [account]
   })
 
+  console.log(rewards)
+
   const queryClient = useQueryClient()
   const { writeContract } = useWriteContract({
     mutation: {

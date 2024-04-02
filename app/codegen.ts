@@ -8,7 +8,7 @@ if (tallyApiKey === undefined) {
 const config: CodegenConfig = {
   generates: {
     "src/lib/generated/subgraph/": {
-      schema: "http://localhost:8000/subgraphs/name/uniswap/staking",
+      schema: "https://api.thegraph.com/subgraphs/name/enzymefinance/uni-staking-sepolia",
       documents: "src/lib/subgraph/**/*.ts",
       preset: "client",
       plugins: [

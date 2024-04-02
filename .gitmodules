@@ -1,6 +1,0 @@
-[submodule "contracts/lib/scopelift"]
-	path = contracts/lib/scopelift
-	url = git@github.com:uniswapfoundation/scopelift.git
-[submodule "contracts/lib/forge-std"]
-	path = contracts/lib/forge-std
-	url = https://github.com/foundry-rs/forge-std

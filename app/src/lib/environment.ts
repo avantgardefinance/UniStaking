@@ -1,4 +1,4 @@
-import { optimismSepolia } from "wagmi/chains"
+import { sepolia } from "wagmi/chains"
 
 export const isServer = typeof window === "undefined"
 export const isBrowser = !isServer
@@ -16,7 +16,7 @@ export const rpcUrl = (() => {
     throw new Error("Missing `ALCHEMY_API_KEY` environment variable")
   }
 
-  return `https://opt-sepolia.g.alchemy.com/v2/${alchemyKey}`
+  return `https://eth-sepolia.g.alchemy.com/v2/${alchemyKey}`
 })()
 
-export const chain = optimismSepolia
+export const chain = sepolia

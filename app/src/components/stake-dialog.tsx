@@ -18,14 +18,13 @@ import { invalidateQueries } from "@/lib/machines/actions"
 import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
 import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
-import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
+import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { QueryClient, useQueryClient } from "@tanstack/react-query"
+import { type QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Info } from "lucide-react"
-import React from "react"
-import { UseFormReturn, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature, parseUnits } from "viem"
 import { writeContract } from "wagmi/actions"
@@ -301,7 +300,7 @@ const useStakeDialog = ({
 
   const { setValue } = form
 
-  const onSubmit = async (values: {
+  const onSubmit = (values: {
     beneficiary: Address
     customDelegatee?: Address
     tallyDelegatee?: Address
@@ -375,7 +374,7 @@ export function StakeDialogContent({
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-4">
             <FormField
-              control={(form as UseFormReturn<any>).control}
+              control={form.control}
               name="amount"
               disabled={isFormDisabled}
               render={({ field }) => (
@@ -405,7 +404,7 @@ export function StakeDialogContent({
               )}
             />
             <FormField
-              control={(form as UseFormReturn<any>).control}
+              control={form.control}
               name="beneficiary"
               disabled={isFormDisabled}
               render={({ field }) => (

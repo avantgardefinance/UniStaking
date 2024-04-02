@@ -1,7 +1,7 @@
 import { AvailableUniForStaking } from "@/components/stake-card-available-uni"
 import { StakeCardRewards } from "@/components/stake-card-rewards"
 import { StakeCardTotalStaked } from "@/components/stake-card-total-staked"
-import { Address } from "viem"
+import type { Address } from "viem"
 
 export function StakeCards(props: {
   currentlyStaked?: bigint

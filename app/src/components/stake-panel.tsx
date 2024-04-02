@@ -7,7 +7,7 @@ import { governanceToken } from "@/lib/consts"
 import { withAccount } from "@/lib/hocs/with-account"
 import { Schema } from "@effect/schema"
 import { useQuery } from "@tanstack/react-query"
-import { Address } from "viem"
+import type { Address } from "viem"
 import { useBalance } from "wagmi"
 
 const decode = Schema.decodeSync(AccountDepositsSchema)

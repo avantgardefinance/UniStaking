@@ -1,6 +1,6 @@
 // Inspired by react-hot-toast library
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast"
-import { ReactNode, useEffect, useState } from "react"
+import { type ReactNode, useEffect, useState } from "react"
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
@@ -47,7 +47,7 @@ type Action =
     }
 
 interface State {
-  toasts: Array<ToasterToast>
+  toasts: ToasterToast[]
 }
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
@@ -108,7 +108,7 @@ export const reducer = (state: State, action: Action): State => {
         )
       }
     }
-    case "REMOVE_TOAST":
+    case "REMOVE_TOAST": {
       if (action.toastId === undefined) {
         return {
           ...state,
@@ -119,6 +119,7 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId)
       }
+    }
   }
 }
 
@@ -153,7 +154,9 @@ function toast({ ...props }: Toast) {
       id,
       open: true,
       onOpenChange: (open) => {
-        if (!open) dismiss()
+        if (!open) {
+          dismiss()
+        }
       }
     }
   })

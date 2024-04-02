@@ -1,10 +1,10 @@
 import { ConnectButton } from "@/components/connect-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import * as React from "react"
-import { Address } from "viem"
+import type { Address } from "viem"
 import { useAccount } from "wagmi"
 
-export function withAccount<Props extends object>(WrappedComponent: React.ComponentType<Props & { account: Address }>) {
+export function withAccount<Props extends object>(component: React.ComponentType<Props & { account: Address }>) {
   return (props: Props) => {
     const account = useAccount()
 
@@ -21,6 +21,6 @@ export function withAccount<Props extends object>(WrappedComponent: React.Compon
       )
     }
 
-    return <WrappedComponent {...props} account={account.address} />
+    return React.createElement(component, { ...props, account: account.address })
   }
 }

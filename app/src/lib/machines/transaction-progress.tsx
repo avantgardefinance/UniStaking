@@ -1,6 +1,6 @@
 import { never } from "@/lib/assertion"
 import { PartyPopper, RotateCw } from "lucide-react"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 
 export function getTransactionProgress({
   machineState,

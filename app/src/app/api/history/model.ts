@@ -1,9 +1,9 @@
 import { Schema } from "@effect/schema"
-import { Address } from "viem"
+import type { Address } from "viem"
 
 const AddressSchema: Schema.Schema<Address> = Schema.string.pipe(Schema.pattern(/^0x[0-9a-fA-F]{40}$/) as any)
 
-export type StakeDeposited = Schema.Schema.To<typeof StakeDepositSchema>
+export type StakeDeposited = Schema.Schema.Type<typeof StakeDepositSchema>
 export const StakeDepositSchema = Schema.struct({
   type: Schema.literal("StakeDeposited"),
   amount: Schema.bigint,
@@ -13,7 +13,7 @@ export const StakeDepositSchema = Schema.struct({
   id: Schema.string
 })
 
-export type StakeWithdrawn = Schema.Schema.To<typeof StakeWithdrawnSchema>
+export type StakeWithdrawn = Schema.Schema.Type<typeof StakeWithdrawnSchema>
 export const StakeWithdrawnSchema = Schema.struct({
   type: Schema.literal("StakeWithdrawn"),
   amount: Schema.bigint,
@@ -23,7 +23,7 @@ export const StakeWithdrawnSchema = Schema.struct({
   id: Schema.string
 })
 
-export type BeneficiaryAltered = Schema.Schema.To<typeof BeneficiaryAlteredSchema>
+export type BeneficiaryAltered = Schema.Schema.Type<typeof BeneficiaryAlteredSchema>
 export const BeneficiaryAlteredSchema = Schema.struct({
   type: Schema.literal("BeneficiaryAltered"),
   oldBeneficiary: AddressSchema,
@@ -34,7 +34,7 @@ export const BeneficiaryAlteredSchema = Schema.struct({
   id: Schema.string
 })
 
-export type DelegateeAltered = Schema.Schema.To<typeof DelegateeAlteredSchema>
+export type DelegateeAltered = Schema.Schema.Type<typeof DelegateeAlteredSchema>
 export const DelegateeAlteredSchema = Schema.struct({
   type: Schema.literal("DelegateeAltered"),
   oldDelegatee: AddressSchema,
@@ -45,7 +45,7 @@ export const DelegateeAlteredSchema = Schema.struct({
   id: Schema.string
 })
 
-export type RewardClaimed = Schema.Schema.To<typeof RewardClaimedSchema>
+export type RewardClaimed = Schema.Schema.Type<typeof RewardClaimedSchema>
 export const RewardClaimedSchema = Schema.struct({
   type: Schema.literal("RewardClaimed"),
   beneficiary: AddressSchema,
@@ -54,7 +54,7 @@ export const RewardClaimedSchema = Schema.struct({
   id: Schema.string
 })
 
-export type HistoryEntry = Schema.Schema.To<typeof HistoryEntrySchema>
+export type HistoryEntry = Schema.Schema.Type<typeof HistoryEntrySchema>
 export const HistoryEntrySchema = Schema.union(
   StakeDepositSchema,
   StakeWithdrawnSchema,
@@ -63,5 +63,5 @@ export const HistoryEntrySchema = Schema.union(
   RewardClaimedSchema
 )
 
-export type History = Schema.Schema.To<typeof HistorySchema>
+export type History = Schema.Schema.Type<typeof HistorySchema>
 export const HistorySchema = Schema.array(HistoryEntrySchema)

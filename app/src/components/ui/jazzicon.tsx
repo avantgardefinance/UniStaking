@@ -1,9 +1,9 @@
 import metemaskJazzicon from "@metamask/jazzicon"
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import type { Address } from "viem"
 
 export function Jazzicon({ address, size }: { address: Address; size: number }) {
-  const jazziconData = useMemo(() => metemaskJazzicon(size, parseInt(address.slice(2, 10), 16)), [address, size])
+  const jazziconData = useMemo(() => metemaskJazzicon(size, Number.parseInt(address.slice(2, 10), 16)), [address, size])
 
   return (
     <div

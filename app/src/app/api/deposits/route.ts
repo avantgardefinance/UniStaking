@@ -2,13 +2,11 @@ import { AccountDepositsSchema } from "@/app/api/deposits/model"
 import { DepositsQuery } from "@/lib/subgraph/deposits"
 import { Schema } from "@effect/schema"
 import { GraphQLClient } from "graphql-request"
-import { NextRequest } from "next/server"
+import type { NextRequest } from "next/server"
 import { isAddress } from "viem"
 
 const encode = Schema.encodeSync(AccountDepositsSchema)
-
-// TODO: Use the "production" subgraph url here when not in development mode.
-const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/staking", {
+const client = new GraphQLClient("https://api.thegraph.com/subgraphs/name/enzymefinance/uni-staking-sepolia", {
   fetch
 })
 

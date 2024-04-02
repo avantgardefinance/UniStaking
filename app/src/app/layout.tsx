@@ -10,7 +10,7 @@ import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 
 export const metadata: Metadata = {
   title: {
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning={true}>
       <head>
         <meta name="theme-color" media="(prefers-color-scheme: light)" color="white" />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" color="black" />

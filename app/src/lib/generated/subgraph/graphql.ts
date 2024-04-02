@@ -23,6 +23,11 @@ export type Scalars = {
    *
    */
   Int8: { input: any; output: any; }
+  /**
+   * A string representation of microseconds UNIX timestamp (16 digits)
+   *
+   */
+  Timestamp: { input: any; output: any; }
 };
 
 export type Account = {
@@ -229,6 +234,11 @@ export enum AdminSet_orderBy {
   newAdmin = 'newAdmin',
   oldAdmin = 'oldAdmin',
   transactionHash = 'transactionHash'
+}
+
+export enum Aggregation_interval {
+  day = 'day',
+  hour = 'hour'
 }
 
 export type BeneficiaryAltered = DepositEvent & Event & {
@@ -2300,6 +2310,8 @@ export type _Block_ = {
   hash?: Maybe<Scalars['Bytes']['output']>;
   /** The block number */
   number: Scalars['Int']['output'];
+  /** The hash of the parent block */
+  parentHash?: Maybe<Scalars['Bytes']['output']>;
   /** Integer representation of the timestamp stored in blocks for the chain */
   timestamp?: Maybe<Scalars['Int']['output']>;
 };

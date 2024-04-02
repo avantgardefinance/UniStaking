@@ -10,12 +10,12 @@
     "typecheck": "pnpm --filter app run typecheck"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.5.3",
-    "typescript": "^5"
+    "@biomejs/biome": "^1.6.3",
+    "typescript": "^5.4.3"
   },
   "pnpm": {
     "patchedDependencies": {
-      "@graphprotocol/graph-cli@0.68.3": "patches/@graphprotocol__graph-cli@0.68.3.patch"
+      "@graphprotocol/graph-cli@0.69.1": "patches/@graphprotocol__graph-cli@0.69.1.patch"
     }
   }
 }

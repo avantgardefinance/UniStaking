@@ -17,17 +17,17 @@ import { invalidateQueries } from "@/lib/machines/actions"
 import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
 import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
-import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
+import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { QueryClient, useQueryClient } from "@tanstack/react-query"
+import { type QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
-import { UseFormReturn, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits, hexToSignature } from "viem"
 import { writeContract } from "wagmi/actions"
 import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
-import { z } from "zod"
+import type { z } from "zod"
 
 const permitAndStakeMoreMachine = setup({
   actors: {
@@ -233,10 +233,7 @@ const useStakeMoreDialog = ({
   })
 
   const { setValue } = form
-
-  const onSubmit = async (values: {
-    amount: bigint
-  }) => {
+  const onSubmit = (values: { amount: bigint }) => {
     if (machineState === "signed") {
       send({ type: "resend" })
       return
@@ -297,7 +294,7 @@ export function StakeMoreDialogContent({
           <div className="space-y-4">
             <FormField
               disabled={isFormDisabled}
-              control={(form as UseFormReturn<any>).control}
+              control={form.control}
               name="amount"
               render={({ field }) => (
                 <FormItem>

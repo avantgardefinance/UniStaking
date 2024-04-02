@@ -1,6 +1,6 @@
 "use client"
 
-import { TallyDelegatee } from "@/app/api/delegatees/model"
+import type { TallyDelegatee } from "@/app/api/delegatees/model"
 import { DelegateeField } from "@/components/form/delegatee-field"
 import { config } from "@/components/providers/wagmi-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -16,10 +16,10 @@ import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
 import { invalidateQueries } from "@/lib/machines/actions"
 import { getTransactionProgress } from "@/lib/machines/transaction-progress"
-import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
+import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { QueryClient, useQueryClient } from "@tanstack/react-query"
+import { type QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Info } from "lucide-react"
 import { FormProvider, useForm } from "react-hook-form"
@@ -287,7 +287,7 @@ const useEditBeneficiaryDelegateeForm = ({
   beneficiary: Address
   delegatee: Address
   stakeId: string
-  tallyDelegatees: ReadonlyArray<TallyDelegatee>
+  tallyDelegatees: readonly TallyDelegatee[]
   tallyDelegateesError: Error | null
 }) => {
   const client = useQueryClient()
@@ -364,7 +364,7 @@ function EditBeneficiaryDelegateeForm({
   beneficiary: Address
   delegatee: Address
   stakeId: string
-  tallyDelegatees: ReadonlyArray<TallyDelegatee>
+  tallyDelegatees: readonly TallyDelegatee[]
   tallyDelegateesError: Error | null
 }) {
   const { error, form, isFormDisabled, onSubmit, progress, isSubmitButtonEnabled } = useEditBeneficiaryDelegateeForm({

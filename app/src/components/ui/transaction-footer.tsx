@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { DialogFooter } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 
 export function TransactionFooter({
   progress,

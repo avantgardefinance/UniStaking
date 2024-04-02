@@ -1,6 +1,6 @@
 import { config } from "@/components/providers/wagmi-provider"
 import { never } from "@/lib/assertion"
-import { Hex, ReplacementReason } from "viem"
+import type { Hex, ReplacementReason } from "viem"
 import { waitForTransactionReceipt } from "wagmi/actions"
 import { fromPromise } from "xstate"
 

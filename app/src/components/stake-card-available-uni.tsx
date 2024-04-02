@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
 import { useState } from "react"
-import { Address } from "viem"
+import type { Address } from "viem"
 
 interface Props {
   availableForStakingUni?: bigint
@@ -51,7 +51,7 @@ function AvailableUniForStakingContent({ availableForStakingUni, isLoading, erro
         <span className="text-xl">UNI</span>
       </h3>
       <Dialog onOpenChange={setOpened}>
-        <DialogTrigger asChild>
+        <DialogTrigger asChild={true}>
           <Button size="lg" className="space-x-2 flex-grow">
             <Plus size={16} />
             <span>Create position</span>

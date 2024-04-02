@@ -1,12 +1,12 @@
 "use client"
 
-import { Deposits } from "@/app/api/deposits/model"
+import type { Deposits } from "@/app/api/deposits/model"
 import { StakeDepositCard } from "@/components/stake-deposit-card"
 import { Alert } from "@/components/ui/alert"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ReactNode } from "react"
-import { Address } from "viem"
+import type { ReactNode } from "react"
+import type { Address } from "viem"
 
 interface Props {
   deposits: Deposits

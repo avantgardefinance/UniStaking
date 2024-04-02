@@ -1,6 +1,6 @@
 "use client"
 
-import { History, HistorySchema } from "@/app/api/history/model"
+import { type History, HistorySchema } from "@/app/api/history/model"
 import { HistoryCard } from "@/components/history-card"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Schema } from "@effect/schema"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
-import { Address } from "viem"
+import type { Address } from "viem"
 
 const decode = Schema.decodeSync(HistorySchema)
 

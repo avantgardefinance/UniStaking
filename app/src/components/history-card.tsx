@@ -1,11 +1,11 @@
-import { HistoryEntry } from "@/app/api/history/model"
+import type { HistoryEntry } from "@/app/api/history/model"
 import { AddressDisplay } from "@/components/ui/address-display"
 import { Badge } from "@/components/ui/badge"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { Card, CardContent } from "@/components/ui/card"
 import { never } from "@/lib/assertion"
 import { formatDate } from "@/lib/date"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import type { Address } from "viem"
 
 export function HistoryCard(item: HistoryEntry) {

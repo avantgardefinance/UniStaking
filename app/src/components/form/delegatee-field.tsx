@@ -1,4 +1,4 @@
-import { TallyDelegatee } from "@/app/api/delegatees/model"
+import type { TallyDelegatee } from "@/app/api/delegatees/model"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
 import { buttonVariants } from "@/components/ui/button"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -27,7 +27,7 @@ export function DelegateeField({
 }: {
   name: string
   disabled?: boolean
-  tallyDelegatees: ReadonlyArray<TallyDelegatee>
+  tallyDelegatees: readonly TallyDelegatee[]
 }) {
   const { delegateeOption, form } = useDelegateeField({ name })
 

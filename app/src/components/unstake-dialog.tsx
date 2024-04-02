@@ -15,18 +15,18 @@ import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
 import { invalidateQueries } from "@/lib/machines/actions"
 import { getTransactionProgress } from "@/lib/machines/transaction-progress"
-import { TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
+import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { QueryClient, useQueryClient } from "@tanstack/react-query"
+import { type QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Upload } from "lucide-react"
-import { UseFormReturn, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
 import { formatUnits } from "viem"
 import { writeContract } from "wagmi/actions"
 import { assign, fromPromise, raise, setup } from "xstate"
-import { z } from "zod"
+import type { z } from "zod"
 
 const unstakeMachine = setup({
   actors: {
@@ -231,7 +231,7 @@ export function UnstakeDialogContent({
           <div className="space-y-4">
             <FormField
               disabled={isFormDisabled}
-              control={(form as UseFormReturn<any>).control}
+              control={form.control}
               name="amount"
               render={({ field }) => (
                 <FormItem>

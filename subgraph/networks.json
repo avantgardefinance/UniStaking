@@ -8,5 +8,15 @@
       "address": "0x6760360e27bE5718786B384236DB8A3C4202f947",
       "startBlock": 19061305
     }
+  },
+  "sepolia": {
+    "UniStaker": {
+      "address": "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5",
+      "startBlock": 5587447
+    },
+    "V3FactoryOwner": {
+      "address": "0xb5b86959aedca85b2b164180f5b78399df832cc0",
+      "startBlock": 5587447
+    }
   }
 }

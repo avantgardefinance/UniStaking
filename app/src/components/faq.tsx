@@ -6,7 +6,7 @@ export function FAQ() {
   return (
     <Card>
       <CardContent>
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible={true} className="w-full">
           <AccordionItem value="item-1">
             <AccordionTrigger>What is Uniswap staking?</AccordionTrigger>
             <AccordionContent>

@@ -7,7 +7,7 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { uniStaker } from "@/lib/consts"
 import { useQueryClient } from "@tanstack/react-query"
 import { Trophy } from "lucide-react"
-import { Address } from "viem"
+import type { Address } from "viem"
 import { useReadContract, useWriteContract } from "wagmi"
 
 function useStakeCardRewards(account: Address) {

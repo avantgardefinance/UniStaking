@@ -1,4 +1,4 @@
-import { Deposit } from "@/app/api/deposits/model"
+import type { Deposit } from "@/app/api/deposits/model"
 import { EditBeneficiaryDelegateeDialogContent } from "@/components/edit-beneficiary-delegatee-dialog"
 import { StakeMoreDialogContent } from "@/components/stake-more-dialog"
 import { AddressDisplay } from "@/components/ui/address-display"
@@ -90,7 +90,7 @@ export function StakeDepositCard({
           </div>
           {isOwner && (
             <Dialog onOpenChange={setEditBeneficiaryDelegateeOpened}>
-              <DialogTrigger asChild>
+              <DialogTrigger asChild={true}>
                 <Button variant="ghost">Edit</Button>
               </DialogTrigger>
               <EditBeneficiaryDelegateeDialogContent
@@ -106,7 +106,7 @@ export function StakeDepositCard({
           {isOwner ? (
             <>
               <Dialog onOpenChange={setUnstakeOpened}>
-                <DialogTrigger asChild>
+                <DialogTrigger asChild={true}>
                   <Button variant="ghost" className="space-x-2 w-full md:w-auto">
                     <Upload size={16} />
                     <span>Unstake</span>
@@ -121,7 +121,7 @@ export function StakeDepositCard({
                 />
               </Dialog>
               <Dialog onOpenChange={setStakeMoreOpened}>
-                <DialogTrigger asChild>
+                <DialogTrigger asChild={true}>
                   <Button
                     variant="secondary"
                     disabled={governanceTokenBalanceValue === 0n}

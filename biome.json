@@ -36,7 +36,9 @@
         "noArrayIndexKey": "off"
       },
       "style": {
-        "noParameterProperties": "off"
+        "noDefaultExport": "off",
+        "noParameterProperties": "off",
+        "useNamingConvention": "off"
       },
       "nursery": {
         "useImportRestrictions": "off"

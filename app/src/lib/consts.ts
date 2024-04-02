@@ -2,10 +2,9 @@ import type { Address } from "viem"
 
 export const walletConnectProjectId = "a400484888cee5855802de84aa377695"
 
-// TODO: Development addresses (CREATE2), see `scripts/Deploy.s.sol`.
-export const rewardsToken: Address = "0x560c21923a970C27c9456613640E1a0f85e9E958"
-export const governanceToken: Address = "0x72574eCD4adab8fc110533A5D7a3E94896b6eA0f"
-export const uniStaker: Address = "0x6012e18CE797F82ef14d4C2c056c414814e2cfb0"
+export const rewardsToken: Address = "0xDf4B5B2C08A77078c05176D8dFAb6274D54215e9"
+export const governanceToken: Address = "0x02405b44ae477699cb3d073ef07c106b6885873e"
+export const uniStaker: Address = "0xa3ad05099eab69055e4ea4f710361616e51c8c2c"
 
 // Const related to signing in permit flow
 export const timeToMakeTransaction = 10 * 60 * 60 // 10 minutes

@@ -1,15 +1,13 @@
-import { HistoryEntry, HistoryEntrySchema } from "@/app/api/history/model"
+import { type HistoryEntry, HistoryEntrySchema } from "@/app/api/history/model"
 import { never } from "@/lib/assertion"
 import { EventsQuery } from "@/lib/subgraph/events"
 import { Schema } from "@effect/schema"
 import { GraphQLClient } from "graphql-request"
-import { NextRequest } from "next/server"
+import type { NextRequest } from "next/server"
 import { isAddress } from "viem"
 
 const encode = Schema.encodeSync(Schema.array(HistoryEntrySchema))
-
-// TODO: Use the "production" subgraph url here when not in development mode.
-const client = new GraphQLClient("http://localhost:8000/subgraphs/name/uniswap/staking", {
+const client = new GraphQLClient("https://api.thegraph.com/subgraphs/name/enzymefinance/uni-staking-sepolia", {
   fetch
 })
 
@@ -26,12 +24,12 @@ export async function GET(request: NextRequest) {
     }
   })
 
-  const history: Array<HistoryEntry> = []
+  const history: HistoryEntry[] = []
   for (const event of events) {
     const type = event.__typename
 
     switch (type) {
-      case "StakeDeposited":
+      case "StakeDeposited": {
         history.push({
           stakeId: event.deposit.id,
           amount: BigInt(event.amount),
@@ -41,8 +39,9 @@ export async function GET(request: NextRequest) {
           type
         })
         break
+      }
 
-      case "StakeWithdrawn":
+      case "StakeWithdrawn": {
         history.push({
           stakeId: event.deposit.id,
           amount: BigInt(event.amount),
@@ -52,8 +51,9 @@ export async function GET(request: NextRequest) {
           type
         })
         break
+      }
 
-      case "BeneficiaryAltered":
+      case "BeneficiaryAltered": {
         history.push({
           stakeId: event.deposit.id,
           owner: event.deposit.owner.id,
@@ -64,8 +64,9 @@ export async function GET(request: NextRequest) {
           type
         })
         break
+      }
 
-      case "DelegateeAltered":
+      case "DelegateeAltered": {
         history.push({
           stakeId: event.deposit.id,
           owner: event.deposit.owner.id,
@@ -76,8 +77,9 @@ export async function GET(request: NextRequest) {
           type
         })
         break
+      }
 
-      case "RewardClaimed":
+      case "RewardClaimed": {
         history.push({
           date: new Date(Number(event.blockTimestamp) * 1000),
           beneficiary: event.beneficiary,
@@ -86,6 +88,7 @@ export async function GET(request: NextRequest) {
           type
         })
         break
+      }
 
       case "RewardNotified":
       case "SurrogateDeployed":

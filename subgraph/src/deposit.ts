@@ -1,5 +1,5 @@
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts"
+import { Address, BigInt, type ethereum, log } from "@graphprotocol/graph-ts"
 import { UniStaker } from "../generated/UniStaker/UniStaker"
 import { Deposit } from "../generated/schema"
 

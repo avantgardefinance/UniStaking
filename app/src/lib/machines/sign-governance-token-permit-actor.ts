@@ -1,7 +1,7 @@
 import { config } from "@/components/providers/wagmi-provider"
 import { uniAbi } from "@/lib/abi/uni"
 import { governanceToken, permitEIP712Options, timeToMakeTransaction, uniStaker } from "@/lib/consts"
-import { Address } from "viem"
+import type { Address } from "viem"
 import { readContract, signTypedData } from "wagmi/actions"
 import { fromPromise } from "xstate"
 

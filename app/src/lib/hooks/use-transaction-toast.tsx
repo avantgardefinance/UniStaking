@@ -31,17 +31,20 @@ export function useTransactionToast({
       )
 
     switch (status) {
-      case "success":
+      case "success": {
         toast({ title: "Success", action })
         break
-      case "pending":
+      }
+      case "pending": {
         toast({ title: "Pending ...", action })
         break
+      }
       case "idle":
         break
-      case "error":
+      case "error": {
         toast({ title: "Failed", action, variant: "destructive" })
         break
+      }
       default:
         never(status, "Unhandled state")
     }

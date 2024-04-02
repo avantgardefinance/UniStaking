@@ -3,7 +3,7 @@
 import { HistoryList } from "@/components/history-list"
 import { withAccount } from "@/lib/hocs/with-account"
 import { History } from "lucide-react"
-import { Address } from "viem"
+import type { Address } from "viem"
 
 function HistoryPage({ account }: { account: Address }) {
   return (

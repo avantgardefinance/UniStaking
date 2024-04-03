@@ -25,8 +25,7 @@ export const config = createConfig(
 export function WagmiProvider({ children }: { children: ReactNode }) {
   return (
     <WagmiProviderBase config={config}>
-      {/* TODO: Remove this configuration once https://github.com/family/connectkit/issues/340 is resolved. */}
-      <ConnectKitProvider options={{ enforceSupportedChains: false }}>{children}</ConnectKitProvider>
+      <ConnectKitProvider>{children}</ConnectKitProvider>
     </WagmiProviderBase>
   )
 }

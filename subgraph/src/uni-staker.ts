@@ -1,6 +1,8 @@
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-import { Address, BigInt, type Bytes, type ethereum } from "@graphprotocol/graph-ts"
-import type {
+// biome-ignore lint/style/useImportType: <explanation>
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
+// biome-ignore lint/style/useImportType: <explanation>
+import {
   BeneficiaryAltered as BeneficiaryAlteredEvent,
   DelegateeAltered as DelegateeAlteredEvent,
   RewardClaimed as RewardClaimedEvent,

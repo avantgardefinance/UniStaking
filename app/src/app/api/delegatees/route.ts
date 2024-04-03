@@ -16,7 +16,7 @@ function query(limit: number, after?: string) {
   return client.request(DelegatesQuery, {
     input: {
       filters: {
-        governanceId: "eip155:1:0x408ED6354d4973f66138C91495F2f2FCbd8724C3"
+        governorId: "eip155:1:0x408ED6354d4973f66138C91495F2f2FCbd8724C3"
       },
       sort: {
         isDescending: true,

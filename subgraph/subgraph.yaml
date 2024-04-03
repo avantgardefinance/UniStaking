@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: UniStaker
-    network: sepolia
+    network: optimism-sepolia
     source:
-      address: "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5"
+      address: "0xa3ad05099eab69055e4ea4f710361616e51c8c2c"
       abi: UniStaker
-      startBlock: 5587447
+      startBlock: 9971154c
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -45,11 +45,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: V3FactoryOwner
-    network: sepolia
+    network: optimism-sepolia
     source:
-      address: "0xb5b86959aedca85b2b164180f5b78399df832cc0"
+      address: "0xe8588c65c40e19bce681b4f1071b70fdb345df48"
       abi: V3FactoryOwner
-      startBlock: 5587447
+      startBlock: 9971154
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

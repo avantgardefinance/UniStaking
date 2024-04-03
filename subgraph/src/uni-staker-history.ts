@@ -1,5 +1,6 @@
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-import { BigInt, type ethereum } from "@graphprotocol/graph-ts"
+// biome-ignore lint/style/useImportType: <explanation>
+import { BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { UniStakerHistory } from "../generated/schema"
 
 const currentUniStakerHistoryId: string = "current"

@@ -23,13 +23,11 @@ export function createTransactionMachine({ client, txHash }: { client: QueryClie
               reject()
             }
           }).then(async ({ blockNumber: transactionBlockNumber }) => {
-            let subgraphSynced = false
-            while (!subgraphSynced) {
+            while (true) {
               const response = await fetch("/api/subgraph-block-number")
               if (response.ok) {
                 const subgraphBlockNumber = decode(await response.json())
                 if (transactionBlockNumber <= subgraphBlockNumber) {
-                  subgraphSynced = true
                   client.invalidateQueries()
                   return resolve()
                 }

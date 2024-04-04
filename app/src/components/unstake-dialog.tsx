@@ -1,5 +1,6 @@
 "use client"
 
+import { useTransactionsManager } from "@/components/providers/transactions-manager-provider"
 import { config } from "@/components/providers/wagmi-provider"
 import { AddressDisplay } from "@/components/ui/address-display"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -13,12 +14,10 @@ import { TransactionFooter } from "@/components/ui/transaction-footer"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
-import { invalidateQueries } from "@/lib/machines/actions"
 import { getTransactionProgress } from "@/lib/machines/transaction-progress"
 import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { type QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Upload } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -51,18 +50,16 @@ const unstakeMachine = setup({
     ),
     waitForTransactionReceipt: waitForTransactionReceiptActor
   },
-  actions: {
-    invalidateQueries
-  },
+
   types: {
     context: {} as Partial<{
       amount: bigint
       error: string
       txHash: Hex
       stakeId: bigint
-      client: QueryClient
+      monitorTransaction: (txHash: Hex) => void
     }>,
-    events: {} as { type: "send"; stakeId: bigint; amount: bigint; client: QueryClient } | TxEvent
+    events: {} as { type: "send"; stakeId: bigint; amount: bigint; monitorTransaction: (txHash: Hex) => void } | TxEvent
   }
 }).createMachine({
   id: "unstake",
@@ -114,8 +111,10 @@ const unstakeMachine = setup({
       invoke: {
         id: "waitForTransactionReceipt",
         src: "waitForTransactionReceipt",
-        input: ({ context: { txHash } }) => {
+        input: ({ context: { txHash, monitorTransaction } }) => {
+          invariant(monitorTransaction !== undefined, "Monitor transaction is not undefined")
           invariant(txHash !== undefined, "Invalid input")
+          monitorTransaction(txHash)
           return txHash
         },
         onDone: {
@@ -133,22 +132,12 @@ const unstakeMachine = setup({
         }
       }
     },
-    confirmed: {
-      entry: [
-        {
-          type: "invalidateQueries",
-          params: ({ context }) => {
-            invariant(context.client !== undefined, "Client is not undefined")
-            return context.client
-          }
-        }
-      ]
-    }
+    confirmed: {}
   }
 })
 
 const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string; availableForUnstaking: bigint }) => {
-  const client = useQueryClient()
+  const { monitorTransaction } = useTransactionsManager()
   const [snapshot, send] = useMachine(unstakeMachine)
 
   const {
@@ -184,7 +173,7 @@ const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string;
       type: "send",
       amount: values.amount,
       stakeId: BigInt(stakeId),
-      client
+      monitorTransaction
     })
   }
 

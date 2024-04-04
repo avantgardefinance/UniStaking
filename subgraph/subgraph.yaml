@@ -10,7 +10,7 @@ dataSources:
     source:
       address: "0xa3ad05099eab69055e4ea4f710361616e51c8c2c"
       abi: UniStaker
-      startBlock: 9971154c
+      startBlock: 9971154
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

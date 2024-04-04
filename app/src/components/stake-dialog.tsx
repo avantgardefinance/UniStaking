@@ -1,6 +1,7 @@
 "use client"
 
 import { DelegateeField } from "@/components/form/delegatee-field"
+import { useTransactionsManager } from "@/components/providers/transactions-manager-provider"
 import { config } from "@/components/providers/wagmi-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { BigIntDisplay } from "@/components/ui/big-int-display"
@@ -14,14 +15,12 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
-import { invalidateQueries } from "@/lib/machines/actions"
 import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
 import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
 import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { type QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Info } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -59,9 +58,6 @@ const permitAndStakeMachine = setup({
     ),
     waitForTransactionReceipt: waitForTransactionReceiptActor
   },
-  actions: {
-    invalidateQueries
-  },
   guards: {
     hasSignatureNotExpired: ({ context }) => {
       invariant(context.deadline !== undefined, "Deadline is not undefined")
@@ -77,10 +73,17 @@ const permitAndStakeMachine = setup({
       delegatee: Address
       beneficiary: Address
       txHash: Hex
-      client: QueryClient
+      monitorTransaction: (txHash: Hex) => void
     }>,
     events: {} as
-      | { type: "sign"; amount: bigint; signer: Address; delegatee: Address; beneficiary: Address; client: QueryClient }
+      | {
+          type: "sign"
+          amount: bigint
+          signer: Address
+          delegatee: Address
+          beneficiary: Address
+          monitorTransaction: (txHash: Hex) => void
+        }
       | { type: "resend" }
       | TxEvent
   }
@@ -179,8 +182,10 @@ const permitAndStakeMachine = setup({
       invoke: {
         id: "waitForTransactionReceipt",
         src: "waitForTransactionReceipt",
-        input: ({ context: { txHash } }) => {
+        input: ({ context: { txHash, monitorTransaction } }) => {
+          invariant(monitorTransaction !== undefined, "Monitor transaction is not undefined")
           invariant(txHash !== undefined, "Invalid input")
+          monitorTransaction(txHash)
           return txHash
         },
         onDone: {
@@ -198,17 +203,7 @@ const permitAndStakeMachine = setup({
         }
       }
     },
-    confirmed: {
-      entry: [
-        {
-          type: "invalidateQueries",
-          params: ({ context }) => {
-            invariant(context.client !== undefined, "Client is not undefined")
-            return context.client
-          }
-        }
-      ]
-    }
+    confirmed: {}
   }
 })
 
@@ -269,7 +264,7 @@ const useStakeDialog = ({
   availableForStakingUni: bigint
   account: Address
 }) => {
-  const client = useQueryClient()
+  const { monitorTransaction } = useTransactionsManager()
   const [snapshot, send] = useMachine(permitAndStakeMachine)
 
   const {
@@ -321,7 +316,7 @@ const useStakeDialog = ({
       signer: account,
       delegatee,
       beneficiary: values.beneficiary,
-      client
+      monitorTransaction
     })
   }
 

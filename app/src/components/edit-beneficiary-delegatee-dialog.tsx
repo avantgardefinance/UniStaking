@@ -2,6 +2,7 @@
 
 import type { TallyDelegatee } from "@/app/api/delegatees/model"
 import { DelegateeField } from "@/components/form/delegatee-field"
+import { useTransactionsManager } from "@/components/providers/transactions-manager-provider"
 import { config } from "@/components/providers/wagmi-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -14,12 +15,10 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
-import { invalidateQueries } from "@/lib/machines/actions"
 import { getTransactionProgress } from "@/lib/machines/transaction-progress"
 import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { address } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { type QueryClient, useQueryClient } from "@tanstack/react-query"
 import { useMachine } from "@xstate/react"
 import { Info } from "lucide-react"
 import { FormProvider, useForm } from "react-hook-form"
@@ -82,9 +81,6 @@ const editBeneficiaryDelegateeMachine = setup({
     ),
     waitForTransactionReceipt: waitForTransactionReceiptActor
   },
-  actions: {
-    invalidateQueries
-  },
   types: {
     context: {} as Partial<{
       delegatee: Address
@@ -95,7 +91,7 @@ const editBeneficiaryDelegateeMachine = setup({
       error: string
       txHash: Hex
       stakeId: bigint
-      client: QueryClient
+      monitorTransaction: (txHash: Hex) => void
     }>,
     events: {} as
       | {
@@ -105,7 +101,7 @@ const editBeneficiaryDelegateeMachine = setup({
           beneficiary: Address
           currentBeneficiary: Address
           currentDelegatee: Address
-          client: QueryClient
+          monitorTransaction: (txHash: Hex) => void
         }
       | TxEvent
   }
@@ -166,8 +162,10 @@ const editBeneficiaryDelegateeMachine = setup({
       invoke: {
         id: "waitForTransactionReceipt",
         src: "waitForTransactionReceipt",
-        input: ({ context: { txHash } }) => {
+        input: ({ context: { txHash, monitorTransaction } }) => {
+          invariant(monitorTransaction !== undefined, "Monitor transaction is not undefined")
           invariant(txHash !== undefined, "Invalid input")
+          monitorTransaction(txHash)
           return txHash
         },
         onDone: {
@@ -185,17 +183,7 @@ const editBeneficiaryDelegateeMachine = setup({
         }
       }
     },
-    confirmed: {
-      entry: [
-        {
-          type: "invalidateQueries",
-          params: ({ context }) => {
-            invariant(context.client !== undefined, "Client is not undefined")
-            return context.client
-          }
-        }
-      ]
-    }
+    confirmed: {}
   }
 })
 
@@ -290,7 +278,7 @@ const useEditBeneficiaryDelegateeForm = ({
   tallyDelegatees: readonly TallyDelegatee[]
   tallyDelegateesError: Error | null
 }) => {
-  const client = useQueryClient()
+  const { monitorTransaction } = useTransactionsManager()
   const [snapshot, send] = useMachine(editBeneficiaryDelegateeMachine)
 
   const {
@@ -337,7 +325,7 @@ const useEditBeneficiaryDelegateeForm = ({
       delegatee,
       currentBeneficiary: values.currentBeneficiary,
       currentDelegatee: values.currentDelegatee,
-      client
+      monitorTransaction
     })
   }
 

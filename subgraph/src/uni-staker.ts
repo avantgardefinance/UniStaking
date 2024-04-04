@@ -46,10 +46,12 @@ export function handleBeneficiaryAltered(event: BeneficiaryAlteredEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  let affected = new Array<Bytes>(0)
   // Only tracking actual changes (beneficiary is initially set to address zero)
   if (event.params.oldBeneficiary.notEqual(Address.zero())) {
-    entity.affected = arrayUnique([deposit.owner, event.params.newBeneficiary, event.params.oldBeneficiary])
+    affected = arrayUnique([deposit.owner, event.params.newBeneficiary, event.params.oldBeneficiary])
   }
+  entity.affected = affected
   entity.save()
 }
 
@@ -69,10 +71,12 @@ export function handleDelegateeAltered(event: DelegateeAlteredEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  let affected = new Array<Bytes>(0)
   // Only tracking actual changes (beneficiary is initially set to address zero)
   if (event.params.oldDelegatee.notEqual(Address.zero())) {
-    entity.affected = arrayUnique([deposit.owner, deposit.delegatee, event.params.oldDelegatee])
+    affected = arrayUnique([deposit.owner, deposit.delegatee, event.params.oldDelegatee])
   }
+  entity.affected = affected
   entity.save()
 }
 

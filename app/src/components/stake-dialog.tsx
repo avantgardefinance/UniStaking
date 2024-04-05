@@ -1,5 +1,3 @@
-"use client"
-
 import { DelegateeField } from "@/components/form/delegatee-field"
 import { useTransactionsManager } from "@/components/providers/transactions-manager-provider"
 import { config } from "@/components/providers/wagmi-provider"
@@ -15,6 +13,7 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { closeDialog } from "@/lib/machines/close-dialog-action"
 import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
 import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
@@ -58,6 +57,9 @@ const permitAndStakeMachine = setup({
     ),
     waitForTransactionReceipt: waitForTransactionReceiptActor
   },
+  actions: {
+    closeDialog
+  },
   guards: {
     hasSignatureNotExpired: ({ context }) => {
       invariant(context.deadline !== undefined, "Deadline is not undefined")
@@ -74,6 +76,7 @@ const permitAndStakeMachine = setup({
       beneficiary: Address
       txHash: Hex
       monitorTransaction: (txHash: Hex) => void
+      closeDialog: () => void
     }>,
     events: {} as
       | {
@@ -83,6 +86,7 @@ const permitAndStakeMachine = setup({
           delegatee: Address
           beneficiary: Address
           monitorTransaction: (txHash: Hex) => void
+          closeDialog: () => void
         }
       | { type: "resend" }
       | TxEvent
@@ -203,7 +207,9 @@ const permitAndStakeMachine = setup({
         }
       }
     },
-    confirmed: {}
+    confirmed: {
+      entry: "closeDialog"
+    }
   }
 })
 
@@ -248,10 +254,12 @@ const formSchema = z
 
 const useStakeDialog = ({
   availableForStakingUni,
-  account
+  account,
+  closeDialog
 }: {
   availableForStakingUni: bigint
   account: Address
+  closeDialog: () => void
 }) => {
   const { monitorTransaction } = useTransactionsManager()
   const [snapshot, send] = useMachine(permitAndStakeMachine)
@@ -305,7 +313,8 @@ const useStakeDialog = ({
       signer: account,
       delegatee,
       beneficiary: values.beneficiary,
-      monitorTransaction
+      monitorTransaction,
+      closeDialog
     })
   }
 
@@ -334,8 +343,9 @@ const useStakeDialog = ({
 
 export function StakeDialogContent({
   availableForStakingUni,
-  account
-}: { availableForStakingUni: bigint; account: Address }) {
+  account,
+  closeDialog
+}: { availableForStakingUni: bigint; account: Address; closeDialog: () => void }) {
   const {
     error,
     form,
@@ -349,7 +359,8 @@ export function StakeDialogContent({
     progress
   } = useStakeDialog({
     availableForStakingUni,
-    account
+    account,
+    closeDialog
   })
 
   return (

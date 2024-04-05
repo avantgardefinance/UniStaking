@@ -1,5 +1,3 @@
-"use client"
-
 import type { TallyDelegatee } from "@/app/api/delegatees/model"
 import { DelegateeField } from "@/components/form/delegatee-field"
 import { useTransactionsManager } from "@/components/providers/transactions-manager-provider"
@@ -15,6 +13,7 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { closeDialog } from "@/lib/machines/close-dialog-action"
 import { getTransactionProgress } from "@/lib/machines/transaction-progress"
 import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { address } from "@/lib/schema"
@@ -81,6 +80,9 @@ const editBeneficiaryDelegateeMachine = setup({
     ),
     waitForTransactionReceipt: waitForTransactionReceiptActor
   },
+  actions: {
+    closeDialog
+  },
   types: {
     context: {} as Partial<{
       delegatee: Address
@@ -92,6 +94,7 @@ const editBeneficiaryDelegateeMachine = setup({
       txHash: Hex
       stakeId: bigint
       monitorTransaction: (txHash: Hex) => void
+      closeDialog: () => void
     }>,
     events: {} as
       | {
@@ -102,6 +105,7 @@ const editBeneficiaryDelegateeMachine = setup({
           currentBeneficiary: Address
           currentDelegatee: Address
           monitorTransaction: (txHash: Hex) => void
+          closeDialog: () => void
         }
       | TxEvent
   }
@@ -183,18 +187,22 @@ const editBeneficiaryDelegateeMachine = setup({
         }
       }
     },
-    confirmed: {}
+    confirmed: {
+      entry: "closeDialog"
+    }
   }
 })
 
 export function EditBeneficiaryDelegateeDialogContent({
   beneficiary,
   delegatee,
-  stakeId
+  stakeId,
+  closeDialog
 }: {
   beneficiary: Address
   delegatee: Address
   stakeId: string
+  closeDialog: () => void
 }) {
   const { error, isLoading, data } = useTallyDelegatees()
 
@@ -212,6 +220,7 @@ export function EditBeneficiaryDelegateeDialogContent({
           delegatee={delegatee}
           stakeId={stakeId}
           tallyDelegateesError={error}
+          closeDialog={closeDialog}
         />
       )}
     </DialogContent>
@@ -270,13 +279,15 @@ const useEditBeneficiaryDelegateeForm = ({
   delegatee: currentDelegatee,
   stakeId,
   tallyDelegatees,
-  tallyDelegateesError
+  tallyDelegateesError,
+  closeDialog
 }: {
   beneficiary: Address
   delegatee: Address
   stakeId: string
   tallyDelegatees: readonly TallyDelegatee[]
   tallyDelegateesError: Error | null
+  closeDialog: () => void
 }) => {
   const { monitorTransaction } = useTransactionsManager()
   const [snapshot, send] = useMachine(editBeneficiaryDelegateeMachine)
@@ -325,7 +336,8 @@ const useEditBeneficiaryDelegateeForm = ({
       delegatee,
       currentBeneficiary: values.currentBeneficiary,
       currentDelegatee: values.currentDelegatee,
-      monitorTransaction
+      monitorTransaction,
+      closeDialog
     })
   }
 
@@ -347,20 +359,23 @@ function EditBeneficiaryDelegateeForm({
   delegatee,
   stakeId,
   tallyDelegatees,
-  tallyDelegateesError
+  tallyDelegateesError,
+  closeDialog
 }: {
   beneficiary: Address
   delegatee: Address
   stakeId: string
   tallyDelegatees: readonly TallyDelegatee[]
   tallyDelegateesError: Error | null
+  closeDialog: () => void
 }) {
   const { error, form, isFormDisabled, onSubmit, progress, isSubmitButtonEnabled } = useEditBeneficiaryDelegateeForm({
     beneficiary,
     delegatee,
     stakeId,
     tallyDelegatees,
-    tallyDelegateesError
+    tallyDelegateesError,
+    closeDialog
   })
 
   return (

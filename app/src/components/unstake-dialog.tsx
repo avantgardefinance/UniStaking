@@ -1,5 +1,3 @@
-"use client"
-
 import { useTransactionsManager } from "@/components/providers/transactions-manager-provider"
 import { config } from "@/components/providers/wagmi-provider"
 import { AddressDisplay } from "@/components/ui/address-display"
@@ -14,6 +12,7 @@ import { TransactionFooter } from "@/components/ui/transaction-footer"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
+import { closeDialog } from "@/lib/machines/close-dialog-action"
 import { getTransactionProgress } from "@/lib/machines/transaction-progress"
 import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
 import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
@@ -50,7 +49,9 @@ const unstakeMachine = setup({
     ),
     waitForTransactionReceipt: waitForTransactionReceiptActor
   },
-
+  actions: {
+    closeDialog
+  },
   types: {
     context: {} as Partial<{
       amount: bigint
@@ -58,8 +59,17 @@ const unstakeMachine = setup({
       txHash: Hex
       stakeId: bigint
       monitorTransaction: (txHash: Hex) => void
+      closeDialog: () => void
     }>,
-    events: {} as { type: "send"; stakeId: bigint; amount: bigint; monitorTransaction: (txHash: Hex) => void } | TxEvent
+    events: {} as
+      | {
+          type: "send"
+          stakeId: bigint
+          amount: bigint
+          monitorTransaction: (txHash: Hex) => void
+          closeDialog: () => void
+        }
+      | TxEvent
   }
 }).createMachine({
   id: "unstake",
@@ -132,11 +142,17 @@ const unstakeMachine = setup({
         }
       }
     },
-    confirmed: {}
+    confirmed: {
+      entry: "closeDialog"
+    }
   }
 })
 
-const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string; availableForUnstaking: bigint }) => {
+const useUnstakeDialog = ({
+  availableForUnstaking,
+  stakeId,
+  closeDialog
+}: { stakeId: string; availableForUnstaking: bigint; closeDialog: () => void }) => {
   const { monitorTransaction } = useTransactionsManager()
   const [snapshot, send] = useMachine(unstakeMachine)
 
@@ -173,7 +189,8 @@ const useUnstakeDialog = ({ availableForUnstaking, stakeId }: { stakeId: string;
       type: "send",
       amount: values.amount,
       stakeId: BigInt(stakeId),
-      monitorTransaction
+      monitorTransaction,
+      closeDialog
     })
   }
 
@@ -197,16 +214,19 @@ export function UnstakeDialogContent({
   availableForUnstaking,
   beneficiary,
   delegatee,
-  stakeId
+  stakeId,
+  closeDialog
 }: {
   availableForUnstaking: bigint
   stakeId: string
   delegatee: Address
   beneficiary: Address
+  closeDialog: () => void
 }) {
   const { error, form, isFormDisabled, progress, onSubmit, setMaxAmount, isSubmitButtonEnabled } = useUnstakeDialog({
     availableForUnstaking,
-    stakeId
+    stakeId,
+    closeDialog
   })
 
   return (

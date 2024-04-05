@@ -1,5 +1,6 @@
 import { SubgraphBlockNumberSchema } from "@/app/api/subgraph-block-number/model"
 import { config } from "@/components/providers/wagmi-provider"
+import { wait } from "@/lib/time"
 import { Schema } from "@effect/schema"
 import { type QueryClient } from "@tanstack/react-query"
 import { Hex } from "viem"
@@ -7,10 +8,6 @@ import { waitForTransactionReceipt } from "wagmi/actions"
 import { fromPromise, setup } from "xstate"
 
 const decode = Schema.decodeSync(SubgraphBlockNumberSchema)
-
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 export function createTransactionMachine({ client, txHash }: { client: QueryClient; txHash: Hex }) {
   return setup({

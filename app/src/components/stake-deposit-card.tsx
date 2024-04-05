@@ -72,7 +72,7 @@ export function StakeDepositCard({
         </div>
         <div className="space-x-2 flex items-baseline">
           <span className="text-2xl font-semibold">
-            <BigIntDisplay value={stakedAmount} decimals={18} precision={2} />
+            <BigIntDisplay value={stakedAmount} decimals={18} />
           </span>
           <span className="text-xl">UNI</span>
         </div>
@@ -89,7 +89,7 @@ export function StakeDepositCard({
             <AddressDisplay value={beneficiary} />
           </div>
           {isOwner && (
-            <Dialog onOpenChange={setEditBeneficiaryDelegateeOpened}>
+            <Dialog open={editBeneficiaryDelegateeOpened} onOpenChange={setEditBeneficiaryDelegateeOpened}>
               <DialogTrigger asChild={true}>
                 <Button variant="ghost">Edit</Button>
               </DialogTrigger>
@@ -98,6 +98,7 @@ export function StakeDepositCard({
                 stakeId={stakeId}
                 delegatee={delegatee}
                 beneficiary={beneficiary}
+                closeDialog={() => setEditBeneficiaryDelegateeOpened(false)}
               />
             </Dialog>
           )}
@@ -105,7 +106,7 @@ export function StakeDepositCard({
         <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
           {isOwner ? (
             <>
-              <Dialog onOpenChange={setUnstakeOpened}>
+              <Dialog open={unstakeOpened} onOpenChange={setUnstakeOpened}>
                 <DialogTrigger asChild={true}>
                   <Button variant="ghost" className="space-x-2 w-full md:w-auto">
                     <Upload size={16} />
@@ -114,13 +115,14 @@ export function StakeDepositCard({
                 </DialogTrigger>
                 <UnstakeDialogContent
                   key={`unstake${unstakeOpened}`}
+                  closeDialog={() => setUnstakeOpened(false)}
                   availableForUnstaking={stakedAmount}
                   stakeId={stakeId}
                   delegatee={delegatee}
                   beneficiary={beneficiary}
                 />
               </Dialog>
-              <Dialog onOpenChange={setStakeMoreOpened}>
+              <Dialog open={stakeMoreOpened} onOpenChange={setStakeMoreOpened}>
                 <DialogTrigger asChild={true}>
                   <Button
                     variant="secondary"
@@ -131,6 +133,7 @@ export function StakeDepositCard({
                   </Button>
                 </DialogTrigger>
                 <StakeMoreDialogContent
+                  closeDialog={() => setStakeMoreOpened(false)}
                   key={`stakeMore${stakeMoreOpened}`}
                   account={account}
                   availableForStakingUni={governanceTokenBalanceValue}

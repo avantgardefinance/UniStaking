@@ -46,18 +46,23 @@ function AvailableUniForStakingContent({ availableForStakingUni, isLoading, erro
     <>
       <h3 className="space-x-2 flex-grow">
         <span className="text-2xl font-semibold">
-          <BigIntDisplay value={availableForStakingUni} decimals={18} precision={2} />
+          <BigIntDisplay value={availableForStakingUni} decimals={18} />
         </span>
         <span className="text-xl">UNI</span>
       </h3>
-      <Dialog onOpenChange={setOpened}>
+      <Dialog open={opened} onOpenChange={setOpened}>
         <DialogTrigger asChild={true}>
           <Button size="lg" className="space-x-2 flex-grow">
             <Plus size={16} />
             <span>Create position</span>
           </Button>
         </DialogTrigger>
-        <StakeDialogContent key={opened.toString()} account={account} availableForStakingUni={availableForStakingUni} />
+        <StakeDialogContent
+          key={opened.toString()}
+          closeDialog={() => setOpened(false)}
+          account={account}
+          availableForStakingUni={availableForStakingUni}
+        />
       </Dialog>
     </>
   )

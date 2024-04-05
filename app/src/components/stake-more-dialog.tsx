@@ -1,5 +1,3 @@
-"use client"
-
 import { useTransactionsManager } from "@/components/providers/transactions-manager-provider"
 import { config } from "@/components/providers/wagmi-provider"
 import { AddressDisplay } from "@/components/ui/address-display"
@@ -14,11 +12,12 @@ import { TransactionFooter } from "@/components/ui/transaction-footer"
 import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
+import { closeDialog } from "@/lib/machines/close-dialog-action"
 import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
 import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
 import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
-import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
+import { stakeMoreUnstakeFormSchema, tokenAmount } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMachine } from "@xstate/react"
 import { useForm } from "react-hook-form"
@@ -55,6 +54,9 @@ const permitAndStakeMoreMachine = setup({
     ),
     waitForTransactionReceipt: waitForTransactionReceiptActor
   },
+  actions: {
+    closeDialog
+  },
   guards: {
     hasSignatureNotExpired: ({ context }) => {
       invariant(context.deadline !== undefined, "Deadline is not undefined")
@@ -70,9 +72,17 @@ const permitAndStakeMoreMachine = setup({
       txHash: Hex
       stakeId: bigint
       monitorTransaction: (txHash: Hex) => void
+      closeDialog: () => void
     }>,
     events: {} as
-      | { type: "sign"; stakeId: bigint; amount: bigint; signer: Address; monitorTransaction: (txHash: Hex) => void }
+      | {
+          type: "sign"
+          stakeId: bigint
+          amount: bigint
+          signer: Address
+          monitorTransaction: (txHash: Hex) => void
+          closeDialog: () => void
+        }
       | { type: "resend" }
       | TxEvent
   }
@@ -188,18 +198,22 @@ const permitAndStakeMoreMachine = setup({
         }
       }
     },
-    confirmed: {}
+    confirmed: {
+      entry: "closeDialog"
+    }
   }
 })
 
 const useStakeMoreDialog = ({
   availableForStakingUni,
   stakeId,
-  account
+  account,
+  closeDialog
 }: {
   availableForStakingUni: bigint
   stakeId: string
   account: Address
+  closeDialog: () => void
 }) => {
   const { monitorTransaction } = useTransactionsManager()
   const [snapshot, send] = useMachine(permitAndStakeMoreMachine)
@@ -220,7 +234,7 @@ const useStakeMoreDialog = ({
     resolver: zodResolver(stakeMoreUnstakeFormSchema)
   })
 
-  const { setValue } = form
+  const { setValue, watch } = form
   const onSubmit = (values: { amount: bigint }) => {
     if (machineState === "signed") {
       send({ type: "resend" })
@@ -232,11 +246,16 @@ const useStakeMoreDialog = ({
       amount: values.amount,
       signer: account,
       stakeId: BigInt(stakeId),
-      monitorTransaction
+      monitorTransaction,
+      closeDialog
     })
   }
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18), { shouldValidate: true })
+
+  const amount = watch("amount")
+  const parsedAmount = tokenAmount({ allowZero: true }).safeParse(amount)
+  const isMax = parsedAmount.success && parsedAmount.data === availableForStakingUni
 
   const isFormDisabled = machineState !== "initial"
   const isSubmitButtonEnabled = (machineState === "initial" || machineState === "signed") && form.formState.isValid
@@ -248,7 +267,8 @@ const useStakeMoreDialog = ({
     error,
     isFormDisabled,
     setMaxAmount,
-    progress
+    progress,
+    isMax
   }
 }
 
@@ -257,19 +277,23 @@ export function StakeMoreDialogContent({
   beneficiary,
   delegatee,
   stakeId,
-  account
+  account,
+  closeDialog
 }: {
   availableForStakingUni: bigint
   stakeId: string
   delegatee: Address
   beneficiary: Address
   account: Address
+  closeDialog: () => void
 }) {
-  const { error, form, isFormDisabled, onSubmit, setMaxAmount, progress, isSubmitButtonEnabled } = useStakeMoreDialog({
-    availableForStakingUni,
-    stakeId,
-    account
-  })
+  const { error, form, isFormDisabled, onSubmit, setMaxAmount, progress, isSubmitButtonEnabled, isMax } =
+    useStakeMoreDialog({
+      availableForStakingUni,
+      stakeId,
+      account,
+      closeDialog
+    })
 
   return (
     <DialogContent>
@@ -294,13 +318,14 @@ export function StakeMoreDialogContent({
                     You have{" "}
                     <Button
                       variant="link"
+                      disabled={isMax || isFormDisabled}
                       onClick={(e) => {
                         e.preventDefault()
                         setMaxAmount()
                       }}
                       className="space-x-1 px-0"
                     >
-                      <BigIntDisplay value={availableForStakingUni} decimals={18} precision={2} />
+                      <BigIntDisplay value={availableForStakingUni} decimals={18} />
                       <span>UNI</span>
                     </Button>{" "}
                     in your balance

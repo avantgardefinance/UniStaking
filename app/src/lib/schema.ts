@@ -22,21 +22,32 @@ export const address = z.string().transform((value, ctx) => {
   return value
 })
 
+export const tokenAmount = ({ decimals = 18, allowZero = false } = {}) =>
+  z.string().transform((value, ctx) => {
+    const parsedValue = value === "" ? 0n : parseUnits(value, decimals)
+    if (parsedValue === 0n && !allowZero) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Amount must be greater than 0"
+      })
+      return z.NEVER
+    }
+
+    if (parsedValue < 0n) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Amount must be greater than 0"
+      })
+      return z.NEVER
+    }
+
+    return parsedValue
+  })
+
 export const stakeMoreUnstakeFormSchema = z
   .object({
     balance: z.bigint(),
-    amount: z.string().transform((value, ctx) => {
-      const parsedValue = value === "" ? 0n : parseUnits(value, 18)
-      if (parsedValue === 0n) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Amount must be greater than 0"
-        })
-        return z.NEVER
-      }
-
-      return parsedValue
-    })
+    amount: tokenAmount()
   })
   .transform((value, ctx) => {
     if (value.balance < value.amount) {

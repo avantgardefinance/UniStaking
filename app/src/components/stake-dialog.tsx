@@ -1,5 +1,3 @@
-"use client"
-
 import { DelegateeField } from "@/components/form/delegatee-field"
 import { useTransactionsManager } from "@/components/providers/transactions-manager-provider"
 import { config } from "@/components/providers/wagmi-provider"
@@ -15,17 +13,18 @@ import { abi as abiUniStaker } from "@/lib/abi/uni-staker"
 import { invariant } from "@/lib/assertion"
 import { uniStaker } from "@/lib/consts"
 import { useTallyDelegatees } from "@/lib/hooks/use-tally-delegatees"
+import { closeDialog } from "@/lib/machines/close-dialog-action"
 import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
 import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
 import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
-import { address } from "@/lib/schema"
+import { address, tokenAmount } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMachine } from "@xstate/react"
 import { Info } from "lucide-react"
 import { useForm } from "react-hook-form"
 import type { Address, Hex } from "viem"
-import { formatUnits, hexToSignature, parseUnits } from "viem"
+import { formatUnits, hexToSignature } from "viem"
 import { writeContract } from "wagmi/actions"
 import { assertEvent, assign, fromPromise, raise, setup } from "xstate"
 import { z } from "zod"
@@ -58,6 +57,9 @@ const permitAndStakeMachine = setup({
     ),
     waitForTransactionReceipt: waitForTransactionReceiptActor
   },
+  actions: {
+    closeDialog
+  },
   guards: {
     hasSignatureNotExpired: ({ context }) => {
       invariant(context.deadline !== undefined, "Deadline is not undefined")
@@ -74,6 +76,7 @@ const permitAndStakeMachine = setup({
       beneficiary: Address
       txHash: Hex
       monitorTransaction: (txHash: Hex) => void
+      closeDialog: () => void
     }>,
     events: {} as
       | {
@@ -83,6 +86,7 @@ const permitAndStakeMachine = setup({
           delegatee: Address
           beneficiary: Address
           monitorTransaction: (txHash: Hex) => void
+          closeDialog: () => void
         }
       | { type: "resend" }
       | TxEvent
@@ -203,7 +207,9 @@ const permitAndStakeMachine = setup({
         }
       }
     },
-    confirmed: {}
+    confirmed: {
+      entry: "closeDialog"
+    }
   }
 })
 
@@ -213,18 +219,7 @@ const formSchema = z
     customDelegatee: address.optional(),
     tallyDelegatee: address.optional(),
     balance: z.bigint(),
-    amount: z.string().transform((value, ctx) => {
-      const parsedValue = value === "" ? 0n : parseUnits(value, 18)
-      if (parsedValue === 0n) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Amount must be greater than 0"
-        })
-        return z.NEVER
-      }
-
-      return parsedValue
-    }),
+    amount: tokenAmount(),
     delegateeOption: z.enum(["custom", "tally"])
   })
   .transform((value, ctx) => {
@@ -259,10 +254,12 @@ const formSchema = z
 
 const useStakeDialog = ({
   availableForStakingUni,
-  account
+  account,
+  closeDialog
 }: {
   availableForStakingUni: bigint
   account: Address
+  closeDialog: () => void
 }) => {
   const { monitorTransaction } = useTransactionsManager()
   const [snapshot, send] = useMachine(permitAndStakeMachine)
@@ -293,7 +290,7 @@ const useStakeDialog = ({
     resolver: zodResolver(formSchema)
   })
 
-  const { setValue } = form
+  const { setValue, watch } = form
 
   const onSubmit = (values: {
     beneficiary: Address
@@ -316,11 +313,16 @@ const useStakeDialog = ({
       signer: account,
       delegatee,
       beneficiary: values.beneficiary,
-      monitorTransaction
+      monitorTransaction,
+      closeDialog
     })
   }
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18), { shouldValidate: true })
+
+  const amount = watch("amount")
+  const parsedAmount = tokenAmount({ allowZero: true }).safeParse(amount)
+  const isMax = parsedAmount.success && parsedAmount.data === availableForStakingUni
 
   const isFormDisabled = machineState !== "initial"
   const isSubmitButtonEnabled = (machineState === "initial" || machineState === "signed") && form.formState.isValid
@@ -332,6 +334,7 @@ const useStakeDialog = ({
     isFormDisabled,
     setMaxAmount,
     progress,
+    isMax,
     tallyDelegatees,
     isLoadingTallyDelegatees,
     isSubmitButtonEnabled
@@ -340,13 +343,15 @@ const useStakeDialog = ({
 
 export function StakeDialogContent({
   availableForStakingUni,
-  account
-}: { availableForStakingUni: bigint; account: Address }) {
+  account,
+  closeDialog
+}: { availableForStakingUni: bigint; account: Address; closeDialog: () => void }) {
   const {
     error,
     form,
     isLoadingTallyDelegatees,
     isFormDisabled,
+    isMax,
     onSubmit,
     setMaxAmount,
     isSubmitButtonEnabled,
@@ -354,7 +359,8 @@ export function StakeDialogContent({
     progress
   } = useStakeDialog({
     availableForStakingUni,
-    account
+    account,
+    closeDialog
   })
 
   return (
@@ -382,14 +388,14 @@ export function StakeDialogContent({
                     You have{" "}
                     <Button
                       variant="link"
-                      disabled={isFormDisabled}
+                      disabled={isFormDisabled || isMax}
                       onClick={(e) => {
                         e.preventDefault()
                         setMaxAmount()
                       }}
                       className="space-x-1 px-0"
                     >
-                      <BigIntDisplay value={availableForStakingUni} decimals={18} precision={2} />
+                      <BigIntDisplay value={availableForStakingUni} decimals={18} />
                       <span>UNI</span>
                     </Button>{" "}
                     in your balance

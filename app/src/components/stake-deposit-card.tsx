@@ -72,7 +72,7 @@ export function StakeDepositCard({
         </div>
         <div className="space-x-2 flex items-baseline">
           <span className="text-2xl font-semibold">
-            <BigIntDisplay value={stakedAmount} decimals={18} precision={2} />
+            <BigIntDisplay value={stakedAmount} decimals={18} />
           </span>
           <span className="text-xl">UNI</span>
         </div>
@@ -120,7 +120,7 @@ export function StakeDepositCard({
                   beneficiary={beneficiary}
                 />
               </Dialog>
-              <Dialog onOpenChange={setStakeMoreOpened}>
+              <Dialog open={stakeMoreOpened} onOpenChange={setStakeMoreOpened}>
                 <DialogTrigger asChild={true}>
                   <Button
                     variant="secondary"

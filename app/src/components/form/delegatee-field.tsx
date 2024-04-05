@@ -7,7 +7,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { Info, Link } from "lucide-react"
+import { Info } from "lucide-react"
+import Link from "next/link"
 import { useFormContext } from "react-hook-form"
 
 function useDelegateeField({ name }: { name: string }) {
@@ -48,9 +49,11 @@ export function DelegateeField({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>
-                    You must delegate your UNI&apos;s votes. The default address is your own, however there are many
-                    active delegatees to choose from. You can view delegatee profiles
+                  <p className="w-80">
+                    <span>
+                      You must delegate your UNI&apos;s votes. The default address is your own, however there are many
+                      active delegatees to choose from. You can view delegatee profiles
+                    </span>
                     <Link href="https://www.tally.xyz/gov/uniswap" target="_blank">
                       {" "}
                       <div
@@ -58,13 +61,13 @@ export function DelegateeField({
                           buttonVariants({
                             variant: "link"
                           }),
-                          "space-x-2 p-0"
+                          "p-0 leading-normal h-auto"
                         )}
                       >
-                        here
+                        <span>here</span>
                       </div>
                     </Link>
-                    .
+                    <span>.</span>
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -147,7 +150,7 @@ export function DelegateeField({
                                 </div>
                                 <div className="flex items-start space-x-1">
                                   <span>Votes:</span>
-                                  <BigIntDisplay value={delegatee.votes} decimals={18} precision={2} />
+                                  <BigIntDisplay value={delegatee.votes} decimals={18} />
                                 </div>
                               </SelectItem>
                             ))}

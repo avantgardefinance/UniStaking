@@ -18,7 +18,7 @@ import { hasSignatureNotExpired } from "@/lib/machines/guards"
 import { getPermitAndStakeProgress } from "@/lib/machines/permit-and-stake-progress"
 import { signGovernanceTokenPermitActor } from "@/lib/machines/sign-governance-token-permit-actor"
 import { type TxEvent, getTxEvent, waitForTransactionReceiptActor } from "@/lib/machines/wait-for-transaction-receipt"
-import { stakeMoreUnstakeFormSchema } from "@/lib/schema"
+import { stakeMoreUnstakeFormSchema, tokenAmount } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMachine } from "@xstate/react"
 import { useForm } from "react-hook-form"
@@ -220,7 +220,7 @@ const useStakeMoreDialog = ({
     resolver: zodResolver(stakeMoreUnstakeFormSchema)
   })
 
-  const { setValue } = form
+  const { setValue, watch } = form
   const onSubmit = (values: { amount: bigint }) => {
     if (machineState === "signed") {
       send({ type: "resend" })
@@ -238,6 +238,10 @@ const useStakeMoreDialog = ({
 
   const setMaxAmount = () => setValue("amount", formatUnits(availableForStakingUni, 18), { shouldValidate: true })
 
+  const amount = watch("amount")
+  const parsedAmount = tokenAmount({ allowZero: true }).safeParse(amount)
+  const isMax = parsedAmount.success && parsedAmount.data === availableForStakingUni
+
   const isFormDisabled = machineState !== "initial"
   const isSubmitButtonEnabled = (machineState === "initial" || machineState === "signed") && form.formState.isValid
 
@@ -248,7 +252,8 @@ const useStakeMoreDialog = ({
     error,
     isFormDisabled,
     setMaxAmount,
-    progress
+    progress,
+    isMax
   }
 }
 
@@ -265,11 +270,12 @@ export function StakeMoreDialogContent({
   beneficiary: Address
   account: Address
 }) {
-  const { error, form, isFormDisabled, onSubmit, setMaxAmount, progress, isSubmitButtonEnabled } = useStakeMoreDialog({
-    availableForStakingUni,
-    stakeId,
-    account
-  })
+  const { error, form, isFormDisabled, onSubmit, setMaxAmount, progress, isSubmitButtonEnabled, isMax } =
+    useStakeMoreDialog({
+      availableForStakingUni,
+      stakeId,
+      account
+    })
 
   return (
     <DialogContent>
@@ -294,13 +300,14 @@ export function StakeMoreDialogContent({
                     You have{" "}
                     <Button
                       variant="link"
+                      disabled={isMax || isFormDisabled}
                       onClick={(e) => {
                         e.preventDefault()
                         setMaxAmount()
                       }}
                       className="space-x-1 px-0"
                     >
-                      <BigIntDisplay value={availableForStakingUni} decimals={18} precision={2} />
+                      <BigIntDisplay value={availableForStakingUni} decimals={18} />
                       <span>UNI</span>
                     </Button>{" "}
                     in your balance

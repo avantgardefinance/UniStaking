@@ -49,7 +49,7 @@ function StakeCard({ amount, date, owner, stakeId }: { date: Date; stakeId: stri
         <span>Amount</span>
         <div>
           <span className="text-lg font-semibold">
-            <BigIntDisplay value={amount} decimals={18} precision={2} />
+            <BigIntDisplay value={amount} decimals={18} />
           </span>{" "}
           <span>UNI</span>
         </div>
@@ -70,7 +70,7 @@ function UnstakeCard({
         <span>Amount</span>
         <div>
           <span className="text-lg font-semibold">
-            <BigIntDisplay value={amount} decimals={18} precision={2} />
+            <BigIntDisplay value={amount} decimals={18} />
           </span>{" "}
           <span>UNI</span>
         </div>

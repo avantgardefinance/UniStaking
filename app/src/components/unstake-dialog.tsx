@@ -238,7 +238,7 @@ export function UnstakeDialogContent({
                       }}
                       className="space-x-1 px-0"
                     >
-                      <BigIntDisplay value={availableForUnstaking} decimals={18} precision={2} />
+                      <BigIntDisplay value={availableForUnstaking} decimals={18} />
                       <span>UNI</span>
                     </Button>{" "}
                     to unstake

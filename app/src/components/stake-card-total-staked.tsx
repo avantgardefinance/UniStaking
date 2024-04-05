@@ -37,7 +37,7 @@ function StakeCardTotalStakedContent({ currentlyStaked, isLoading, error }: Prop
     <>
       <h3 className="space-x-2 flex-grow">
         <span className="text-2xl font-semibold">
-          <BigIntDisplay value={currentlyStaked} decimals={18} precision={2} />
+          <BigIntDisplay value={currentlyStaked} decimals={18} />
         </span>
         <span className="text-xl">UNI</span>
       </h3>

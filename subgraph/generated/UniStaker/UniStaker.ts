@@ -601,6 +601,60 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  claimReward(): BigInt {
+    let result = super.call("claimReward", "claimReward():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_claimReward(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("claimReward", "claimReward():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  claimRewardOnBehalf(
+    _beneficiary: Address,
+    _deadline: BigInt,
+    _signature: Bytes,
+  ): BigInt {
+    let result = super.call(
+      "claimRewardOnBehalf",
+      "claimRewardOnBehalf(address,uint256,bytes):(uint256)",
+      [
+        ethereum.Value.fromAddress(_beneficiary),
+        ethereum.Value.fromUnsignedBigInt(_deadline),
+        ethereum.Value.fromBytes(_signature),
+      ],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_claimRewardOnBehalf(
+    _beneficiary: Address,
+    _deadline: BigInt,
+    _signature: Bytes,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "claimRewardOnBehalf",
+      "claimRewardOnBehalf(address,uint256,bytes):(uint256)",
+      [
+        ethereum.Value.fromAddress(_beneficiary),
+        ethereum.Value.fromUnsignedBigInt(_deadline),
+        ethereum.Value.fromBytes(_signature),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   depositorTotalStaked(depositor: Address): BigInt {
     let result = super.call(
       "depositorTotalStaked",
@@ -627,7 +681,7 @@ export class UniStaker extends ethereum.SmartContract {
   deposits(depositId: BigInt): UniStaker__depositsResult {
     let result = super.call(
       "deposits",
-      "deposits(uint256):(uint256,address,address,address)",
+      "deposits(uint256):(uint96,address,address,address)",
       [ethereum.Value.fromUnsignedBigInt(depositId)],
     );
 
@@ -644,7 +698,7 @@ export class UniStaker extends ethereum.SmartContract {
   ): ethereum.CallResult<UniStaker__depositsResult> {
     let result = super.tryCall(
       "deposits",
-      "deposits(uint256):(uint256,address,address,address)",
+      "deposits(uint256):(uint96,address,address,address)",
       [ethereum.Value.fromUnsignedBigInt(depositId)],
     );
     if (result.reverted) {
@@ -841,7 +895,7 @@ export class UniStaker extends ethereum.SmartContract {
   ): BigInt {
     let result = super.call(
       "permitAndStake",
-      "permitAndStake(uint256,address,address,uint256,uint8,bytes32,bytes32):(uint256)",
+      "permitAndStake(uint96,address,address,uint256,uint8,bytes32,bytes32):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(_amount),
         ethereum.Value.fromAddress(_delegatee),
@@ -867,7 +921,7 @@ export class UniStaker extends ethereum.SmartContract {
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "permitAndStake",
-      "permitAndStake(uint256,address,address,uint256,uint8,bytes32,bytes32):(uint256)",
+      "permitAndStake(uint96,address,address,uint256,uint8,bytes32,bytes32):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(_amount),
         ethereum.Value.fromAddress(_delegatee),
@@ -973,20 +1027,24 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  stake(_amount: BigInt, _delegatee: Address): BigInt {
-    let result = super.call("stake", "stake(uint256,address):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_amount),
-      ethereum.Value.fromAddress(_delegatee),
-    ]);
+  scaledUnclaimedRewardCheckpoint(account: Address): BigInt {
+    let result = super.call(
+      "scaledUnclaimedRewardCheckpoint",
+      "scaledUnclaimedRewardCheckpoint(address):(uint256)",
+      [ethereum.Value.fromAddress(account)],
+    );
 
     return result[0].toBigInt();
   }
 
-  try_stake(_amount: BigInt, _delegatee: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("stake", "stake(uint256,address):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_amount),
-      ethereum.Value.fromAddress(_delegatee),
-    ]);
+  try_scaledUnclaimedRewardCheckpoint(
+    account: Address,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "scaledUnclaimedRewardCheckpoint",
+      "scaledUnclaimedRewardCheckpoint(address):(uint256)",
+      [ethereum.Value.fromAddress(account)],
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -994,10 +1052,10 @@ export class UniStaker extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  stake1(_amount: BigInt, _delegatee: Address, _beneficiary: Address): BigInt {
+  stake(_amount: BigInt, _delegatee: Address, _beneficiary: Address): BigInt {
     let result = super.call(
       "stake",
-      "stake(uint256,address,address):(uint256)",
+      "stake(uint96,address,address):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(_amount),
         ethereum.Value.fromAddress(_delegatee),
@@ -1008,20 +1066,44 @@ export class UniStaker extends ethereum.SmartContract {
     return result[0].toBigInt();
   }
 
-  try_stake1(
+  try_stake(
     _amount: BigInt,
     _delegatee: Address,
     _beneficiary: Address,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "stake",
-      "stake(uint256,address,address):(uint256)",
+      "stake(uint96,address,address):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(_amount),
         ethereum.Value.fromAddress(_delegatee),
         ethereum.Value.fromAddress(_beneficiary),
       ],
     );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  stake1(_amount: BigInt, _delegatee: Address): BigInt {
+    let result = super.call("stake", "stake(uint96,address):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(_amount),
+      ethereum.Value.fromAddress(_delegatee),
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_stake1(
+    _amount: BigInt,
+    _delegatee: Address,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("stake", "stake(uint96,address):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(_amount),
+      ethereum.Value.fromAddress(_delegatee),
+    ]);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -1034,16 +1116,18 @@ export class UniStaker extends ethereum.SmartContract {
     _delegatee: Address,
     _beneficiary: Address,
     _depositor: Address,
+    _deadline: BigInt,
     _signature: Bytes,
   ): BigInt {
     let result = super.call(
       "stakeOnBehalf",
-      "stakeOnBehalf(uint256,address,address,address,bytes):(uint256)",
+      "stakeOnBehalf(uint96,address,address,address,uint256,bytes):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(_amount),
         ethereum.Value.fromAddress(_delegatee),
         ethereum.Value.fromAddress(_beneficiary),
         ethereum.Value.fromAddress(_depositor),
+        ethereum.Value.fromUnsignedBigInt(_deadline),
         ethereum.Value.fromBytes(_signature),
       ],
     );
@@ -1056,16 +1140,18 @@ export class UniStaker extends ethereum.SmartContract {
     _delegatee: Address,
     _beneficiary: Address,
     _depositor: Address,
+    _deadline: BigInt,
     _signature: Bytes,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "stakeOnBehalf",
-      "stakeOnBehalf(uint256,address,address,address,bytes):(uint256)",
+      "stakeOnBehalf(uint96,address,address,address,uint256,bytes):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(_amount),
         ethereum.Value.fromAddress(_delegatee),
         ethereum.Value.fromAddress(_beneficiary),
         ethereum.Value.fromAddress(_depositor),
+        ethereum.Value.fromUnsignedBigInt(_deadline),
         ethereum.Value.fromBytes(_signature),
       ],
     );
@@ -1125,29 +1211,6 @@ export class UniStaker extends ethereum.SmartContract {
       "unclaimedReward",
       "unclaimedReward(address):(uint256)",
       [ethereum.Value.fromAddress(_beneficiary)],
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  unclaimedRewardCheckpoint(account: Address): BigInt {
-    let result = super.call(
-      "unclaimedRewardCheckpoint",
-      "unclaimedRewardCheckpoint(address):(uint256)",
-      [ethereum.Value.fromAddress(account)],
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_unclaimedRewardCheckpoint(account: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "unclaimedRewardCheckpoint",
-      "unclaimedRewardCheckpoint(address):(uint256)",
-      [ethereum.Value.fromAddress(account)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1258,8 +1321,12 @@ export class AlterBeneficiaryOnBehalfCall__Inputs {
     return this._call.inputValues[2].value.toAddress();
   }
 
+  get _deadline(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
   get _signature(): Bytes {
-    return this._call.inputValues[3].value.toBytes();
+    return this._call.inputValues[4].value.toBytes();
   }
 }
 
@@ -1334,8 +1401,12 @@ export class AlterDelegateeOnBehalfCall__Inputs {
     return this._call.inputValues[2].value.toAddress();
   }
 
+  get _deadline(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
   get _signature(): Bytes {
-    return this._call.inputValues[3].value.toBytes();
+    return this._call.inputValues[4].value.toBytes();
   }
 }
 
@@ -1371,6 +1442,10 @@ export class ClaimRewardCall__Outputs {
   constructor(call: ClaimRewardCall) {
     this._call = call;
   }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
 }
 
 export class ClaimRewardOnBehalfCall extends ethereum.Call {
@@ -1394,8 +1469,12 @@ export class ClaimRewardOnBehalfCall__Inputs {
     return this._call.inputValues[0].value.toAddress();
   }
 
+  get _deadline(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
   get _signature(): Bytes {
-    return this._call.inputValues[1].value.toBytes();
+    return this._call.inputValues[2].value.toBytes();
   }
 }
 
@@ -1403,6 +1482,36 @@ export class ClaimRewardOnBehalfCall__Outputs {
   _call: ClaimRewardOnBehalfCall;
 
   constructor(call: ClaimRewardOnBehalfCall) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class InvalidateNonceCall extends ethereum.Call {
+  get inputs(): InvalidateNonceCall__Inputs {
+    return new InvalidateNonceCall__Inputs(this);
+  }
+
+  get outputs(): InvalidateNonceCall__Outputs {
+    return new InvalidateNonceCall__Outputs(this);
+  }
+}
+
+export class InvalidateNonceCall__Inputs {
+  _call: InvalidateNonceCall;
+
+  constructor(call: InvalidateNonceCall) {
+    this._call = call;
+  }
+}
+
+export class InvalidateNonceCall__Outputs {
+  _call: InvalidateNonceCall;
+
+  constructor(call: InvalidateNonceCall) {
     this._call = call;
   }
 }
@@ -1667,6 +1776,10 @@ export class StakeCall__Inputs {
   get _delegatee(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
+
+  get _beneficiary(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
 }
 
 export class StakeCall__Outputs {
@@ -1704,10 +1817,6 @@ export class Stake1Call__Inputs {
 
   get _delegatee(): Address {
     return this._call.inputValues[1].value.toAddress();
-  }
-
-  get _beneficiary(): Address {
-    return this._call.inputValues[2].value.toAddress();
   }
 }
 
@@ -1786,8 +1895,12 @@ export class StakeMoreOnBehalfCall__Inputs {
     return this._call.inputValues[2].value.toAddress();
   }
 
+  get _deadline(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
   get _signature(): Bytes {
-    return this._call.inputValues[3].value.toBytes();
+    return this._call.inputValues[4].value.toBytes();
   }
 }
 
@@ -1832,8 +1945,12 @@ export class StakeOnBehalfCall__Inputs {
     return this._call.inputValues[3].value.toAddress();
   }
 
+  get _deadline(): BigInt {
+    return this._call.inputValues[4].value.toBigInt();
+  }
+
   get _signature(): Bytes {
-    return this._call.inputValues[4].value.toBytes();
+    return this._call.inputValues[5].value.toBytes();
   }
 }
 
@@ -1912,8 +2029,12 @@ export class WithdrawOnBehalfCall__Inputs {
     return this._call.inputValues[2].value.toAddress();
   }
 
+  get _deadline(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
   get _signature(): Bytes {
-    return this._call.inputValues[3].value.toBytes();
+    return this._call.inputValues[4].value.toBytes();
   }
 }
 

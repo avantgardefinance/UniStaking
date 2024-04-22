@@ -66,6 +66,28 @@ export class FeesClaimed__Params {
   }
 }
 
+export class PayoutAmountSet extends ethereum.Event {
+  get params(): PayoutAmountSet__Params {
+    return new PayoutAmountSet__Params(this);
+  }
+}
+
+export class PayoutAmountSet__Params {
+  _event: PayoutAmountSet;
+
+  constructor(event: PayoutAmountSet) {
+    this._event = event;
+  }
+
+  get oldPayoutAmount(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get newPayoutAmount(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
 export class V3FactoryOwner__claimFeesResult {
   value0: BigInt;
   value1: BigInt;
@@ -109,25 +131,6 @@ export class V3FactoryOwner extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  PAYOUT_AMOUNT(): BigInt {
-    let result = super.call("PAYOUT_AMOUNT", "PAYOUT_AMOUNT():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_PAYOUT_AMOUNT(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "PAYOUT_AMOUNT",
-      "PAYOUT_AMOUNT():(uint256)",
-      [],
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   PAYOUT_TOKEN(): Address {
@@ -232,6 +235,21 @@ export class V3FactoryOwner extends ethereum.SmartContract {
         value[1].toBigInt(),
       ),
     );
+  }
+
+  payoutAmount(): BigInt {
+    let result = super.call("payoutAmount", "payoutAmount():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_payoutAmount(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("payoutAmount", "payoutAmount():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 }
 
@@ -429,6 +447,36 @@ export class SetFeeProtocolCall__Outputs {
   _call: SetFeeProtocolCall;
 
   constructor(call: SetFeeProtocolCall) {
+    this._call = call;
+  }
+}
+
+export class SetPayoutAmountCall extends ethereum.Call {
+  get inputs(): SetPayoutAmountCall__Inputs {
+    return new SetPayoutAmountCall__Inputs(this);
+  }
+
+  get outputs(): SetPayoutAmountCall__Outputs {
+    return new SetPayoutAmountCall__Outputs(this);
+  }
+}
+
+export class SetPayoutAmountCall__Inputs {
+  _call: SetPayoutAmountCall;
+
+  constructor(call: SetPayoutAmountCall) {
+    this._call = call;
+  }
+
+  get _newPayoutAmount(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class SetPayoutAmountCall__Outputs {
+  _call: SetPayoutAmountCall;
+
+  constructor(call: SetPayoutAmountCall) {
     this._call = call;
   }
 }

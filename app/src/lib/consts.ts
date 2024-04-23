@@ -2,9 +2,9 @@ import type { Address } from "viem"
 
 export const walletConnectProjectId = "a400484888cee5855802de84aa377695"
 
-export const rewardsToken: Address = "0xdf4b5b2c08a77078c05176d8dfab6274d54215e9"
-export const governanceToken: Address = "0x02405b44ae477699cb3d073ef07c106b6885873e"
-export const uniStaker: Address = "0xa3ad05099eab69055e4ea4f710361616e51c8c2c"
+export const rewardsToken: Address = "0x2b9c54c1aa3d4365369db7412202f06ad47f1df1"
+export const governanceToken: Address = "0xec4f972a3585b4c72f095d3fd2e6385afa41bae8"
+export const uniStaker: Address = "0x111616271964951ee149aF3F47f7B3dd2f26ce26"
 
 // Const related to signing in permit flow
 export const timeToMakeTransaction = 10 * 60 * 60 // 10 minutes

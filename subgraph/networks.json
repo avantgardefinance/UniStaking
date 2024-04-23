@@ -11,11 +11,11 @@
   },
   "sepolia": {
     "UniStaker": {
-      "address": "0x8019fc84c804a9de8f0bcffb5cf90d9982d3f8c5",
+      "address": "0x111616271964951ee149aF3F47f7B3dd2f26ce26",
       "startBlock": 5587447
     },
     "V3FactoryOwner": {
-      "address": "0xb5b86959aedca85b2b164180f5b78399df832cc0",
+      "address": "0xa9ed4bb8da0230382fcf4bc834d13ba12899318c",
       "startBlock": 5587447
     }
   }

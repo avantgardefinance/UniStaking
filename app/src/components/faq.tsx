@@ -45,7 +45,7 @@ export function FAQ() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-4">
-            <AccordionTrigger>How do rewards get distributed?</AccordionTrigger>
+            <AccordionTrigger>Which pools earn fees?</AccordionTrigger>
             <AccordionContent>
               The roll-out of protocol fees will be incremental and data-driven. Gauntlet has suggested a framework to
               guide this process, which will occur over the course of several months and start with a limited number of
